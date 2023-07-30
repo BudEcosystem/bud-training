@@ -1,0 +1,4 @@
+torch
+transformers
+collie
+flash-attn==1.0.9
