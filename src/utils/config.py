@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--train_micro_batch_size', default=4, type=int, help="micro batch size per device")
     parser.add_argument('--eval_batch_size', default=4, type=int, help="eval batch size per device")
     parser.add_argument('--learning_rate', default=0.01, type=float, help="Learning rate for the training")
-    parser.add_argument('--optimizer', default="efficient", help="Wandb group to be used")
+    parser.add_argument('--optimizer', default="efficient", help="Optimizer to be used. [efficient, adamw]")
     parser.add_argument('--tp_size', default=1, type=int, help="Tensor parallelism count")
     parser.add_argument('--dp_size', default=1, type=int, help="Data parallelism count")
     parser.add_argument('--pp_size', default=1, type=int, help="Pipeline parallelism count")
