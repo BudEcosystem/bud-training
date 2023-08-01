@@ -4,12 +4,18 @@ from collie.module import GPTLMLoss
 from collie.utils.monitor import StepTimeMonitor, TGSMonitor, MemoryMonitor, LossMonitor, EvalMonitor
 from collie.callbacks import CheckpointCallback
 
+import torch
+
 def get_optimizer(model, args):
-    return Lomo(
-        model,
-        lr = args.learning_rate,
-        clip_grad_norm = 5.0
-    )
+    if args.optimizer == 'adamw':
+        return torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
+    else:
+        return Lomo(
+            model,
+            lr = args.learning_rate,
+            clip_grad_norm = 5.0
+        )
+    
 
 
 def get_monitors(config):
