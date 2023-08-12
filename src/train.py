@@ -24,6 +24,7 @@ def main():
     )
 
     trainer.train()
+    trainer.save_model(args.output_dir)
 
 
 if __name__ == "__main__":

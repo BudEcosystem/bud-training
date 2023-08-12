@@ -4,3 +4,5 @@ collie
 fire
 gradio
 datasets
+pymongo
+fastapi
