@@ -1,0 +1,28 @@
+constants:
+  - table_name: "datasets"
+    source_type:
+      0: Huggingface
+      1: Local Upload
+    type:
+      0: Text
+      1: Text & Image
+  - table_name: "models"
+    type:
+      0: LLM
+      1: SD
+  - table_name: "pipelines"
+    type:
+      0: LLM LoRA
+      1: SD LoRA
+  - table_name: "runs"
+    status:
+      0: Queued
+      1: Running
+      2: Finished
+      3: Failed
+      4: Stopped
+  - table_name: "serving_history"
+    status:
+      0: Idle
+      1: Running
+      2: Failed

@@ -1,0 +1,4 @@
+pipelines:
+  llm_lora:
+    display_name: "LLM LoRA"
+    config_path: ""
