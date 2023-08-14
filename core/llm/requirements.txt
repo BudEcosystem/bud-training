@@ -1,0 +1,6 @@
+torch
+transformers
+collie
+fire
+gradio
+datasets
