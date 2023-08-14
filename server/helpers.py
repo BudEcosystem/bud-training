@@ -31,16 +31,13 @@ def save_file_obj_to_filesystem(
     try:
         filepath = osp.join(base_dir.get(file_category, settings.CACHE_DIR), filepath)
         Path(osp.abspath(filepath)).mkdir(exist_ok=True, parents=True)
-        try:
-            with open(filepath, "wb+") as file_object:
-                shutil.copyfileobj(file.file, file_object)
-        except PermissionError:
-            pass
+        with open(filepath, "wb+") as file_object:
+            shutil.copyfileobj(file.file, file_object)
     finally:
         file.file.close()
 
-    # if not osp.isfile(filepath):
-    #     raise FileNotFoundError("File saving failed")
+    if not osp.isfile(filepath):
+        raise FileNotFoundError("File saving failed")
 
     logger.info(f"Succesffully saved the file {file.filename} to {filepath}")
     return Path(filepath)
