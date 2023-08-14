@@ -1,13 +1,13 @@
+from pathlib import Path
+
 from .conf import settings
 from utils.factory import NestedNamespace
 
 
 settings = NestedNamespace(settings)
 
-
-from utils.loggers import get_logger, init_loggers
-
-init_loggers()
-
-logger = get_logger("module_log")
-logger.debug("Initialized all logger objects !!!")
+Path(settings.LOG_DIR).mkdir(exist_ok=True, parents=True)
+Path(settings.DATA_DIR).mkdir(exist_ok=True, parents=True)
+Path(settings.MODEL_DIR).mkdir(exist_ok=True, parents=True)
+Path(settings.TRAIN_DIR).mkdir(exist_ok=True, parents=True)
+Path(settings.CACHE_DIR).mkdir(exist_ok=True, parents=True)

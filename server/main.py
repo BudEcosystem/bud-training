@@ -18,9 +18,7 @@ logger = get_logger("server_log")
 
 app = FastAPI()
 
-app.add_middleware(
-    TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS
-)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,13 +40,19 @@ async def custom_exception_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
     except CustomHttpException as exc:
-        response = JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
+        response = JSONResponse(
+            status_code=exc.status_code,
+            content={"message": exc.detail, "success": False},
+        )
     except HTTPException as exc:
         raise JSONResponse(status_code=exc.status_code, content={"error": exc.detail})
     except Exception as exc:
         logger.error(exc, exc_info=True)
-        response = JSONResponse(status_code=500, content={"message": "Internal server error.", "success": False})
-    
+        response = JSONResponse(
+            status_code=500,
+            content={"message": "Internal server error.", "success": False},
+        )
+
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     return response

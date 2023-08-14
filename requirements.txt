@@ -1,7 +1,9 @@
 environs
 python-json-logger
 psycopg2-binary
+
 fastapi
+python-multipart
 
 torch
 transformers

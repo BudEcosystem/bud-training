@@ -1,16 +1,10 @@
 import io
 import sys
-import yaml
-from os import path as osp
-from functools import lru_cache
 from reprlib import Repr as _Repr
 
 from sqlalchemy import Table
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import DeclarativeMeta
-
-
-dirpath = osp.dirname(osp.realpath(__file__))
 
 
 class Repr(_Repr):
@@ -171,32 +165,3 @@ class PrettyRepresentableBase(object):
             str: Representation of class with attributes
         """
         return _shared_pretty_repr.repr(self)
-    
-
-@lru_cache
-def load_constants(config_path=None):
-    if not config_path:
-        config_path = osp.join(dirpath, "config", "constants.yaml")
-    constants = {}
-
-    if osp.isfile(config_path):
-        with open(config_path, "r") as file:
-            data = yaml.safe_load(file)
-
-        for entry in data["constants"]:
-            constants[entry['table_name']] = entry
-    return constants
-
-
-def validate_constants(table_name, column_name, value):
-    constants = load_constants()
-    if table_name not in constants or column_name not in constants[table_name]:
-        return True
-    return value in constants[table_name][column_name]
-
-
-def get_constant_alias(table_name, column_name, value):
-    constants = load_constants()
-    if table_name not in constants or column_name not in constants[table_name]:
-        return value
-    return constants[table_name][column_name].get(value, value)

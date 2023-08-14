@@ -9,6 +9,7 @@ from config import settings
 
 engine = create_engine(settings.database.psql.URL, pool_pre_ping=True)
 
+
 @lru_cache
 def create_session() -> scoped_session:
     Session = scoped_session(

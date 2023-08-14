@@ -18,5 +18,7 @@ async def validate_auth_token(token: str):
         raise HTTPException(status_code=401, detail="Authorization failed")
 
 
-def get_dataset_crud(db_session: Session = Depends(get_session)) -> psql_crud.DatasetCRUD:
+def get_dataset_crud(
+    db_session: Session = Depends(get_session),
+) -> psql_crud.DatasetCRUD:
     return psql_crud.DatasetCRUD(db_session)
