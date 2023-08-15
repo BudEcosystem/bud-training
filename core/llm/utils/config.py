@@ -4,12 +4,13 @@ import argparse
 
 from transformers import Seq2SeqTrainingArguments
 
-# from collie.config import CollieConfig
+try:
+    from collie.config import CollieConfig
+except ImportError:
+    pass
 
-from utils.loaders import argparse_to_pydantic
 
-
-def get_argparser():
+def get_argparser(parse_args=True):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -118,7 +119,7 @@ def get_argparser():
     )
     parser.add_argument("--wandb_group", type=str, help="Wandb group to be used")
 
-    return parser
+    return parser if not parse_args else parser.parse_args()
 
 
 def get_config(args):

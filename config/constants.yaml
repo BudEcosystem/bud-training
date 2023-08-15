@@ -26,7 +26,7 @@ nodes:
   name:
     0: LLM Finetuning
     1: SD LoRA Finetuning
-    2: Human Eval
+    2: HumanEval
     3: Custom Eval
   property_type:
     integer: 0

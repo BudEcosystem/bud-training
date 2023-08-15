@@ -7,8 +7,5 @@ Training:
     family: SD
 Eval:
   - node_id: 2
-    config_path: ""
-    family: LLM
-  - node_id: 3
-    config_path: ""
+    config_path: "config/eval/humaneval.yaml"
     family: LLM

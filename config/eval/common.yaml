@@ -1,0 +1,12 @@
+description: Common Eval params
+properties:
+  dataset:
+    description: Dataset for eval
+    title: Dataset
+    type: dataset
+  base_model:
+    description: Base model for eval
+    title: Base Model
+    type: model
+title: Commons
+type: object

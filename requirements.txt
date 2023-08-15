@@ -1,3 +1,4 @@
+# Modules
 environs
 bson
 python-json-logger
@@ -5,12 +6,26 @@ sqlalchemy
 alembic
 psycopg2-binary
 
+# Server
 fastapi
 python-multipart
 
+# LLM
 torch
-transformers
-collie
+git+https://github.com/OpenLMLab/collie
 fire
 gradio
 datasets
+
+# SD
+accelerate>=0.16.0
+torchvision
+transformers>=4.25.1
+ftfy
+tensorboard
+Jinja2
+
+# Optional
+wandb
+xformers
+bitsandbytes
