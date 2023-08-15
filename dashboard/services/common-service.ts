@@ -14,7 +14,7 @@ export async function addDataset(data: any) {
   let queryParams = 'name=' + data['name'] + '&source_type=' + data['source_type'] + '&type=' + data['type'] + '&source=' + data['source']
   let formdata = new FormData();
   formdata.append('metadata_file', data['meta_file'])
-  formdata.append('archive_file', data['archive_file'])
+  if( data['archive_file']) formdata.append('archive_file', data['archive_file'])
   try {
     const { data } = await apiClient.post(`dataset?` + queryParams, formdata);
     return data;

@@ -4,7 +4,6 @@ import { AppConfig } from "../utils/app-config";
 
 const apiClient = (function () {
   const URL = AppConfig.apiBaseUrl;
-  const unauthorizedCode = [401];
 
   let instance = axios.create({
     baseURL: `${URL}`,
@@ -16,6 +15,11 @@ const apiClient = (function () {
 
   instance.interceptors.request.use(async (config) => {
     config.headers['x-token'] = 'Nc5C00ZCyObhJuE5XDapaZH1';
+
+    if (config.data instanceof FormData) {
+      // Set 'multipart/form-data' content type for FormData requests
+      config.headers['Content-Type'] = 'multipart/form-data';
+    }
 
     return config;
   });

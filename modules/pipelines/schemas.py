@@ -1,6 +1,6 @@
 from typing import List, Any
 from pydantic import BaseModel as _BaseModel
-from pydantic import Field, model_validator, validator
+from pydantic import Field, root_validator, validator
 from os import path as osp
 import yaml
 
@@ -30,29 +30,31 @@ class Property(BaseModel):
     type: int | str
     type_alias: str | None = None
 
-    @model_validator(mode="after")
-    def validate_model(self) -> "Property":
-        if isinstance(self.type, int) or (
-            isinstance(self.type, str) and self.type.isdigit()
+    @root_validator()
+    def validate_model(cls, values) -> "Property":
+        if isinstance(values["type"], int) or (
+            isinstance(values["type"], str) and values["type"].isdigit()
         ):
             properties = {
                 value: key
                 for key, value in NODE_CONSTANTS.get("property_type", {}).items()
             }
-            self.type = int(self.type)
+            values["type"] = int(values["type"])
         else:
             properties = NODE_CONSTANTS.get("property_type", {})
 
-        if self.type not in properties:
-            raise ValueError(f"Property type '{self.type}' is not defined in constants")
+        if values["type"] not in properties:
+            raise ValueError(
+                f"Property type '{values['type']}' is not defined in constants"
+            )
 
-        if isinstance(self.type, int):
-            self.type_alias = NODE_CONSTANTS["property_type"][self.type]
+        if isinstance(values["type"], int):
+            values["type_alias"] = NODE_CONSTANTS["property_type"][values["type"]]
         else:
-            self.type_alias = self.type
-            self.type = NODE_CONSTANTS["property_type"][self.type]
+            values["type_alias"] = values["type"]
+            values["type"] = NODE_CONSTANTS["property_type"][values["type"]]
 
-        return self
+        return values
 
 
 class TrainConfig(BaseModel):
@@ -70,28 +72,32 @@ class Node(TrainConfig):
 class NodeCreate(Node):
     config_path: str
 
-    @model_validator(mode="after")
-    def validate_model(self) -> "NodeCreate":
-        if self.node_id != -1 and self.node_id not in NODE_CONSTANTS.get("name", {}):
-            raise ValueError(f"Node type '{self.node_id}' is not defined in constants")
-
-        if self.node_id != -1:
-            self.node_name = NODE_CONSTANTS["name"][self.node_id]
-
-        if not self.config_path:
-            return self
-
-        if not osp.isfile(self.config_path):
-            raise FileNotFoundError(
-                f"Couldn't locate the config file at '{self.config_path}'"
+    @root_validator()
+    def validate_model(cls, values) -> "NodeCreate":
+        if values["node_id"] != -1 and values["node_id"] not in NODE_CONSTANTS.get(
+            "name", {}
+        ):
+            raise ValueError(
+                f"Node type '{values['node_id']}' is not defined in constants"
             )
 
-        with open(self.config_path, "r") as file:
+        if values["node_id"] != -1:
+            values["node_name"] = NODE_CONSTANTS["name"][values["node_id"]]
+
+        if not values["config_path"]:
+            return values
+
+        if not osp.isfile(values["config_path"]):
+            raise FileNotFoundError(
+                f"Couldn't locate the config file at '{values['config_path']}'"
+            )
+
+        with open(values["config_path"], "r") as file:
             data = yaml.safe_load(file)
 
         if data:
-            self.description = data["description"]
-            self.properties = []
+            values["description"] = data["description"]
+            values["properties"] = []
 
             if data.get("inherits"):
                 if isinstance(data["inherits"], str):
@@ -104,23 +110,23 @@ class NodeCreate(Node):
                     )
 
                 for config_path in data["inherits"]:
-                    self.properties.extend(
+                    values["properties"].extend(
                         NodeCreate(
                             node_id=-1, family="inherited", config_path=config_path
                         ).properties
                     )
 
-            if data.get("outputs") and not len(self.outputs):
+            if data.get("outputs") and not len(values["outputs"]):
                 if not isinstance(data["outputs"], dict):
                     raise ValueError("'outputs' param should be of type dict")
 
                 for name, output in data["outputs"].items():
-                    self.outputs.append(Property(name=name, **output))
+                    values["outputs"].append(Property(name=name, **output))
 
             for key, value in data["properties"].items():
-                self.properties.append(Property(name=key, **value))
+                values["properties"].append(Property(name=key, **value))
 
-        return self
+        return values
 
 
 class NodeCategory(BaseModel):
@@ -136,14 +142,14 @@ class Pipelines(SpecialExclusionBaseModel):
         osp.join(ROOT_PATH, "config", "pipelines.yaml"), hidden=True
     )
 
-    @model_validator(mode="after")
-    def validate_model(self) -> "Pipelines":
-        if not osp.isfile(self.config_path):
+    @root_validator()
+    def validate_model(cls, values) -> "Pipelines":
+        if not osp.isfile(values["config_path"]):
             raise FileNotFoundError(
-                f"Couldn't locate the config file at '{self.config_path}'"
+                f"Couldn't locate the config file at '{values['config_path']}'"
             )
 
-        with open(self.config_path, "r") as file:
+        with open(values["config_path"], "r") as file:
             data = yaml.safe_load(file)
 
         def refactor_node(node):
@@ -162,13 +168,13 @@ class Pipelines(SpecialExclusionBaseModel):
             node["outputs"] = outputs
             return node
 
-        self.pipelines = []
+        values["pipelines"] = []
         for category, nodes in data.items():
-            self.pipelines.append(
+            values["pipelines"].append(
                 NodeCategory(
                     category=category,
                     nodes=[NodeCreate(**refactor_node(node)) for node in nodes],
                 )
             )
 
-        return self
+        return values

@@ -1,5 +1,5 @@
-from .trainer.diffusers_trainer import DiffusersTrainer
-from .utils.train_config import get_lora_argparser
+from trainer.diffusers_trainer import DiffusersTrainer
+from utils.train_config import get_lora_argparser
 
 
 if __name__ == "__main__":

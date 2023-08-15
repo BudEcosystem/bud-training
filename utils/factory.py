@@ -187,4 +187,4 @@ class SpecialExclusionBaseModel(BaseModel):
             return {
                 k: v for k, v in super().dict(**kwargs).items() if k not in exclusions
             }
-        return super().model_dump(**kwargs)
+        return super().dict(**kwargs)

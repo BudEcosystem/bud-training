@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator, model_validator
+from pydantic import BaseModel, validator, root_validator
 from pydantic.types import UUID4
 from datetime import datetime
 from fastapi import Form
@@ -6,6 +6,7 @@ from fastapi import Form
 from . import TABLE_ALIAS
 from .validations import validate_constants, get_constant_alias
 from utils.exceptions import CustomHttpException
+
 
 class DatasetCreate(BaseModel):
     name: str
@@ -73,21 +74,24 @@ class Dataset(BaseModel):
     class Config:
         from_attributes = True
 
-    @model_validator(mode="after")
-    def validate_constant_aliases(self) -> "Dataset":
-        self.source_type_alias = str(
+    @root_validator()
+    def validate_constant_aliases(cls, values) -> "Dataset":
+        values["source_type_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Dataset"],
                 column_name="source_type",
-                value=self.source_type,
+                value=values["source_type"],
             )
         )
-        self.type_alias = str(
+        values["type_alias"] = str(
             get_constant_alias(
-                table_name=TABLE_ALIAS["Dataset"], column_name="type", value=self.type
+                table_name=TABLE_ALIAS["Dataset"],
+                column_name="type",
+                value=values["type"],
             )
         )
-        return self
+        return values
+
 
 class ModelCreate(BaseModel):
     name: str
@@ -130,23 +134,27 @@ class Model(BaseModel):
 
     class Config:
         from_attributes = True
-    
-    @model_validator(mode="after")
-    def validate_constant_aliases(self) -> "Model":
-        self.source_type_alias = str(
+
+    @root_validator()
+    def validate_constant_aliases(cls, values) -> "Model":
+        values["source_type_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Model"],
                 column_name="source_type",
-                value=self.source_type,
+                value=values["source_type"],
             )
         )
-        self.type_alias = str(
+        values["type_alias"] = str(
             get_constant_alias(
-                table_name=TABLE_ALIAS["Model"], column_name="type", value=self.type
+                table_name=TABLE_ALIAS["Model"],
+                column_name="type",
+                value=values["type"],
             )
         )
-        return self
+        return values
 
+class ModelUpdate(BaseModel):
+    name: str
 
 class PipelineCreate(BaseModel):
     dataset_id: UUID4
@@ -180,14 +188,16 @@ class Pipeline(BaseModel):
     class Config:
         from_attributes = True
 
-    @model_validator(mode="after")
-    def validate_constant_aliases(self) -> "Pipeline":
-        self.type_alias = str(
+    @root_validator()
+    def validate_constant_aliases(cls, values) -> "Pipeline":
+        values["type_alias"] = str(
             get_constant_alias(
-                table_name=TABLE_ALIAS["Pipeline"], column_name="type", value=self.type
+                table_name=TABLE_ALIAS["Pipeline"],
+                column_name="type",
+                value=values["type"],
             )
         )
-        return self
+        return values
 
 
 class Run(BaseModel):
@@ -211,19 +221,21 @@ class Run(BaseModel):
     class Config:
         from_attributes = True
 
-    @model_validator(mode="after")
-    def validate_constant_aliases(self) -> "Run":
-        self.type_alias = str(
+    @root_validator()
+    def validate_constant_aliases(cls, values) -> "Run":
+        values["type_alias"] = str(
             get_constant_alias(
-                table_name=TABLE_ALIAS["Run"], column_name="type", value=self.type
+                table_name=TABLE_ALIAS["Run"], column_name="type", value=values["type"]
             )
         )
-        self.status_alias = str(
+        values["status_alias"] = str(
             get_constant_alias(
-                table_name=TABLE_ALIAS["Run"], column_name="status", value=self.status
+                table_name=TABLE_ALIAS["Run"],
+                column_name="status",
+                value=values["status"],
             )
         )
-        return self
+        return values
 
 
 class RunModel(BaseModel):
@@ -260,13 +272,13 @@ class ServingHistory(BaseModel):
     class Config:
         from_attributes = True
 
-    @model_validator(mode="after")
-    def validate_constant_aliases(self) -> "ServingHistory":
-        self.status_alias = str(
+    @root_validator()
+    def validate_constant_aliases(cls, values) -> "ServingHistory":
+        values["status_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Serving History"],
                 column_name="status",
-                value=self.status,
+                value=values["status"],
             )
         )
-        return self
+        return values

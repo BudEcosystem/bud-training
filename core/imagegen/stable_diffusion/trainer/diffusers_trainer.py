@@ -1,7 +1,7 @@
-import argparse
 import logging
 import math
 import os
+import sys
 import random
 import shutil
 from pathlib import Path
@@ -31,9 +31,14 @@ from diffusers.optimization import get_scheduler
 from diffusers.utils import is_wandb_available, check_min_version
 from diffusers.utils.import_utils import is_xformers_available
 
-from ..library.lora import add_lora_layers_to_unet
-from ..utils.custom_train_functions import compute_snr
-from ..utils.models import load_diffusers_stable_diffusion_models
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.abspath(os.path.join(dir_path, os.pardir)))
+
+
+from library.lora import add_lora_layers_to_unet
+from utils.custom_train_functions import compute_snr
+from utils.models import load_diffusers_stable_diffusion_models
 
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
@@ -118,7 +123,7 @@ class DiffusersTrainer:
 
         return accelerator
 
-    def setup_training_output_repo(
+    def setup_train_output_repo(
         self,
         output_dir: str | Path,
         push_to_hub: bool = False,
@@ -136,7 +141,7 @@ class DiffusersTrainer:
                 token=hub_token,
             ).repo_id
 
-        return repo_id
+            return repo_id
 
     def load_models(self):
         (
@@ -478,7 +483,7 @@ class DiffusersTrainer:
         progress_bar.set_description("Steps")
 
         for epoch in range(first_epoch, self.args.num_train_epochs):
-            unet.train()
+            self.unet.train()
             train_loss = 0.0
             for step, batch in enumerate(self.train_dataloader):
                 # Skip steps until we reach the resumed step
@@ -491,7 +496,7 @@ class DiffusersTrainer:
                         progress_bar.update(1)
                     continue
 
-                with self.accelerator.accumulate(unet):
+                with self.accelerator.accumulate(self.unet):
                     # Convert images to latent space
                     latents = self.vae.encode(
                         batch["pixel_values"].to(dtype=self.weight_dtype)
@@ -545,7 +550,7 @@ class DiffusersTrainer:
                         )
 
                     # Predict the noise residual and compute loss
-                    model_pred = unet(
+                    model_pred = self.unet(
                         noisy_latents, timesteps, encoder_hidden_states
                     ).sample
 
@@ -670,8 +675,8 @@ class DiffusersTrainer:
         # Save the lora layers
         self.accelerator.wait_for_everyone()
         if self.accelerator.is_main_process:
-            unet = unet.to(torch.float32)
-            unet.save_attn_procs(self.args.output_dir)
+            self.unet = self.unet.to(torch.float32)
+            self.unet.save_attn_procs(self.args.output_dir)
 
             if self.args.push_to_hub:
                 self.save_model_card(
@@ -721,16 +726,17 @@ class DiffusersTrainer:
         if self.args.seed is not None:
             generator = generator.manual_seed(self.args.seed)
         images = []
-        for _ in range(self.args.num_validation_images):
-            images.append(
-                pipeline(
-                    self.args.validation_prompt,
-                    num_inference_steps=30,
-                    generator=generator,
-                ).images[0]
-            )
+        if self.args.validation_prompt is not None:
+            for _ in range(self.args.num_validation_images):
+                images.append(
+                    pipeline(
+                        self.args.validation_prompt,
+                        num_inference_steps=30,
+                        generator=generator,
+                    ).images[0]
+                )
 
-        if self.accelerator.is_main_process:
+        if self.accelerator.is_main_process and self.args.validation_prompt is not None:
             for tracker in self.accelerator.trackers:
                 if tracker.name == "tensorboard":
                     np_images = np.stack([np.asarray(img) for img in images])

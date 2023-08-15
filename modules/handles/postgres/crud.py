@@ -41,7 +41,7 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return objs
 
     def create(self, obj: CreateSchemaType) -> ModelType:
-        db_obj: ModelType = self.model(**obj.model_dump())
+        db_obj: ModelType = self.model(**obj.dict())
         self.db_session.add(db_obj)
         try:
             self.db_session.commit()
@@ -62,7 +62,7 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             raise CustomHttpException(
                 status_code=404, detail=f"No data exist for id '{id}'"
             )
-        for column, value in obj.model_dump(exclude_unset=True).items():
+        for column, value in obj.dict(exclude_unset=True).items():
             setattr(db_obj, column, value)
         self.db_session.commit()
         self.db_session.refresh(db_obj)
@@ -88,9 +88,9 @@ class DatasetCRUD(BaseCRUD[models.Datasets, None, schemas.DatasetUpdate]):
         self, obj: schemas.DatasetCreate, dataset_id: UUID4 | None = None
     ) -> models.Datasets:
         if dataset_id:
-            db_obj = self.model(**obj.model_dump(), dataset_id=dataset_id)
+            db_obj = self.model(**obj.dict(), dataset_id=dataset_id)
         else:
-            db_obj = self.model(**obj.model_dump())
+            db_obj = self.model(**obj.dict())
         self.db_session.add(db_obj)
         try:
             self.db_session.commit()
@@ -124,11 +124,13 @@ class ModelCRUD(BaseCRUD[models.Datasets, None, schemas.DatasetUpdate]):
         self, obj: schemas.ModelCreate, model_id: UUID4 | None = None
     ) -> models.Datasets:
         if self.db_session.query(self.__model__).filter_by(name=obj.name).first():
-            raise CustomHttpException(status_code=412, detail=f"Name {obj.name} already exists.")
+            raise CustomHttpException(
+                status_code=412, detail=f"Name {obj.name} already exists."
+            )
         if model_id:
-            db_obj = self.model(**obj.model_dump(), model_id=model_id)
+            db_obj = self.model(**obj.dict(), model_id=model_id)
         else:
-            db_obj = self.model(**obj.model_dump())
+            db_obj = self.model(**obj.dict())
         self.db_session.add(db_obj)
         try:
             self.db_session.commit()
@@ -141,10 +143,10 @@ class ModelCRUD(BaseCRUD[models.Datasets, None, schemas.DatasetUpdate]):
         self.db_session.refresh(db_obj)
         return db_obj
 
-    def does_name_exists(
-        self, obj: schemas.ModelCreate
-    ) -> bool:
+    def does_name_exists(self, obj: schemas.ModelCreate) -> bool:
         if self.db_session.query(self.__model__).filter_by(name=obj.name).first():
-            raise CustomHttpException(status_code=412, detail=f"Name {obj.name} already exists.")
+            raise CustomHttpException(
+                status_code=412, detail=f"Name {obj.name} already exists."
+            )
         else:
             return True

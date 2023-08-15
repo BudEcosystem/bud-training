@@ -47,6 +47,8 @@ export default function DatasetDetail(props: any) {
         if (props.data['type']) setContentType(props.data['type'])
         if (props.data['source_type']) setSourceType(props.data['source_type'])
         setSource(props.data['source'])
+        setFiles([])
+        setImageFiles([])
 
     }, [props.data])
 

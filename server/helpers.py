@@ -31,7 +31,7 @@ def save_file_obj_to_filesystem(
     base_dir = {"dataset": settings.DATA_DIR, "model": settings.MODEL_DIR}
     try:
         filepath = osp.join(base_dir.get(file_category, settings.CACHE_DIR), filepath)
-        Path(osp.abspath(filepath)).mkdir(exist_ok=True, parents=True)
+        Path(osp.dirname(filepath)).mkdir(exist_ok=True, parents=True)
         with open(filepath, "wb+") as file_object:
             shutil.copyfileobj(file.file, file_object)
     finally:

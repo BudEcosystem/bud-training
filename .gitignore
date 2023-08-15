@@ -167,6 +167,7 @@ data
 logs
 models
 checkpoints
+results
 
 db/*.db
 db/migrations/postgres/versions/*

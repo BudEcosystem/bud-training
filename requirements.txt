@@ -9,6 +9,7 @@ psycopg2-binary
 # Server
 fastapi
 python-multipart
+pydantic<2.0
 
 # LLM
 torch
@@ -18,6 +19,7 @@ gradio
 datasets
 
 # SD
+git+https://github.com/huggingface/diffusers.git
 accelerate>=0.16.0
 torchvision
 transformers>=4.25.1
@@ -29,3 +31,5 @@ Jinja2
 wandb
 xformers
 bitsandbytes
+
+git+https://github.com/microsoft/DeepSpeed.git
