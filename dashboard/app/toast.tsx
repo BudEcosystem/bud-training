@@ -1,24 +1,32 @@
-import { cookies } from 'next/headers';
-import DismissButton from './dismiss-button';
+import { CheckCircleIcon, XMarkIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
-export default function Toast() {
-  const cookieStore = cookies();
-  const isHidden = cookieStore.get('template-banner-hidden');
+export default function ToastComponent(props: any) {
 
-  return isHidden ? null : (
-    <div className="sticky rounded-2xl w-11/12 sm:w-[581px] h-40 sm:h-[80px] p-0.5 z-10 bottom-10 left-0 right-0 mx-auto">
-      <div className="rounded-[14px] w-full h-full bg-gray-50 border border-gray-200 flex flex-col sm:flex-row items-center justify-center sm:justify-between space-y-3 sm:space-y-0 px-5">
-        <p className="text-black text-[13px] font-mono w-[304px] h-10 flex items-center justify-center p-3">
-          Get started with Next.js and Vercel instantly. <DismissButton />
-        </p>
-        <a
-          className="text-white text-[13px] font-mono bg-black hover:bg-gray-700 transition-all rounded-md w-[220px] h-10 flex items-center justify-center whitespace-nowrap"
-          href="https://vercel.com/templates/next.js/admin-dashboard-tailwind-planetscale-react-nextjs"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Clone & Deploy
-        </a>
+  return (
+    <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+      <div className="p-4">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            {props.type == 'success' && <CheckCircleIcon className="h-6 w-6 text-green-400" aria-hidden="true" />}
+            {props.type == 'error' && <ExclamationCircleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />}
+          </div>
+          <div className="ml-3 w-0 flex-1 pt-0.5">
+            <p className="text-sm font-medium text-gray-900">{props.title}</p>
+            {props.message && <p className="mt-1 text-sm text-gray-500">{props.message}</p>}
+          </div>
+          <div className="ml-4 flex flex-shrink-0">
+            <button
+              type="button"
+              className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            // onClick={() => {
+            //   setShow(false)
+            // }}
+            >
+              <span className="sr-only">Close</span>
+              <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

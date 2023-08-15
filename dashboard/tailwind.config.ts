@@ -46,7 +46,7 @@ export default {
         // light
         'tremor-input': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
         'tremor-card':
-          '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+          '0 0 0 1px rgba(0,0,59,0.051) ,0px 8px 40px rgba(0,0,59,0.051) ,0px 12px 32px -16px rgba(0,0,0,0.055)',
         'tremor-dropdown':
           '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)'
       },

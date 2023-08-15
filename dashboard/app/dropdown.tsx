@@ -11,11 +11,21 @@ export default function Dropdown(props:any) {
   const [selected, setSelected] = useState({} as any)
 
   useEffect(() => {
-    setSelected(props.options[0])
+    console.log(props)
+    let current = props.options.filter((item: any) => item.id == props.selected)
+    
+    current = current.length ? current[0] : props.options[0]
+    console.log(current)
+    setSelected(current)
   }, [props])
 
+  const onChange =  (val: any) => {
+    setSelected(val)
+    props.onChange(val)
+  }
+
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={onChange}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">{props.label}</Listbox.Label>

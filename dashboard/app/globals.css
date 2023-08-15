@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+
+html{
+    --color-background-image-base: #fff; 
+    --color-background-image-accent-1: #4f46e5; 
+    --color-background-image-accent-2: #8b5cf6; 
+    --color-background-image-accent-3: #6b21a8; 
+    --color-background-image-accent-4: #60a5fa; 
+    --color-background-image-accent-5: #f8fafc; 
+    --color-background-image-accent-6: #6366f1; 
+    --color-background-image-accent-7: #818cf8;
+
+    /* --color-background-image-base: var(--color-background); 
+    --color-background-image-accent-1: var(--indigo-a7); 
+    --color-background-image-accent-2: var(--violet-6); 
+    --color-background-image-accent-3: var(--purple-9); 
+    --color-background-image-accent-4: var(--blue-5); 
+    --color-background-image-accent-5: var(--slate-1); 
+    --color-background-image-accent-6: var(--crimson-a5); 
+    --color-background-image-accent-7: var(--indigo-5); */
+}
+
 body{
     background: #fff;
 }
@@ -14,4 +35,19 @@ input{
 .logo-wrap p{
     color: #fff;
     margin-left: 10px;
+}
+
+.shadow-tremor-card{
+    box-shadow: 0 0 0 1px rgba(0,0,59,0.051) ,0px 8px 40px rgba(0,0,59,0.051) ,0px 12px 32px -16px rgba(0,0,0,0.055);
+}
+
+.Toastify__toast {
+    box-shadow: none;
+    border-radius: 0.5rem;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+}
+.Toastify__toast-body{
+    padding: 0;
 }
