@@ -1,0 +1,12 @@
+description: Common Training params
+properties:
+  dataset:
+    description: Dataset for training
+    title: Dataset
+    type: dataset
+  base_model:
+    description: Base model for training
+    title: Base Model
+    type: model
+title: Commons
+type: object

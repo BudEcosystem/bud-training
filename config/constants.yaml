@@ -1,4 +1,4 @@
-constants:
+postgres:
   - table_name: "datasets"
     source_type:
       0: Hugging Face
@@ -10,10 +10,6 @@ constants:
     type:
       0: LLM
       1: SD
-  - table_name: "pipelines"
-    type:
-      0: LLM LoRA
-      1: SD LoRA
   - table_name: "runs"
     status:
       0: Queued
@@ -26,3 +22,16 @@ constants:
       0: Idle
       1: Running
       2: Failed
+nodes:
+  name:
+    0: LLM Finetuning
+    1: SD LoRA Finetuning
+    2: Human Eval
+    3: Custom Eval
+  property_type:
+    integer: 0
+    number: 1
+    string: 2
+    boolean: 3
+    dataset: 4
+    model: 5

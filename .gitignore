@@ -167,4 +167,6 @@ data
 logs
 models
 checkpoints
-modules/handles/postgres/migrations/versions/*
+
+db/*.db
+db/migrations/postgres/versions/*

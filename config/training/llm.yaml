@@ -1,0 +1,116 @@
+description: LLM Finetuning
+inherits:
+  - config/training/common.yaml
+properties:
+  dp_size:
+    default: 1
+    description: Data parallelism count
+    title: Dp Size
+    type: integer
+  eval_batch_size:
+    default: 4
+    description: eval batch size per device
+    title: Eval Batch Size
+    type: integer
+  eval_per_n_steps:
+    default: 200
+    description: every n steps for eval
+    title: Eval Per N Steps
+    type: integer
+  history_column:
+    default: history
+    description: Column name for history column
+    title: History Column
+    type: string
+  learning_rate:
+    default: 0.01
+    description: Learning rate for the training
+    title: Learning Rate
+    type: number
+  max_length:
+    default: 2048
+    description: The cut off length for the tokenizer
+    title: Max Length
+    type: integer
+  optimizer:
+    default: efficient
+    description: Optimizer to be used. [efficient, adamw]
+    title: Optimizer
+    type: string
+  pp_size:
+    default: 1
+    description: Pipeline parallelism count
+    title: Pp Size
+    type: integer
+  prompt_column:
+    default: prompt
+    description: Column name for prompt column
+    title: Prompt Column
+    type: string
+  prompt_template:
+    default: default
+    description: Prompt template to be used for the model input
+    title: Prompt Template
+    type: string
+  response_column:
+    default: response
+    description: Column name for response column
+    title: Response Column
+    type: string
+  split:
+    default: train
+    description: split of the json file or dataset from huggingface
+    title: Split
+    type: string
+  split_ratio:
+    default: 0.05
+    description: Test/Validation split ratio
+    title: Split Ratio
+    type: number
+  stage:
+    default: sft
+    description: training stage
+    title: Stage
+    type: string
+  tp_size:
+    default: 1
+    description: Tensor parallelism count
+    title: Tp Size
+    type: integer
+  train_epochs:
+    default: 3
+    description: number epochs for train
+    title: Train Epochs
+    type: integer
+  train_micro_batch_size:
+    default: 4
+    description: micro batch size per device
+    title: Train Micro Batch Size
+    type: integer
+  train_type:
+    default: full
+    description: training type
+    title: Train Type
+    type: string
+  trust_remote_code:
+    default: true
+    description: Allow loading remote code for tokenizer
+    title: Trust Remote Code
+    type: boolean
+  wandb_group:
+    default: null
+    description: Wandb group to be used
+    title: Wandb Group
+    type: string
+  wandb_project:
+    default: training
+    description: Wandb project to be used
+    title: Wandb Project
+    type: string
+  wandb_team:
+    default: bud-a
+    description: Wandb team to be used
+    title: Wandb Team
+    type: string
+title: LLMFinetune
+type: object

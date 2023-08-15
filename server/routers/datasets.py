@@ -1,10 +1,15 @@
 from typing import List
 from pydantic.types import UUID4
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile, Body
 from fastapi.responses import HTMLResponse
 
-from ..models import ResponseBase
-from ..dependencies import validate_token_header, get_dataset_crud, psql_crud
+from ..schemas import ResponseBase
+from ..dependencies import (
+    validate_token_header,
+    get_dataset_crud,
+    psql_crud,
+    form_json_deserializer,
+)
 from modules.handles.postgres import schemas as psql_schemas
 from .. import helpers
 from .. import logger
@@ -16,6 +21,31 @@ router = APIRouter(
     dependencies=[Depends(validate_token_header)],
     responses={404: {"description": "Not found"}},
 )
+
+
+# @router.post("/", response_model=ResponseBase[psql_schemas.Dataset])
+# def add_dataset(
+# dataset: str = Body(
+#         examples=psql_schemas.DatasetCreate.model_config["json_schema_extra"][
+#             "examples"
+#         ]
+#     ),
+#     metadata_file: UploadFile | None = File(None),
+#     archive_file: UploadFile | None = File(None),
+#     service: psql_crud.DatasetCRUD = Depends(get_dataset_crud),
+# ) -> ResponseBase[psql_schemas.Dataset] | dict:
+#     dataset: psql_schemas.DatasetCreate = form_json_deserializer(
+#         psql_schemas.DatasetCreate, dataset
+#     )
+#     dataset_id = helpers.save_datasets_to_filesystem(
+#         source_type=dataset.source_type,
+#         dataset_type=dataset.type,
+#         source=dataset.source,
+#         metadata_file=metadata_file,
+#         archive_file=archive_file,
+#     )
+#     dataset = service.create(dataset, dataset_id=dataset_id)
+#     return ResponseBase[psql_schemas.Dataset](data=dataset)
 
 
 @router.post("/", response_model=ResponseBase[psql_schemas.Dataset])

@@ -1,20 +1,30 @@
 from functools import lru_cache
 
-from . import TABLE_ALIAS, CONSTANTS
+from . import TABLE_ALIAS
+from config import CONSTANTS
+
+
+PSQL_CONSTANTS = CONSTANTS.get("postgres", {})
 
 
 @lru_cache(maxsize=2000)
 def get_constant_alias(table_name, column_name, value):
-    if table_name not in CONSTANTS or column_name not in CONSTANTS[table_name]:
+    if (
+        table_name not in PSQL_CONSTANTS
+        or column_name not in PSQL_CONSTANTS[table_name]
+    ):
         return value
-    return CONSTANTS[table_name][column_name].get(value, value)
+    return PSQL_CONSTANTS[table_name][column_name].get(value, value)
 
 
 @lru_cache(maxsize=2000)
 def validate_constants(table_name, column_name, value):
-    if table_name not in CONSTANTS or column_name not in CONSTANTS[table_name]:
+    if (
+        table_name not in PSQL_CONSTANTS
+        or column_name not in PSQL_CONSTANTS[table_name]
+    ):
         return True
-    return value in CONSTANTS[table_name][column_name]
+    return value in PSQL_CONSTANTS[table_name][column_name]
 
 
 @lru_cache(maxsize=500)
@@ -27,7 +37,7 @@ def is_dataset_source_type_equals(source_type, value):
 
     return (
         str(
-            CONSTANTS.get(table_name, {})
+            PSQL_CONSTANTS.get(table_name, {})
             .get(column_name, {})
             .get(source_type, source_type)
         ).lower()
@@ -53,7 +63,7 @@ def is_dataset_type_equals(_type, value):
 
     return (
         str(
-            CONSTANTS.get(table_name, {}).get(column_name, {}).get(_type, _type)
+            PSQL_CONSTANTS.get(table_name, {}).get(column_name, {}).get(_type, _type)
         ).lower()
         == value.lower()
     )

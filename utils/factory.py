@@ -9,6 +9,7 @@ from typing import Any
 from uuid import uuid4
 
 from bson import ObjectId
+from pydantic import BaseModel
 
 
 def freeze(o: Any):
@@ -160,3 +161,30 @@ class NestedNamespace(SimpleNamespace):
                 )
             else:
                 self.__setattr__(key, value)
+
+
+EXCLUDED_SPECIAL_FIELDS = "exclude_special_fields"
+
+
+class _ExclusionDict(dict):
+    def __init__(self):
+        super().__init__({"__all__": {EXCLUDED_SPECIAL_FIELDS: True}})
+
+    def get(self, key):
+        return self
+
+
+ExcludeSpecial = _ExclusionDict()
+
+
+class SpecialExclusionBaseModel(BaseModel):
+    _special_exclusions: set[str]
+
+    def dict(self, **kwargs):
+        exclusions = getattr(self.__class__, "_special_exclusions", None)
+        exclude = kwargs.get("exclude")
+        if exclusions and exclude and EXCLUDED_SPECIAL_FIELDS in exclude:
+            return {
+                k: v for k, v in super().dict(**kwargs).items() if k not in exclusions
+            }
+        return super().model_dump(**kwargs)

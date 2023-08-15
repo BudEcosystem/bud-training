@@ -13,6 +13,19 @@ class DatasetCreate(BaseModel):
     source_type: int
     type: int
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Dataset XXX",
+                    "source": "",
+                    "source_type": 0,
+                    "type": 0,
+                }
+            ]
+        }
+    }
+
     @validator("name")
     def name_is_valid(cls, value: str) -> str:
         if not value.strip().strip('"').strip("'"):

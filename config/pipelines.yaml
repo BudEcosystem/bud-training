@@ -1,4 +1,14 @@
-pipelines:
-  llm_lora:
-    display_name: "LLM LoRA"
+Training:
+  - node_id: 0
+    config_path: "config/training/llm.yaml"
+    family: LLM
+  - node_id: 1
+    config_path: "config/training/sd_lora.yaml"
+    family: SD
+Eval:
+  - node_id: 2
     config_path: ""
+    family: LLM
+  - node_id: 3
+    config_path: ""
+    family: LLM
