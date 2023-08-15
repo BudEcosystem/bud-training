@@ -38,7 +38,7 @@ class Datasets(Base):
     dataset_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String, nullable=False)
     source = Column(String, nullable=True)  # HF name, folder/file path
-    source_type = Column(String, nullable=False)  # Hugginface, custom
+    source_type = Column(Integer, nullable=False)  # Hugginface, custom
     type = Column(Integer, nullable=False)  # Text, Text & Image
     created_at = Column(DateTime(timezone=True), server_default=UtcNow())
     modified_at = Column(
@@ -50,7 +50,8 @@ class Models(Base):
     __tablename__ = TABLE_ALIAS["Model"]
     model_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String, nullable=False)
-    source = Column(String, nullable=True)  # HF name, folder/file path
+    source = Column(String, nullable=True)
+    source_type = Column(Integer, nullable=False)  # Hugginface, custom
     type = Column(Integer, nullable=False)  # LLM, SD
     is_finetuned = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=UtcNow())

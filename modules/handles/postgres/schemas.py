@@ -1,11 +1,11 @@
 from pydantic import BaseModel, validator, model_validator
 from pydantic.types import UUID4
 from datetime import datetime
+from fastapi import Form
 
 from . import TABLE_ALIAS
 from .validations import validate_constants, get_constant_alias
 from utils.exceptions import CustomHttpException
-
 
 class DatasetCreate(BaseModel):
     name: str
@@ -89,11 +89,21 @@ class Dataset(BaseModel):
         )
         return self
 
-
 class ModelCreate(BaseModel):
     name: str
     source: str | None = None
     type: int
+    source_type: int
+
+    @validator("source_type")
+    def source_type_is_valid(cls, value: str) -> str:
+        if not validate_constants(
+            table_name=TABLE_ALIAS["Model"], column_name="source_type", value=value
+        ):
+            raise CustomHttpException(
+                status_code=422, detail=f"'source_type' doesn't support value '{value}'"
+            )
+        return value
 
     @validator("type")
     def type_is_valid(cls, value: str) -> str:
@@ -112,15 +122,24 @@ class Model(BaseModel):
     source: str | None = None
     type: int
     type_alias: str | None = None
+    source_type: int
+    source_type_alias: str | None = None
     is_finetuned: bool
     created_at: datetime
     modified_at: datetime
 
     class Config:
         from_attributes = True
-
+    
     @model_validator(mode="after")
     def validate_constant_aliases(self) -> "Model":
+        self.source_type_alias = str(
+            get_constant_alias(
+                table_name=TABLE_ALIAS["Model"],
+                column_name="source_type",
+                value=self.source_type,
+            )
+        )
         self.type_alias = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Model"], column_name="type", value=self.type

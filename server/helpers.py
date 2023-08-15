@@ -10,9 +10,10 @@ import shutil
 
 from modules.handles.postgres import validations as psql_validations
 from modules.datasets.huggingface import is_valid_dataset
+from modules.models.utils import validate_model_path
+
 from config import settings
 from . import logger
-
 
 def delete_dir_from_filesystem(file_category: str, dirname: str):
     base_dir = {"dataset": settings.DATA_DIR, "model": settings.MODEL_DIR}
@@ -104,3 +105,5 @@ def save_datasets_to_filesystem(
         if psql_validations.is_dataset_type_text_and_image(dataset_type):
             save_image_archive_to_filesystem(archive_file, dataset_id)
     return dataset_id
+
+

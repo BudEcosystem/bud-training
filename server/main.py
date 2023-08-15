@@ -33,6 +33,8 @@ app.add_middleware(GZipMiddleware, minimum_size=500)
 
 app.include_router(datasets.router)
 app.include_router(pipelines.router)
+app.include_router(models.router)
+
 
 
 @app.middleware("http")

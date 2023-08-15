@@ -9,14 +9,16 @@ function classNames(...classes) {
 
 export default function Dropdown(props:any) {
   const [selected, setSelected] = useState({} as any)
+  const [disabled, setDisabled] = useState(false)
 
   useEffect(() => {
-    console.log(props)
+    
     let current = props.options.filter((item: any) => item.id == props.selected)
     
     current = current.length ? current[0] : props.options[0]
-    console.log(current)
     setSelected(current)
+
+    setDisabled(props.disabled)
   }, [props])
 
   const onChange =  (val: any) => {
@@ -25,7 +27,7 @@ export default function Dropdown(props:any) {
   }
 
   return (
-    <Listbox value={selected} onChange={onChange}>
+    <Listbox value={selected} onChange={onChange} disabled={disabled}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">{props.label}</Listbox.Label>

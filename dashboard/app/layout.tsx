@@ -31,11 +31,7 @@ export default async function RootLayout({
         <HomeLayout>
           {children}
         </HomeLayout>
-        <ToastContainer
-          autoClose={false}
-          hideProgressBar
-          limit={2}
-        />
+        <ToastContainer />
       </body>
     </html>
   );

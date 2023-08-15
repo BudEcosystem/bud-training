@@ -51,3 +51,6 @@ input{
 .Toastify__toast-body{
     padding: 0;
 }
+button[data-headlessui-state='disabled']{
+    background: rgba(239, 239, 239, 0.3);
+}

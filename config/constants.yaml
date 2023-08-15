@@ -10,6 +10,9 @@ postgres:
     type:
       0: LLM
       1: SD
+    source_type:
+      0: Hugging Face
+      1: Local Upload
   - table_name: "runs"
     status:
       0: Queued

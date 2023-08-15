@@ -44,3 +44,8 @@ def get_dataset_crud(
     db_session: Session = Depends(get_session),
 ) -> psql_crud.DatasetCRUD:
     return psql_crud.DatasetCRUD(db_session)
+
+def get_model_crud(
+    db_session: Session = Depends(get_session),
+) -> psql_crud.ModelCRUD:
+    return psql_crud.ModelCRUD(db_session)
