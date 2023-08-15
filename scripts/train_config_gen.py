@@ -16,6 +16,15 @@ if __name__ == "__main__":
         model_name="LLMFinetune",
         model_desc="LLM Finetuning",
         exclude_args=["help", "model_path", "data_path", "output_dir"],
-        extras={"inherits": ["config/training/common.yaml"]},
+        extras={
+            "inherits": ["config/training/common.yaml"],
+            "outputs": {
+                "model": {
+                    "description": "Finetuned Model Checkpoint",
+                    "title": "Model",
+                    "type": "model",
+                }
+            },
+        },
         export_path="config/training/llm.yaml",
     )

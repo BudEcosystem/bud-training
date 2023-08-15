@@ -1,6 +1,11 @@
 description: LLM Finetuning
 inherits:
   - config/training/common.yaml
+outputs:
+  model:
+    description: Finetuned Model Checkpoint
+    title: Model
+    type: model
 properties:
   dp_size:
     default: 1

@@ -58,6 +58,7 @@ class Property(BaseModel):
 class TrainConfig(BaseModel):
     description: str | None = None
     properties: List[Property] | None = []
+    outputs: List[Property] | None = []
 
 
 class Node(TrainConfig):
@@ -67,7 +68,7 @@ class Node(TrainConfig):
 
 
 class NodeCreate(Node):
-    config_path: str | None = Field(None, hidden=True)
+    config_path: str
 
     @model_validator(mode="after")
     def validate_model(self) -> "NodeCreate":
@@ -97,6 +98,10 @@ class NodeCreate(Node):
                     data["inherits"] = [data["inherits"]]
                 elif isinstance(data["inherits"], dict):
                     data["inherits"] = list(data["inherits"].values())
+                elif not isinstance(data["inherits"], list):
+                    raise ValueError(
+                        "'inherits' param should be of type str, dict or list"
+                    )
 
                 for config_path in data["inherits"]:
                     self.properties.extend(
@@ -104,6 +109,13 @@ class NodeCreate(Node):
                             node_id=-1, family="inherited", config_path=config_path
                         ).properties
                     )
+
+            if data.get("outputs") and not len(self.outputs):
+                if not isinstance(data["outputs"], dict):
+                    raise ValueError("'outputs' param should be of type dict")
+
+                for name, output in data["outputs"].items():
+                    self.outputs.append(Property(name=name, **output))
 
             for key, value in data["properties"].items():
                 self.properties.append(Property(name=key, **value))
@@ -134,12 +146,28 @@ class Pipelines(SpecialExclusionBaseModel):
         with open(self.config_path, "r") as file:
             data = yaml.safe_load(file)
 
+        def refactor_node(node):
+            if "outputs" in node:
+                if not isinstance(node["outputs"], dict):
+                    raise ValueError("'outputs' param should be of type dict")
+            else:
+                return node
+
+            outputs = []
+            for key, value in node["outputs"].items():
+                output = {"name": key}
+                output.update(value)
+                outputs.append(output)
+
+            node["outputs"] = outputs
+            return node
+
         self.pipelines = []
         for category, nodes in data.items():
             self.pipelines.append(
                 NodeCategory(
                     category=category,
-                    nodes=[NodeCreate(**node) for node in nodes],
+                    nodes=[NodeCreate(**refactor_node(node)) for node in nodes],
                 )
             )
 
