@@ -29,7 +29,9 @@ def freeze(o: Any):
     return o
 
 
-def make_hash(data: Any, algorithm: str = "sha1", serializer: str = None, sort: bool = False):
+def make_hash(
+    data: Any, algorithm: str = "sha1", serializer: str = None, sort: bool = False
+):
     """Makes a hash out of anything that contains only list,dict and hashable types including string and numeric types
 
     Args:
@@ -149,7 +151,9 @@ class NestedNamespace(SimpleNamespace):
                     key,
                     tuple(
                         map(
-                            lambda val: NestedNamespace(val) if type(val) in [dict, list] else val,
+                            lambda val: NestedNamespace(val)
+                            if type(val) in [dict, list]
+                            else val,
                             value,
                         )
                     ),

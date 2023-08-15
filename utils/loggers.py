@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import logging.config
-from os import path
+from os import path as osp
 from pathlib import Path
 
 from config import settings
@@ -61,13 +61,15 @@ def create_file_logger(
     Returns:
         logging.Logger: File logger instance with ColorFormatter
     """
-    filename = f"{filename}_{datetime.utcnow().astimezone().strftime('%Y-%m-%dT%H-%M-%S')}"
+    filename = (
+        f"{filename}_{datetime.utcnow().astimezone().strftime('%Y-%m-%dT%H-%M-%S')}"
+    )
     Path(log_dir).mkdir(exist_ok=True, parents=True)
 
     logger = logging.getLogger(filename)
     logger.setLevel(log_levels.get(log_level, logging.DEBUG))
 
-    file_handler = logging.FileHandler(path.join(log_dir, f"{filename}.log"))
+    file_handler = logging.FileHandler(osp.join(log_dir, f"{filename}.log"))
     file_handler.setFormatter(ColorFormatter())
     logger.addHandler(file_handler)
 
@@ -86,11 +88,14 @@ def init_loggers(log_dir: str = settings.LOG_DIR):
         log_dir (str, optional): Log directory to use. Defaults to settings.LOG_DIR.
     """
     Path(log_dir).mkdir(exist_ok=True, parents=True)
-    print()
     logging.config.fileConfig(
-        f"{path.abspath(path.join(path.dirname(__file__), '../'))}/config/logging.ini",
+        osp.join(
+            osp.abspath(osp.join(osp.dirname(__file__), ".." + osp.sep)),
+            "config",
+            "logging.ini",
+        ),
         disable_existing_loggers=False,
-        defaults={"logdir": log_dir},
+        defaults={"logdir": log_dir.replace(osp.sep, "/")},
     )
 
 

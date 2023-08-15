@@ -1,7 +1,7 @@
 constants:
   - table_name: "datasets"
     source_type:
-      0: Huggingface
+      0: Hugging Face
       1: Local Upload
     type:
       0: Text

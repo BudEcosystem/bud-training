@@ -165,4 +165,6 @@ wandb
 cache
 data
 logs
+models
+checkpoints
 modules/handles/postgres/migrations/versions/*

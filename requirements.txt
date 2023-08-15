@@ -1,7 +1,12 @@
 environs
+bson
 python-json-logger
+sqlalchemy
+alembic
 psycopg2-binary
+
 fastapi
+python-multipart
 
 torch
 transformers
