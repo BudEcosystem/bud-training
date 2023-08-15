@@ -3,7 +3,8 @@ from diffusers.models.attention_processor import LoRAAttnProcessor
 
 
 def add_lora_layers_to_unet(
-    unet: UNet2DConditionModel, rank: int
+    unet: UNet2DConditionModel,
+    rank: int,
 ) -> UNet2DConditionModel:
     # now we will add new LoRA weights to the attention layers
     # It's important to realize here how many attention weights will be added and of which sizes
