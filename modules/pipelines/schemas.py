@@ -55,7 +55,9 @@ class NodeCreate(Node):
 
     @model_validator(mode="after")
     def validate_model(self) -> "Node":
-        self.node_name = NODE_CONSTANTS.get(self.node_id, self.node_id)
+        if self.node_id not in NODE_CONSTANTS.get("name", {}):
+            raise ValueError(f"Node type '{self.node_id}' is not defined in constants")
+        self.node_name = NODE_CONSTANTS["name"][self.node_id]
 
         if not self.config_path:
             return self
