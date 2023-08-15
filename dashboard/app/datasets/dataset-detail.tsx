@@ -41,11 +41,11 @@ export default function DatasetDetail(props: any) {
     }, [props.open])
 
     useEffect(() => {
-        console.log(props.data)
+        
         setDatasetId(props.data['dataset_id'])
         setName(props.data['name'])
-        if (props.data['type']) setContentType(props.data['type'])
-        if (props.data['source_type']) setSourceType(props.data['source_type'])
+        if (props.data['type'] || props.data['type'] == 0) setContentType(props.data['type'])
+        if (props.data['source_type'] || props.data['source_type'] == 0) setSourceType(props.data['source_type'])
         setSource(props.data['source'])
         setFiles([])
         setImageFiles([])
@@ -62,7 +62,7 @@ export default function DatasetDetail(props: any) {
             showToast('error', 'Missing information', 'Please enter huggingface repo')
             return
         }
-        console.log(files[0])
+        
         let data = {
             name: name,
             source_type: sourceType,
@@ -103,12 +103,12 @@ export default function DatasetDetail(props: any) {
 
 
     const handleDrop = (type: string, action: string, event: any) => {
-        console.log(type, action, event)
+        
         event.preventDefault();
         let droppedFiles = [] as any
         if (action == 'drop') droppedFiles = Array.from(event.dataTransfer.files);
         if (action == 'change') droppedFiles = Array.from(event.target.files);
-        console.log(droppedFiles)
+        
 
         const file = droppedFiles[0];
         if (file && validateFile(file, type)) {
@@ -224,7 +224,7 @@ export default function DatasetDetail(props: any) {
                                                                 </div>
                                                             </div>
                                                         }
-                                                        {sourceType == 1 &&
+                                                        {(sourceType == 1 && !datasetId) &&
                                                             <div className="col-span-full">
                                                                 <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
                                                                     JSON file
@@ -261,7 +261,7 @@ export default function DatasetDetail(props: any) {
                                                                 ))}
                                                             </div>
                                                         }
-                                                        {(sourceType == 1 && contentType == 1) &&
+                                                        {(sourceType == 1 && contentType == 1 && !datasetId) &&
                                                             <div className="col-span-full">
                                                                 <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
                                                                     Image archive

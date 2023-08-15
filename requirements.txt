@@ -34,3 +34,5 @@ xformers
 bitsandbytes
 
 git+https://github.com/microsoft/DeepSpeed.git
+
+watchdog

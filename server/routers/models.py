@@ -1,15 +1,11 @@
 from typing import List
 from pydantic.types import UUID4
-from fastapi import APIRouter, Depends, File, UploadFile, Form
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, Form
 
 from ..schemas import ResponseBase
 from ..dependencies import validate_token_header, get_model_crud, psql_crud
 from modules.handles.postgres import schemas as psql_schemas
-
-# from modules.models import utils
-from .. import logger
-
+from modules.model_module import utils
 
 router = APIRouter(
     prefix="/models",
@@ -41,7 +37,7 @@ def read_datasets(
     page: int = 1,
     limit: int = 100,
     service: psql_crud.DatasetCRUD = Depends(get_model_crud),
-) -> ResponseBase[List[psql_schemas.Dataset]] | dict:
+) -> ResponseBase[List[psql_schemas.Model]] | dict:
     models = service.list(page=page, limit=limit)
     return ResponseBase[List[psql_schemas.Model]](data=models)
 
