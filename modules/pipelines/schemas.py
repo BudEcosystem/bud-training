@@ -32,11 +32,27 @@ class Property(BaseModel):
 
     @model_validator(mode="after")
     def validate_model(self) -> "Property":
-        if self.type not in NODE_CONSTANTS.get("property_type", {}):
+        if isinstance(self.type, int) or (
+            isinstance(self.type, str) and self.type.isdigit()
+        ):
+            properties = {
+                value: key
+                for key, value in NODE_CONSTANTS.get("property_type", {}).items()
+            }
+            self.type = int(self.type)
+        else:
+            properties = NODE_CONSTANTS.get("property_type", {})
+
+        if self.type not in properties:
             raise ValueError(f"Property type '{self.type}' is not defined in constants")
 
-        self.type_alias = self.type
-        self.type = NODE_CONSTANTS["property_type"][self.type]
+        if isinstance(self.type, int):
+            self.type_alias = NODE_CONSTANTS["property_type"][self.type]
+        else:
+            self.type_alias = self.type
+            self.type = NODE_CONSTANTS["property_type"][self.type]
+
+        return self
 
 
 class TrainConfig(BaseModel):
@@ -54,10 +70,12 @@ class NodeCreate(Node):
     config_path: str | None = Field(None, hidden=True)
 
     @model_validator(mode="after")
-    def validate_model(self) -> "Node":
-        if self.node_id not in NODE_CONSTANTS.get("name", {}):
+    def validate_model(self) -> "NodeCreate":
+        if self.node_id != -1 and self.node_id not in NODE_CONSTANTS.get("name", {}):
             raise ValueError(f"Node type '{self.node_id}' is not defined in constants")
-        self.node_name = NODE_CONSTANTS["name"][self.node_id]
+
+        if self.node_id != -1:
+            self.node_name = NODE_CONSTANTS["name"][self.node_id]
 
         if not self.config_path:
             return self
@@ -82,7 +100,7 @@ class NodeCreate(Node):
 
                 for config_path in data["inherits"]:
                     self.properties.extend(
-                        Node(
+                        NodeCreate(
                             node_id=-1, family="inherited", config_path=config_path
                         ).properties
                     )
@@ -120,7 +138,8 @@ class Pipelines(SpecialExclusionBaseModel):
         for category, nodes in data.items():
             self.pipelines.append(
                 NodeCategory(
-                    category=category, nodes=[NodeCreate(**node) for node in nodes]
+                    category=category,
+                    nodes=[NodeCreate(**node) for node in nodes],
                 )
             )
 
