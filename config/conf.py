@@ -21,6 +21,9 @@ settings = {
     "auth": {
         "X_TOKEN": env.str("X_TOKEN"),
     },
-    "database": {"psql": {"URL": env.str("PSQL_URL")}},
+    "database": {
+        "psql": {"URL": env.str("PSQL_URL")},
+        "redis": {"URL": env.str("REDIS_URL")},
+    },
     "pipelines": {},
 }
