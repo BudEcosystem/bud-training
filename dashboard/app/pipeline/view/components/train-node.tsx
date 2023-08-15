@@ -20,7 +20,7 @@ export default function TrainNode(){
                     />
                     Trainer</p>
                 <div className='group rounded-full bg-gray-200 p-1 cursor-pointer hover:bg-indigo-500'>
-                <TrashIcon
+                    <TrashIcon
                       className="h-2.5 w-2.5 shrink-0 group-hover:text-white"
                       aria-hidden="true"
                     />

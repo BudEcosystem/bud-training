@@ -1,15 +1,18 @@
+import { Suspense } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import './globals.css';
 
 import Nav from './nav';
 import Toast from './toast';
-import { Suspense } from 'react';
-
 import HomeLayout from './home-layout';
+import Background from './background';
 
 export const metadata = {
-  title: 'Next.js 13 + PlanetScale + NextAuth + Tailwind CSS',
+  title: 'Bud flow',
   description:
-    'A user admin dashboard configured with Next.js, PlanetScale, NextAuth, Tailwind CSS, TypeScript, ESLint, and Prettier.'
+    'A dashboard which allow the management of foundational models'
 };
 
 export default async function RootLayout({
@@ -22,12 +25,17 @@ export default async function RootLayout({
       <body className="h-full">
         <Suspense>
           {/* <Nav /> */}
-          
+
         </Suspense>
+        {/* <Background></Background> */}
         <HomeLayout>
-            {children}
-          </HomeLayout>
-        {/* <Toast /> */}
+          {children}
+        </HomeLayout>
+        <ToastContainer
+          autoClose={false}
+          hideProgressBar
+          limit={2}
+        />
       </body>
     </html>
   );

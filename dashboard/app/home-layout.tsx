@@ -55,7 +55,7 @@ export default function HomeLayout({
         <body class="h-full">
         ```
       */}
-      <div className='h-full'>
+      <div className='h-full relative'>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog as="div" className="relative z-50 lg:hidden" onClose={setSidebarOpen}>
             <Transition.Child

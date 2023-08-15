@@ -1,20 +1,35 @@
 'use client';
 
 import { Card, Title, Text } from '@tremor/react';
+import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import DatasetDetail from './dataset-detail';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getDatasets } from '../../services/common-service';
 
-const people = [
-    { name: 'Alpaca', title: 'Huggingface', type: 'Text', role: 'Length' },
-    // More people...
-  ]
 
 export default function Datasets(){
 
     const [openDetail, setOpenDetail] = useState(false)
+    const [datasets, setDatasets] = useState([])
+    const [selected, setSelected] = useState({})
 
-    const showDetail = () => {
+    useEffect(() => {
+      getAllDatasets()
+    }, [])
+
+    const showDetail = (edit = {} ) => {
+        setSelected(edit)
         setOpenDetail(!openDetail)
+    }
+
+    async function getAllDatasets() {
+      let res = await getDatasets();
+      
+      if (res.status) {
+        setDatasets(res.data);
+      } else {
+        // toast.error(res.data.message);
+      }
     }
 
     return(
@@ -53,6 +68,12 @@ export default function Datasets(){
                     scope="col"
                     className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
                   >
+                    Source type
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                  >
                     Source
                   </th>
                   <th
@@ -61,30 +82,25 @@ export default function Datasets(){
                   >
                     Content type
                   </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                  >
-                    Length
-                  </th>
                   <th scope="col" className="relative py-3 pl-3 pr-4 sm:pr-0">
                     <span className="sr-only">Edit</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {people.map((person) => (
-                  <tr key={person.type}>
+                {datasets.map((item: any) => (
+                  <tr key={item.dataset_id}>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      {person.name}
+                      {item.name}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.title}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.type}</td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.role}</td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                      <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                        Edit<span className="sr-only">, {person.name}</span>
-                      </a>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.source_type_alias}</td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {item.source_type == 0 && <a className='text-indigo-400' href={"https://huggingface.co/datasets/" + item.source} target='_blank'>{item.source}</a>}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.type_alias}</td>
+                    <td className="relative flex whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
+                      <PencilIcon onClick={() => showDetail(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
+                      <TrashIcon className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
                     </td>
                   </tr>
                 ))}
@@ -94,7 +110,7 @@ export default function Datasets(){
         </div>
         </Card>
       </div>
-      <DatasetDetail open={openDetail}></DatasetDetail>
+      <DatasetDetail open={openDetail} data={selected}></DatasetDetail>
     </div>
     )
 }
