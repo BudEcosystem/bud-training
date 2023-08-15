@@ -135,7 +135,7 @@ class Model(BaseModel):
     class Config:
         from_attributes = True
 
-    @root_validator()
+    @root_validator(pre=True)
     def validate_constant_aliases(cls, values) -> "Model":
         values["source_type_alias"] = str(
             get_constant_alias(

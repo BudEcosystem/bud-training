@@ -7,7 +7,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from .routers import datasets, models, pipelines, runs, servings
+from .routers import datasets, models, pipelines, runs, servings, logs
 from utils.exceptions import CustomHttpException
 from utils.loggers import get_logger
 from config import settings
@@ -34,7 +34,7 @@ app.add_middleware(GZipMiddleware, minimum_size=500)
 app.include_router(datasets.router)
 app.include_router(pipelines.router)
 app.include_router(models.router)
-
+app.include_router(logs.router)
 
 
 @app.middleware("http")

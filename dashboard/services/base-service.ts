@@ -8,7 +8,7 @@ const apiClient = (function () {
   let instance = axios.create({
     baseURL: `${URL}`,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     // timeout: 5000,
   });

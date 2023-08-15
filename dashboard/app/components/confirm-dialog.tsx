@@ -11,7 +11,7 @@ export default function ConfirmDialog(props: any) {
 
     useEffect(() => {
         console.log(props.selected, selected)
-        if (props.selected['dataset_id'] != selected['dataset_id']) {
+        if (JSON.stringify(props.selected) !== JSON.stringify(selected)) {
             console.log(props.selected, selected)
             setSelected(props.selected);
         }

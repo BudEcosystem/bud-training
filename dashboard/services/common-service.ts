@@ -42,3 +42,44 @@ export async function deleteDataset(dataset_id: any) {
     return error?.response;
   }
 }
+
+export async function getModels() {
+  try {
+    const { data } = await apiClient.get(`models`);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function addModel(params: any) {
+  
+  // let queryParams = 'name=' + data['name'] + '&source_type=' + data['source_type'] + '&type=' + data['type'] + '&source=' + data['source']
+  
+  try {
+    const { data } = await apiClient.post(`models?`, params);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function updateModel(params: any) {
+
+  try {
+    const { data } = await apiClient.put(`models/` + params['id'], params);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function deleteModel(model_id: any) {
+
+  try {
+    const { data } = await apiClient.delete(`models/` + model_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
