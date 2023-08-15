@@ -22,7 +22,7 @@ export default function Datasets() {
   }, [])
 
   const showDetail = (edit: any = {}) => {
-    console.log(edit)
+    
     if (!edit.dataset_id) {
       edit['dataset_id'] = null
       edit['name'] = ''
