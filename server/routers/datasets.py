@@ -1,14 +1,12 @@
 from typing import List
 from pydantic.types import UUID4
-from fastapi import APIRouter, Depends, File, UploadFile, Body
-from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Depends, File, UploadFile
 
 from ..schemas import ResponseBase
 from ..dependencies import (
     validate_token_header,
     get_dataset_crud,
     psql_crud,
-    form_json_deserializer,
 )
 from modules.handles.postgres import schemas as psql_schemas
 from .. import helpers
@@ -21,31 +19,6 @@ router = APIRouter(
     dependencies=[Depends(validate_token_header)],
     responses={404: {"description": "Not found"}},
 )
-
-
-# @router.post("/", response_model=ResponseBase[psql_schemas.Dataset])
-# def add_dataset(
-# dataset: str = Body(
-#         examples=psql_schemas.DatasetCreate.model_config["json_schema_extra"][
-#             "examples"
-#         ]
-#     ),
-#     metadata_file: UploadFile | None = File(None),
-#     archive_file: UploadFile | None = File(None),
-#     service: psql_crud.DatasetCRUD = Depends(get_dataset_crud),
-# ) -> ResponseBase[psql_schemas.Dataset] | dict:
-#     dataset: psql_schemas.DatasetCreate = form_json_deserializer(
-#         psql_schemas.DatasetCreate, dataset
-#     )
-#     dataset_id = helpers.save_datasets_to_filesystem(
-#         source_type=dataset.source_type,
-#         dataset_type=dataset.type,
-#         source=dataset.source,
-#         metadata_file=metadata_file,
-#         archive_file=archive_file,
-#     )
-#     dataset = service.create(dataset, dataset_id=dataset_id)
-#     return ResponseBase[psql_schemas.Dataset](data=dataset)
 
 
 @router.post("/", response_model=ResponseBase[psql_schemas.Dataset])
@@ -63,7 +36,9 @@ def add_dataset(
         archive_file=archive_file,
     )
     dataset = service.create(dataset, dataset_id=dataset_id)
-    return ResponseBase[psql_schemas.Dataset](data=dataset)
+    return ResponseBase[psql_schemas.Dataset](
+        data=psql_schemas.Dataset.from_orm(dataset)
+    )
 
 
 @router.get("/", response_model=ResponseBase[List[psql_schemas.Dataset]])
@@ -79,7 +54,9 @@ def read_datasets(
         datasets = service.get_dataset_by_type(
             dataset_type=dataset_type, page=page, limit=limit
         )
-    return ResponseBase[List[psql_schemas.Dataset]](data=datasets)
+    return ResponseBase[List[psql_schemas.Dataset]](
+        data=[psql_schemas.Dataset.from_orm(dataset) for dataset in datasets]
+    )
 
 
 @router.get("/{dataset_id}", response_model=ResponseBase[psql_schemas.Dataset])
@@ -87,7 +64,9 @@ def read_dataset_by_id(
     dataset_id: UUID4, service: psql_crud.DatasetCRUD = Depends(get_dataset_crud)
 ) -> ResponseBase[psql_schemas.Dataset] | dict:
     dataset = service.get(id=dataset_id)
-    return ResponseBase[psql_schemas.Dataset](data=dataset)
+    return ResponseBase[psql_schemas.Dataset](
+        data=psql_schemas.Dataset.from_orm(dataset)
+    )
 
 
 @router.put("/{dataset_id}", response_model=ResponseBase[psql_schemas.Dataset])
@@ -97,7 +76,9 @@ def edit_dataset(
     service: psql_crud.DatasetCRUD = Depends(get_dataset_crud),
 ) -> ResponseBase[psql_schemas.Dataset] | dict:
     dataset = service.update(id=dataset_id, obj=dataset)
-    return ResponseBase[psql_schemas.Dataset](data=dataset)
+    return ResponseBase[psql_schemas.Dataset](
+        data=psql_schemas.Dataset.from_orm(dataset)
+    )
 
 
 @router.delete("/{dataset_id}", response_model=ResponseBase[None])
@@ -105,6 +86,7 @@ def delete_dataset(
     dataset_id: UUID4, service: psql_crud.DatasetCRUD = Depends(get_dataset_crud)
 ) -> ResponseBase[None] | dict:
     service.delete(id=dataset_id)
+    helpers.delete_dir_from_filesystem("dataset", str(dataset_id))
     return ResponseBase[None](
         message="Successfully deleted", meta={"dataset_id": dataset_id}, data=None
     )

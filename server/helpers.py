@@ -10,10 +10,10 @@ import shutil
 
 from modules.handles.postgres import validations as psql_validations
 from modules.datasets.huggingface import is_valid_dataset
-from modules.models.utils import validate_model_path
 
 from config import settings
 from . import logger
+
 
 def delete_dir_from_filesystem(file_category: str, dirname: str):
     base_dir = {"dataset": settings.DATA_DIR, "model": settings.MODEL_DIR}
@@ -59,7 +59,8 @@ def save_metadata_file_to_filesystem(
             detail="Only '.jsonl' and 'json' formats are supported for metadata/text files",
         )
 
-    dataset_id = dataset_id or str(uuid4())
+    dataset_id = dataset_id or uuid4()
+    dataset_id = str(dataset_id)
 
     filename = f"metadata.{suffix}"
     return dataset_id, save_file_obj_to_filesystem(
@@ -75,7 +76,9 @@ def save_image_archive_to_filesystem(
             status_code=400, detail="Image archive file is either corrupted or empty"
         )
 
-    dataset_id = dataset_id or str(uuid4())
+    dataset_id = dataset_id or uuid4()
+    dataset_id = str(dataset_id)
+
     suffix = Path(file.filename).suffix.lstrip(".")
     if suffix not in ["zip"]:
         delete_dir_from_filesystem("dataset", dataset_id)
@@ -105,5 +108,3 @@ def save_datasets_to_filesystem(
         if psql_validations.is_dataset_type_text_and_image(dataset_type):
             save_image_archive_to_filesystem(archive_file, dataset_id)
     return dataset_id
-
-

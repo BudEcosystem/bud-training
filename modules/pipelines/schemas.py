@@ -1,6 +1,6 @@
-from typing import List, Any
+from typing import List, Any, Dict
 from pydantic import BaseModel as _BaseModel
-from pydantic import Field, root_validator, validator
+from pydantic import Field, root_validator
 from os import path as osp
 import yaml
 
@@ -30,7 +30,7 @@ class Property(BaseModel):
     type: int | str
     type_alias: str | None = None
 
-    @root_validator()
+    @root_validator(pre=True)
     def validate_model(cls, values) -> "Property":
         if isinstance(values["type"], int) or (
             isinstance(values["type"], str) and values["type"].isdigit()
@@ -68,12 +68,8 @@ class Node(TrainConfig):
     node_name: str | None = None
     family: str
 
-
-class NodeCreate(Node):
-    config_path: str
-
-    @root_validator()
-    def validate_model(cls, values) -> "NodeCreate":
+    @root_validator(pre=True)
+    def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if values["node_id"] != -1 and values["node_id"] not in NODE_CONSTANTS.get(
             "name", {}
         ):
@@ -116,7 +112,8 @@ class NodeCreate(Node):
                         ).properties
                     )
 
-            if data.get("outputs") and not len(values["outputs"]):
+            values["outputs"] = []
+            if data.get("outputs") and not len(values.get("outputs", [])):
                 if not isinstance(data["outputs"], dict):
                     raise ValueError("'outputs' param should be of type dict")
 
@@ -127,6 +124,10 @@ class NodeCreate(Node):
                 values["properties"].append(Property(name=key, **value))
 
         return values
+
+
+class NodeCreate(Node):
+    config_path: str
 
 
 class NodeCategory(BaseModel):
@@ -142,8 +143,8 @@ class Pipelines(SpecialExclusionBaseModel):
         osp.join(ROOT_PATH, "config", "pipelines.yaml"), hidden=True
     )
 
-    @root_validator()
-    def validate_model(cls, values) -> "Pipelines":
+    @root_validator
+    def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         if not osp.isfile(values["config_path"]):
             raise FileNotFoundError(
                 f"Couldn't locate the config file at '{values['config_path']}'"
@@ -173,7 +174,7 @@ class Pipelines(SpecialExclusionBaseModel):
             values["pipelines"].append(
                 NodeCategory(
                     category=category,
-                    nodes=[NodeCreate(**refactor_node(node)) for node in nodes],
+                    nodes=[Node(**refactor_node(node)) for node in nodes],
                 )
             )
 

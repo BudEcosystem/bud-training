@@ -1,7 +1,7 @@
+from typing import Dict, Any
 from pydantic import BaseModel, validator, root_validator
 from pydantic.types import UUID4
 from datetime import datetime
-from fastapi import Form
 
 from . import TABLE_ALIAS
 from .validations import validate_constants, get_constant_alias
@@ -72,10 +72,10 @@ class Dataset(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-    @root_validator()
-    def validate_constant_aliases(cls, values) -> "Dataset":
+    @root_validator
+    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["source_type_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Dataset"],
@@ -133,10 +133,10 @@ class Model(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-    @root_validator()
-    def validate_constant_aliases(cls, values) -> "Model":
+    @root_validator
+    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["source_type_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Model"],
@@ -153,8 +153,10 @@ class Model(BaseModel):
         )
         return values
 
+
 class ModelUpdate(BaseModel):
     name: str
+
 
 class PipelineCreate(BaseModel):
     dataset_id: UUID4
@@ -186,10 +188,10 @@ class Pipeline(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-    @root_validator()
-    def validate_constant_aliases(cls, values) -> "Pipeline":
+    @root_validator
+    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["type_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Pipeline"],
@@ -219,10 +221,10 @@ class Run(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-    @root_validator()
-    def validate_constant_aliases(cls, values) -> "Run":
+    @root_validator
+    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["type_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Run"], column_name="type", value=values["type"]
@@ -245,7 +247,7 @@ class RunModel(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class Serving(BaseModel):
@@ -255,14 +257,14 @@ class Serving(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class ServingHistory(BaseModel):
     serving_id: UUID4
     model_id: UUID4
     endpoint: str
-    log_path: str  # Local path?
+    log_path: str
     status: int
     started_at: datetime
     stopped_at: datetime
@@ -270,10 +272,10 @@ class ServingHistory(BaseModel):
     modified_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
-    @root_validator()
-    def validate_constant_aliases(cls, values) -> "ServingHistory":
+    @root_validator
+    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["status_alias"] = str(
             get_constant_alias(
                 table_name=TABLE_ALIAS["Serving History"],

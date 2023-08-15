@@ -6,7 +6,8 @@ from fastapi.responses import HTMLResponse
 from ..schemas import ResponseBase
 from ..dependencies import validate_token_header, get_model_crud, psql_crud
 from modules.handles.postgres import schemas as psql_schemas
-from modules.models import utils
+
+# from modules.models import utils
 from .. import logger
 
 
@@ -17,19 +18,23 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("/", response_model=ResponseBase[psql_schemas.Model])
 def add_model(
-    name: str = Form(...), source: str = Form(...), type: int = Form(...),source_type: int = Form(...),
+    name: str = Form(...),
+    source: str = Form(...),
+    type: int = Form(...),
+    source_type: int = Form(...),
     service: psql_crud.ModelCRUD = Depends(get_model_crud),
 ) -> ResponseBase[psql_schemas.Model] | dict:
-    model = psql_schemas.ModelCreate(name=name,source=source,type=type, source_type=source_type)
-    service.does_name_exists(model)
-    model_id = utils.save_models_to_filesystem(
-        source_type=source_type,
-        source=source
+    model = psql_schemas.ModelCreate(
+        name=name, source=source, type=type, source_type=source_type
     )
+    service.does_name_exists(model)
+    model_id = utils.save_models_to_filesystem(source_type=source_type, source=source)
     model = service.create(model, model_id=model_id)
     return ResponseBase[psql_schemas.Model](data=model)
+
 
 @router.get("/", response_model=ResponseBase[List[psql_schemas.Model]])
 def read_datasets(
@@ -59,6 +64,7 @@ def edit_dataset(
     service.does_name_exists(model)
     model = service.update(id=model_id, obj=model)
     return ResponseBase[psql_schemas.Model](data=model)
+
 
 @router.delete("/{model_id}", response_model=ResponseBase[None])
 def delete_dataset(
