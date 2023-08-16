@@ -14,7 +14,7 @@ DIR_PATH = osp.dirname(osp.realpath(__file__))
 ROOT_PATH = osp.abspath(osp.join(osp.dirname(__file__), ".." + osp.sep))
 
 
-@lru_cache
+@lru_cache(5)
 def load_constants(config_path: str | None = None):
     if not config_path:
         config_path = osp.join(ROOT_PATH, "config", "constants.yaml")

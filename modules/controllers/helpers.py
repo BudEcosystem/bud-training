@@ -6,7 +6,7 @@ from config import settings
 PSQL_CONSTANTS = settings.database.psql.CONSTANTS
 
 
-@lru_cache(maxsize=2000)
+@lru_cache(maxsize=10)
 def get_constant_alias(table_name, column_name, value):
     if (
         table_name not in PSQL_CONSTANTS
@@ -16,7 +16,7 @@ def get_constant_alias(table_name, column_name, value):
     return PSQL_CONSTANTS[table_name][column_name].get(value, value)
 
 
-@lru_cache(maxsize=2000)
+@lru_cache(maxsize=10)
 def validate_constants(table_name, column_name, value):
     if (
         table_name not in PSQL_CONSTANTS

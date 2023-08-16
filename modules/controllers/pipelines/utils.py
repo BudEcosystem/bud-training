@@ -1,9 +1,9 @@
 from os import path as osp
 
 from ...handles.postgres.database import create_session
-from ...handles.postgres.crud import ModelCRUD
 from ...handles.postgres.validations import is_model_source_type_equals
 from ..datasets import DatasetCRUD
+from ..models.manager import ModelCRUD
 from ..datasets import utils as dataset_validations
 from config import settings
 
@@ -17,11 +17,12 @@ def validate_property_value_by_type(ptype, value):
         4: fetch_dataset_path_by_id,
         5: fetch_model_path_by_id,
     }
-    ptype = int(ptype)
-    if ptype in type_definitions:
-        value = type_definitions[ptype](value)
-    else:
-        raise ValueError(f"Type '{ptype}' is not supported")
+    # ptype = int(ptype)
+    # if ptype in type_definitions:
+    #     value = type_definitions[ptype](value)
+    # else:
+    #     raise ValueError(f"Type '{ptype}' is not supported")
+    return value
 
 
 def fetch_dataset_path_by_id(dataset_id):
@@ -43,7 +44,7 @@ def fetch_dataset_path_by_id(dataset_id):
         raise ValueError("Couldn't recognize dataset source")
 
     db_session.remove()
-    return dataset_path
+    return str(dataset_path)
 
 
 def fetch_model_path_by_id(model_id):
@@ -62,4 +63,4 @@ def fetch_model_path_by_id(model_id):
         raise ValueError("Couldn't recognize model source")
 
     db_session.remove()
-    return model_path
+    return str(model_path)

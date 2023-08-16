@@ -9,7 +9,7 @@ PSQL_CONSTANTS = settings.database.psql.CONSTANTS
 PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
-@lru_cache(maxsize=500)
+@lru_cache(maxsize=10)
 def is_dataset_source_type_equals(source_type, value):
     table_name = PSQL_TABLE_ALIAS.Dataset
     column_name = "source_type"
@@ -35,7 +35,7 @@ def is_dataset_source_type_local_upload(value):
     return is_dataset_source_type_equals(value, "Local Upload")
 
 
-@lru_cache(maxsize=500)
+@lru_cache(maxsize=10)
 def is_dataset_type_equals(_type, value):
     table_name = PSQL_TABLE_ALIAS.Dataset
     column_name = "type"

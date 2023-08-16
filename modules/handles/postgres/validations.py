@@ -7,7 +7,7 @@ PSQL_CONSTANTS = settings.database.psql.CONSTANTS
 PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
-@lru_cache(maxsize=2000)
+@lru_cache(maxsize=10)
 def get_constant_alias(table_name, column_name, value):
     if (
         table_name not in PSQL_CONSTANTS
@@ -17,7 +17,7 @@ def get_constant_alias(table_name, column_name, value):
     return PSQL_CONSTANTS[table_name][column_name].get(value, value)
 
 
-@lru_cache(maxsize=2000)
+@lru_cache(maxsize=10)
 def validate_constants(table_name, column_name, value):
     if (
         table_name not in PSQL_CONSTANTS
@@ -27,7 +27,7 @@ def validate_constants(table_name, column_name, value):
     return value in PSQL_CONSTANTS[table_name][column_name]
 
 
-@lru_cache(maxsize=500)
+@lru_cache(maxsize=10)
 def is_model_source_type_equals(source_type, value):
     table_name = PSQL_TABLE_ALIAS["Dataset"]
     column_name = "source_type"
@@ -45,7 +45,7 @@ def is_model_source_type_equals(source_type, value):
     )
 
 
-@lru_cache(maxsize=500)
+@lru_cache(maxsize=10)
 def is_model_type_equals(_type, value):
     table_name = PSQL_TABLE_ALIAS["Dataset"]
     column_name = "type"
