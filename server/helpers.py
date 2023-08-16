@@ -8,7 +8,7 @@ from fastapi import UploadFile, HTTPException
 import shutil
 
 from modules.controllers.datasets import (
-    validations as psql_validations,
+    utils as psql_validations,
 )
 
 from config import settings

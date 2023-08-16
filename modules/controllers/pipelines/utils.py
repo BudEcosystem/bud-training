@@ -4,7 +4,7 @@ from ...handles.postgres.database import create_session
 from ...handles.postgres.crud import ModelCRUD
 from ...handles.postgres.validations import is_model_source_type_equals
 from ..datasets import DatasetCRUD
-from ..datasets import validations as dataset_validations
+from ..datasets import utils as dataset_validations
 from config import settings
 
 
@@ -57,7 +57,7 @@ def fetch_model_path_by_id(model_id):
     elif is_model_source_type_equals(db_obj.source_type, "Hugging Face"):
         model_path = db_obj.source
         # Change
-        is_valid_dataset(model_path)
+        dataset_validations.is_valid_hf_dataset(model_path)
     else:
         raise ValueError("Couldn't recognize model source")
 

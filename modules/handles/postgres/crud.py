@@ -1,6 +1,5 @@
 from typing import Any, Generic, List, Optional, Type, TypeVar
 from pydantic import BaseModel
-from pydantic.types import UUID4
 
 from sqlalchemy.exc import IntegrityError as AlchemyIntegrityError
 from sqlalchemy.orm import Session
@@ -8,7 +7,7 @@ from sqlalchemy.orm import Session
 from utils.exceptions import CustomHttpException
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from . import models
 from utils.loggers import get_logger
 
 
@@ -76,41 +75,3 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             )
         self.db_session.delete(db_obj)
         self.db_session.commit()
-
-
-class ModelCRUD(BaseCRUD[models.Models, None, schemas.ModelUpdate]):
-    __model__ = models.Models
-
-    def __init__(self, db_session: Session):
-        super().__init__(model=self.__model__, db_session=db_session)
-
-    def create(
-        self, obj: schemas.ModelCreate, model_id: UUID4 | None = None
-    ) -> models.Models:
-        if self.db_session.query(self.__model__).filter_by(name=obj.name).first():
-            raise CustomHttpException(
-                status_code=412, detail=f"Name {obj.name} already exists."
-            )
-        if model_id:
-            db_obj = self.model(**obj.dict(), model_id=model_id)
-        else:
-            db_obj = self.model(**obj.dict())
-        self.db_session.add(db_obj)
-        try:
-            self.db_session.commit()
-        except AlchemyIntegrityError as e:
-            self.db_session.rollback()
-            if "duplicate key" in str(e):
-                raise CustomHttpException(status_code=409, detail="Conflict Error")
-            else:
-                raise e
-        self.db_session.refresh(db_obj)
-        return db_obj
-
-    def does_name_exists(self, obj: schemas.ModelCreate) -> bool:
-        if self.db_session.query(self.__model__).filter_by(name=obj.name).first():
-            raise CustomHttpException(
-                status_code=412, detail=f"Name {obj.name} already exists."
-            )
-        else:
-            return True
