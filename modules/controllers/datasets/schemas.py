@@ -17,19 +17,6 @@ class DatasetCreate(BaseModel):
     source_type: int
     type: int
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "name": "Dataset XXX",
-                    "source": "",
-                    "source_type": 0,
-                    "type": 0,
-                }
-            ]
-        }
-    }
-
     @validator("name")
     def name_is_valid(cls, value: str) -> str:
         if not value.strip().strip('"').strip("'"):
@@ -41,7 +28,7 @@ class DatasetCreate(BaseModel):
     @validator("source_type")
     def source_type_is_valid(cls, value: str) -> str:
         if not validate_constants(
-            table_name=PSQL_TABLE_ALIAS["Dataset"],
+            table_name=PSQL_TABLE_ALIAS.Dataset,
             column_name="source_type",
             value=value,
         ):
@@ -53,7 +40,7 @@ class DatasetCreate(BaseModel):
     @validator("type")
     def type_is_valid(cls, value: str) -> str:
         if not validate_constants(
-            table_name=PSQL_TABLE_ALIAS["Dataset"], column_name="type", value=value
+            table_name=PSQL_TABLE_ALIAS.Dataset, column_name="type", value=value
         ):
             raise CustomHttpException(
                 status_code=422, detail=f"'type' doesn't support value '{value}'"
@@ -83,14 +70,14 @@ class Dataset(BaseModel):
     def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["source_type_alias"] = str(
             get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Dataset"],
+                table_name=PSQL_TABLE_ALIAS.Dataset,
                 column_name="source_type",
                 value=values["source_type"],
             )
         )
         values["type_alias"] = str(
             get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Dataset"],
+                table_name=PSQL_TABLE_ALIAS.Dataset,
                 column_name="type",
                 value=values["type"],
             )

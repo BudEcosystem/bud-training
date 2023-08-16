@@ -11,7 +11,7 @@ PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 @lru_cache(maxsize=500)
 def is_dataset_source_type_equals(source_type, value):
-    table_name = PSQL_TABLE_ALIAS["Dataset"]
+    table_name = PSQL_TABLE_ALIAS.Dataset
     column_name = "source_type"
 
     if source_type is None:
@@ -37,7 +37,7 @@ def is_dataset_source_type_local_upload(value):
 
 @lru_cache(maxsize=500)
 def is_dataset_type_equals(_type, value):
-    table_name = PSQL_TABLE_ALIAS["Dataset"]
+    table_name = PSQL_TABLE_ALIAS.Dataset
     column_name = "type"
 
     if _type is None:

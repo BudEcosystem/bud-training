@@ -20,7 +20,7 @@ class ModelCreate(BaseModel):
     @validator("source_type")
     def source_type_is_valid(cls, value: str) -> str:
         if not validate_constants(
-            table_name=PSQL_TABLE_ALIAS["Model"], column_name="source_type", value=value
+            table_name=PSQL_TABLE_ALIAS.Model, column_name="source_type", value=value
         ):
             raise CustomHttpException(
                 status_code=422, detail=f"'source_type' doesn't support value '{value}'"
@@ -30,7 +30,7 @@ class ModelCreate(BaseModel):
     @validator("type")
     def type_is_valid(cls, value: str) -> str:
         if not validate_constants(
-            table_name=PSQL_TABLE_ALIAS["Model"], column_name="type", value=value
+            table_name=PSQL_TABLE_ALIAS.Model, column_name="type", value=value
         ):
             raise CustomHttpException(
                 status_code=422, detail=f"'type' doesn't support value '{value}'"
@@ -61,14 +61,14 @@ class Model(BaseModel):
     def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["source_type_alias"] = str(
             get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Model"],
+                table_name=PSQL_TABLE_ALIAS.Model,
                 column_name="source_type",
                 value=values["source_type"],
             )
         )
         values["type_alias"] = str(
             get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Model"],
+                table_name=PSQL_TABLE_ALIAS.Model,
                 column_name="type",
                 value=values["type"],
             )
