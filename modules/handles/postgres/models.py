@@ -15,9 +15,10 @@ from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.ext.declarative import declarative_base
 
 from .helpers import RepresentableBase
-from . import TABLE_ALIAS
+from config import settings
 
 
+PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 Base = declarative_base(cls=RepresentableBase)
 
 
@@ -34,7 +35,7 @@ def pg_utc_now(element, compiler, **kw):
 
 
 class Datasets(Base):
-    __tablename__ = TABLE_ALIAS["Dataset"]
+    __tablename__ = PSQL_TABLE_ALIAS.Dataset
     dataset_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String, nullable=False)
     source = Column(String, nullable=True)  # HF name, folder/file path
@@ -47,13 +48,21 @@ class Datasets(Base):
 
 
 class Models(Base):
-    __tablename__ = TABLE_ALIAS["Model"]
+    __tablename__ = PSQL_TABLE_ALIAS.Model
     model_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    base_model_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey(f"{PSQL_TABLE_ALIAS.Model}.model_id"),
+        nullable=True,
+    )
     name = Column(String, nullable=False)
     source = Column(String, nullable=True)
     source_type = Column(Integer, nullable=False)  # Hugginface, custom
-    type = Column(Integer, nullable=False)  # LLM, SD
+    type = Column(Integer, nullable=False)  # adapter, delta, full
+    family = Column(Integer, nullable=False)
     is_finetuned = Column(Boolean, default=False)
+    meta = Column(JSON, default={})
+    base_model = relationship("Models", foreign_keys=[base_model_id])
     created_at = Column(DateTime(timezone=True), server_default=UtcNow())
     modified_at = Column(
         DateTime(timezone=True), server_default=UtcNow(), onupdate=UtcNow()
@@ -61,10 +70,10 @@ class Models(Base):
 
 
 class Pipelines(Base):
-    __tablename__ = TABLE_ALIAS["Pipeline"]
+    __tablename__ = PSQL_TABLE_ALIAS.Pipeline
     pipeline_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     name = Column(String, nullable=False)
-    graph = Column(JSON, nullable=False)
+    dags = Column(JSON, nullable=False)
     runs = relationship("Runs", back_populates="pipeline")
     created_at = Column(DateTime(timezone=True), server_default=UtcNow())
     modified_at = Column(
@@ -73,31 +82,21 @@ class Pipelines(Base):
 
 
 class Runs(Base):
-    __tablename__ = TABLE_ALIAS["Run"]
+    __tablename__ = PSQL_TABLE_ALIAS.Run
     run_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     pipeline_id = Column(
-        UUID(as_uuid=True), ForeignKey(f"{TABLE_ALIAS['Pipeline']}.pipeline_id")
-    )
-    dataset_id = Column(
-        UUID(as_uuid=True), ForeignKey(f"{TABLE_ALIAS['Dataset']}.dataset_id")
-    )
-    base_model_id = Column(
-        UUID(as_uuid=True), ForeignKey(f"{TABLE_ALIAS['Model']}.model_id")
+        UUID(as_uuid=True), ForeignKey(f"{PSQL_TABLE_ALIAS.Pipeline}.pipeline_id")
     )
     name = Column(String, nullable=False)
-    type = Column(Integer, nullable=False)  # LLM LoRA, SD LoRA, SD Dreambooth
-    params = Column(JSON, nullable=False)
-    source = Column(String, nullable=False)  # Folder/Blob path
+    dags = Column(JSON, nullable=False)
     results = Column(JSON, default={})  # Training results (loss, acc etc...)
     meta = Column(
         JSON, default={}
-    )  # {"nodes": "completed": [], "failed": [], "running": []}
+    )  # {"dags": "completed": [], "failed": [], "running": []}
     status = Column(Integer, default=0)  # Queued, Running, Finished, Failed, Stopped
     pipeline = relationship(
         "Pipelines", foreign_keys=[pipeline_id], back_populates="runs"
     )
-    dataset = relationship("Datasets", foreign_keys=[dataset_id])
-    base_model = relationship("Models", foreign_keys=[base_model_id])
     started_at = Column(DateTime(timezone=True))
     finished_at = Column(DateTime(timezone=True))
     created_at = Column(DateTime(timezone=True), server_default=UtcNow())
@@ -107,11 +106,11 @@ class Runs(Base):
 
 
 class RunsnModels(Base):
-    __tablename__ = TABLE_ALIAS["Run and Model"]
+    __tablename__ = PSQL_TABLE_ALIAS.Run_and_Model
     id = Column(Integer, primary_key=True)
-    run_id = Column(UUID(as_uuid=True), ForeignKey(f"{TABLE_ALIAS['Run']}.run_id"))
+    run_id = Column(UUID(as_uuid=True), ForeignKey(f"{PSQL_TABLE_ALIAS.Run}.run_id"))
     model_id = Column(
-        UUID(as_uuid=True), ForeignKey(f"{TABLE_ALIAS['Model']}.model_id")
+        UUID(as_uuid=True), ForeignKey(f"{PSQL_TABLE_ALIAS.Model}.model_id")
     )
     run = relationship("Runs", foreign_keys=[run_id])
     model = relationship("Models", foreign_keys=[model_id])
@@ -122,10 +121,10 @@ class RunsnModels(Base):
 
 
 class ServingHistory(Base):
-    __tablename__ = TABLE_ALIAS["Serving History"]
+    __tablename__ = PSQL_TABLE_ALIAS.Serving_History
     serving_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     model_id = Column(
-        UUID(as_uuid=True), ForeignKey(f"{TABLE_ALIAS['Model']}.model_id")
+        UUID(as_uuid=True), ForeignKey(f"{PSQL_TABLE_ALIAS.Model}.model_id")
     )
     endpoint = Column(String, nullable=False)
     log_path = Column(String, nullable=True)

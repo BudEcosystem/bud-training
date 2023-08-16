@@ -7,11 +7,6 @@ import 'reactflow/dist/style.css';
 import Node from './components/node';
 import ComponentDetail from './component-detail';
 
-const initialNodes = [
-    { id: '1', type:'trainerNode', position: { x: 0, y: 0 }, data: { label: '1' } },
-    { id: '2', type:'evaluateNode', position: { x: 200, y: 0 }, data: { label: '2' } },
-];
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
 const nodeTypes = {
     node: Node
@@ -20,8 +15,8 @@ const nodeTypes = {
 export default function Canvas() {
 
     const reactFlowWrapper = useRef({} as any);
-    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState({} as any);
     const [showNodeDetails, setShowDetails] = useState(false);
 
@@ -34,10 +29,10 @@ export default function Canvas() {
             event.preventDefault();
 
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-            const type = event.dataTransfer.getData('application/reactflow');
-            console.log(type)
+            const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
+            console.log(data)
             // check if the dropped element is valid
-            if (typeof type === 'undefined' || !type) {
+            if (typeof data === 'undefined' || !data) {
                 return;
             }
 
@@ -47,9 +42,9 @@ export default function Canvas() {
             });
             const newNode = {
                 id: getId(),
-                type,
+                type: 'node',
                 position,
-                data: { label: `${type} node` },
+                data: data,
             };
 
             setNodes((nds) => nds.concat(newNode));
@@ -81,7 +76,7 @@ export default function Canvas() {
                         // onNodesDelete={deleteConfirm}
                         nodeTypes={nodeTypes}
                         fitView
-                        onNodeClick={onNodeClick}
+                        // onNodeClick={onNodeClick}
                     >
                         <Controls />
                         <MiniMap />

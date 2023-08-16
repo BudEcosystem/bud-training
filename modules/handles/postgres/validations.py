@@ -1,10 +1,10 @@
 from functools import lru_cache
 
-from . import TABLE_ALIAS
-from config import CONSTANTS
+from config import settings
 
 
-PSQL_CONSTANTS = CONSTANTS.get("postgres", {})
+PSQL_CONSTANTS = settings.database.psql.CONSTANTS
+PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
 @lru_cache(maxsize=2000)
@@ -28,8 +28,8 @@ def validate_constants(table_name, column_name, value):
 
 
 @lru_cache(maxsize=500)
-def is_dataset_source_type_equals(source_type, value):
-    table_name = TABLE_ALIAS["Dataset"]
+def is_model_source_type_equals(source_type, value):
+    table_name = PSQL_TABLE_ALIAS["Dataset"]
     column_name = "source_type"
 
     if source_type is None:
@@ -45,17 +45,9 @@ def is_dataset_source_type_equals(source_type, value):
     )
 
 
-def is_dataset_source_type_huggingface(value):
-    return is_dataset_source_type_equals(value, "Hugging Face")
-
-
-def is_dataset_source_type_local_upload(value):
-    return is_dataset_source_type_equals(value, "Local Upload")
-
-
 @lru_cache(maxsize=500)
-def is_dataset_type_equals(_type, value):
-    table_name = TABLE_ALIAS["Dataset"]
+def is_model_type_equals(_type, value):
+    table_name = PSQL_TABLE_ALIAS["Dataset"]
     column_name = "type"
 
     if _type is None:
@@ -67,7 +59,3 @@ def is_dataset_type_equals(_type, value):
         ).lower()
         == value.lower()
     )
-
-
-def is_dataset_type_text_and_image(value):
-    return is_dataset_type_equals(value, "Text & Image")

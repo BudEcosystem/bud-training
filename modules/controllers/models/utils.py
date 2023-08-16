@@ -90,5 +90,8 @@ def find_available_port(start_port=7860):
             port += 1
 
 def run_inference_sd_lora():
-    command = [settings.PYTHON_ENV, "core/imagegen/stable_diffusion/utils/gradio_sd_lora.py", "arg2"]
+
+    command = [settings.PYTHON_ENV, "core/imagegen/stable_diffusion/utils/gradio_sd_lora.py", "--base_model_path",
+               "runwayml/stable-diffusion-v1-5", "--lora_path","/root/bud-training/checkpoints/logo-train-test"]
+    with open(os.path.join(settings.LOG_DIR, ""), "w") as log_file:
 

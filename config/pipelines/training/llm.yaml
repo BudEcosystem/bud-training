@@ -1,6 +1,9 @@
 description: LLM Finetuning
+category_id: 0
+node_id: 0
+family_id: 0
 inherits:
-  - config/training/common.yaml
+  - config/pipelines/training/common.yaml
 outputs:
   model:
     description: Finetuned Model Checkpoint

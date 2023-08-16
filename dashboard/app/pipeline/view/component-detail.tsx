@@ -7,7 +7,7 @@ export default function ComponentDetail(props: any) {
   const [open, setOpen] = useState(false)
   
   useEffect(() => {
-    setOpen(true)
+    // setOpen(true)
   }, [props])
 
   return (

@@ -11,6 +11,7 @@ fastapi
 python-multipart
 pydantic<2.0
 celery
+watchdog
 
 # LLM
 torch
@@ -33,9 +34,13 @@ wandb
 xformers
 bitsandbytes
 
+<<<<<<< HEAD
 git+https://github.com/microsoft/DeepSpeed.git
 
 watchdog
 celery
 gevent
 Redis
+=======
+git+https://github.com/microsoft/DeepSpeed.git
+>>>>>>> 30741de2c22de644ef7bece06ab64b0276305cfd
