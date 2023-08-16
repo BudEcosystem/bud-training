@@ -1,6 +1,10 @@
 from functools import lru_cache
 
 from config import settings
+from utils.loggers import get_logger
+
+
+logger = get_logger("module_log")
 
 
 PSQL_CONSTANTS = settings.database.psql.CONSTANTS

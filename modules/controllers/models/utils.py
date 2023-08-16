@@ -4,9 +4,8 @@ from typing import Tuple
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import  HTTPException
+from fastapi import HTTPException
 
-from modules.handles.postgres import validations as psql_validations
 from modules.controllers.datasets import utils
 from config import settings
 
@@ -15,7 +14,6 @@ import shutil
 
 from utils.exceptions import CustomHttpException
 
-import subprocess, socket
 
 def validate_model_path(model_path: str) -> bool:
     if not model_path:
@@ -32,12 +30,11 @@ def validate_model_path(model_path: str) -> bool:
             status_code=422,
             detail=f"Couldn't find '{model_path}' on the Hugging Face Hub. Either the model doesn't exist on the hub or the repo is private or gated.",
         )
-    
+
 
 def save_model_to_filesystem(
-    model_path: str, dataset_id: str | None = None
+    model_path: str, model_id: str | None = None
 ) -> Tuple[str, Path]:
-
     if not os.path.exists(model_path):
         raise HTTPException(
             status_code=400, detail=f"The path {model_path} does not exist."
@@ -47,7 +44,7 @@ def save_model_to_filesystem(
             status_code=400, detail=f"The path {model_path} is not a directory."
         )
 
-    model_id = dataset_id or str(uuid4())
+    model_id = model_id or str(uuid4())
     dest_path = os.path.join(settings.MODEL_DIR, model_id)
 
     if not os.path.exists(dest_path):
@@ -63,16 +60,19 @@ def save_model_to_filesystem(
 
     return model_id
 
+
 def save_models_to_filesystem(
     source_type: int,
-    source: str | None = None,):
+    source: str | None = None,
+):
     model_id = None
     if utils.is_dataset_source_type_huggingface(source_type):
         validate_model_path(source)
     elif utils.is_dataset_source_type_local_upload(source_type):
         model_id = save_model_to_filesystem(source)
-        
+
     return model_id
+
 
 def delete_model_path(model_id: str):
     path = os.path.join(settings.MODEL_DIR, str(model_id))

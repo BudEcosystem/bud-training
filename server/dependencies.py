@@ -5,9 +5,6 @@ from pydantic import BaseModel, ValidationError
 from fastapi import Header, Depends, Form, HTTPException
 from fastapi.encoders import jsonable_encoder
 
-from modules.handles.postgres.database import get_session
-from modules.controllers.datasets.manager import DatasetCRUD
-import modules.handles.postgres.crud as psql_crud
 from config import settings
 
 
@@ -39,9 +36,3 @@ async def validate_token_header(x_token: Annotated[str, Header()]):
 async def validate_auth_token(token: str):
     if token != "":
         raise HTTPException(status_code=401, detail="Authorization failed")
-
-
-def get_dataset_crud(
-    db_session: Session = Depends(get_session),
-) -> DatasetCRUD:
-    return DatasetCRUD(db_session)
