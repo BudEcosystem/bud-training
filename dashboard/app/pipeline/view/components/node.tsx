@@ -3,7 +3,7 @@ import { Handle, Position } from 'reactflow';
 import { TrashIcon, BeakerIcon, ChartBarIcon } from "@heroicons/react/24/outline"
 
 export default function Node(data: any){
-    console.log(data)
+    // console.log(data)
     return(
         <div className='card border border-indigo-900 rounded py-2 pl-2 pr-1 text-xs bg-white w-44'>
             <Handle

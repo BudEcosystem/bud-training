@@ -7,7 +7,7 @@ from uuid import uuid4
 from fastapi import  HTTPException
 
 from modules.handles.postgres import validations as psql_validations
-
+from modules.controllers.datasets import utils
 from config import settings
 
 import os
@@ -23,7 +23,7 @@ def validate_model_path(model_path: str) -> bool:
             status_code=422,
             detail=f"dataset source can't be empty for Hugging Face model",
         )
-    url = f"https://huggingface.co/{model_path}/resolve/main/config.json"
+    url = f"https://huggingface.co/{model_path}/resolve/main/.gitattributes"
     response = requests.head(url)
     if response.status_code == 200:
         return True
@@ -67,9 +67,9 @@ def save_models_to_filesystem(
     source_type: int,
     source: str | None = None,):
     model_id = None
-    if psql_validations.is_dataset_source_type_huggingface(source_type):
+    if utils.is_dataset_source_type_huggingface(source_type):
         validate_model_path(source)
-    elif psql_validations.is_dataset_source_type_local_upload(source_type):
+    elif utils.is_dataset_source_type_local_upload(source_type):
         model_id = save_model_to_filesystem(source)
         
     return model_id
@@ -89,9 +89,10 @@ def find_available_port(start_port=7860):
                 return port
             port += 1
 
-def run_inference_sd_lora():
+def run_inference_sd_lora(port):
 
     command = [settings.PYTHON_ENV, "core/imagegen/stable_diffusion/utils/gradio_sd_lora.py", "--base_model_path",
-               "runwayml/stable-diffusion-v1-5", "--lora_path","/root/bud-training/checkpoints/logo-train-test"]
-    with open(os.path.join(settings.LOG_DIR, ""), "w") as log_file:
-
+               "runwayml/stable-diffusion-v1-5", "--lora_path","/root/bud-training/checkpoints/logo-train-test", "--port",str(port)]
+    with open(os.path.join(settings.LOG_DIR, "log_file.txt"), "w") as log_file:
+            process = subprocess.Popen(command, stdout=log_file, stderr=subprocess.STDOUT)
+            process.wait

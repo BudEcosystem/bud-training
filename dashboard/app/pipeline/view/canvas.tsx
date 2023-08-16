@@ -19,6 +19,7 @@ export default function Canvas() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState({} as any);
     const [showNodeDetails, setShowDetails] = useState(false);
+    const [selected, setSelected] = useState(null);
 
     let id = 0;
     const getId = () => `dndnode_${id++}`;
@@ -55,9 +56,13 @@ export default function Canvas() {
     const onDragOver = useCallback((event: any) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
-      }, []);
-    
-    const onNodeClick = () => {setShowDetails(true)}
+    }, []);
+
+    const onNodeClick = (event: any, node: any) => {
+        console.log('clicked', node);
+        setSelected(node)
+        setShowDetails(!showNodeDetails)
+    }
 
     return (
         <div style={{ width: '100vw', height: '100%' }}>
@@ -76,7 +81,7 @@ export default function Canvas() {
                         // onNodesDelete={deleteConfirm}
                         nodeTypes={nodeTypes}
                         fitView
-                        // onNodeClick={onNodeClick}
+                        onNodeClick={onNodeClick}
                     >
                         <Controls />
                         <MiniMap />
@@ -87,6 +92,6 @@ export default function Canvas() {
             </ReactFlowProvider>
             <ComponentDetail open={showNodeDetails}></ComponentDetail>
         </div>
-        
+
     );
 }
