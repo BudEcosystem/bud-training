@@ -56,3 +56,20 @@ class ServingHistory(BaseModel):
             )
         )
         return values
+
+class ServingStatus(BaseModel):
+    
+    status: int
+
+    class Config:
+        orm_mode = True
+
+    @validator("status")
+    def status_is_valid(cls, value: str) -> str:
+        if not validate_constants(
+            table_name=PSQL_TABLE_ALIAS.Serving_History, column_name="status", value=value
+        ):
+            raise CustomHttpException(
+                status_code=422, detail=f"'status' doesn't support value '{value}'"
+            )
+        return value

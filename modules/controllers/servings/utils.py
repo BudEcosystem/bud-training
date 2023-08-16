@@ -23,7 +23,7 @@ def run_inference_sd_lora(port,base_model_path,log_path,lora_path=None):
          command.extend(("--lora_path",lora_path))
     with open(log_path, "a") as log_file:
             process = subprocess.Popen(command, stdout=log_file, stderr=subprocess.STDOUT)
-            process.wait
+    return process
 
 def get_model_path(model):
     if model.source_type == 1:
@@ -41,5 +41,6 @@ def run_inference(serving_id,port,model,base_model):
         if model.type == 0:
             base_model_path = get_model_path(base_model)
             task = celery_worker.run_inference_sd.apply_async([port,base_model_path,log_path,model_path],task_id=serving_id)
-
+    else:
+        CustomHttpException(status_code=422, detail="Currently we don't support inference of this model")
           
