@@ -19,7 +19,7 @@ export default function Canvas() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState({} as any);
     const [showNodeDetails, setShowDetails] = useState(false);
-    const [selected, setSelected] = useState(null);
+    const [selected, setSelected] = useState({} as any);
 
     let id = 0;
     const getId = () => `dndnode_${id++}`;
@@ -90,7 +90,7 @@ export default function Canvas() {
                 </div>
 
             </ReactFlowProvider>
-            <ComponentDetail open={showNodeDetails}></ComponentDetail>
+            <ComponentDetail open={showNodeDetails} selected={selected}></ComponentDetail>
         </div>
 
     );

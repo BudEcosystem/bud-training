@@ -13,8 +13,7 @@ postgres:
       2: Full
     family: &family
       0: LLaMa
-      1: SD 1.5 LoRA
-      2: SD 1.5
+      1: SD 1.5
     source_type:
       0: Hugging Face
       1: Local Upload

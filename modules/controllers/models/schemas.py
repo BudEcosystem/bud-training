@@ -92,7 +92,7 @@ class Model(BaseModel):
             get_constant_alias(
                 table_name=PSQL_TABLE_ALIAS.Model,
                 column_name="family",
-                value=values["type"],
+                value=values["family"],
             )
         )
         return values

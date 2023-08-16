@@ -165,7 +165,7 @@ wandb
 cache
 data
 logs
-./models/
+models/
 checkpoints
 results
 

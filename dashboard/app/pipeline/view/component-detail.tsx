@@ -6,14 +6,20 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 export default function ComponentDetail(props: any) {
   const [open, setOpen] = useState(false)
   const [init, setInit] = useState(false)
-  
+  const [node, setNode] = useState({} as any)
+
   useEffect(() => {
     if (!init) {
-        setInit(true)
-        return
+      setInit(true)
+      return
     }
     setOpen(true)
-}, [props.open])
+  }, [props.open])
+
+  useEffect(() => {
+    
+    setOpen(props.selected?.data)
+  }, [props.selected])
 
   return (
     <Transition.Root show={open} as={Fragment}>

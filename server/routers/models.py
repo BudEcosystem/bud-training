@@ -5,22 +5,12 @@ from fastapi import APIRouter, Depends, Form
 from ..schemas import ResponseBase
 from ..dependencies import validate_token_header
 from modules.controllers.models import schemas, manager, utils
-from workers import celery_worker
 router = APIRouter(
     prefix="/models",
     tags=["models"],
     dependencies=[Depends(validate_token_header)],
     responses={404: {"description": "Not found"}},
 )
-
-@router.get("/inference/", response_model=ResponseBase[None])
-def inference(
-) -> ResponseBase[None] | dict:
-    port = utils.find_available_port()
-    task = celery_worker.run_inference.apply_async([port])
-    return ResponseBase[None](
-        message="Successfully started", meta={"port": port, "id": task.id}, data=None
-    )
 
 @router.post("/", response_model=ResponseBase[schemas.Model])
 def add_model(

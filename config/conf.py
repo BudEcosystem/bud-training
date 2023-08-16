@@ -94,7 +94,8 @@ settings = {
         "CONFIGS": PIPELINE_CONFIGS,
         "AVAILABLE_PIPELINES": [],
     },
-    "PYTHON_ENV": env.str("PYTHON_ENV")
+    "PYTHON_ENV": env.str("PYTHON_ENV"),
+    "SD_ENDPOINT": env.str("SD_ENDPOINT")
 }
 
 

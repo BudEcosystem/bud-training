@@ -79,20 +79,3 @@ def delete_model_path(model_id: str):
     if os.path.exists(path):
         shutil.rmtree(path)
     return True
-
-def find_available_port(start_port=7860):
-    port = start_port
-    while True:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            result = sock.connect_ex(('0.0.0.0', port))
-            if result != 0: # Port is available
-                return port
-            port += 1
-
-def run_inference_sd_lora(port):
-
-    command = [settings.PYTHON_ENV, "core/imagegen/stable_diffusion/utils/gradio_sd_lora.py", "--base_model_path",
-               "runwayml/stable-diffusion-v1-5", "--lora_path","/root/bud-training/checkpoints/logo-train-test", "--port",str(port)]
-    with open(os.path.join(settings.LOG_DIR, "log_file.txt"), "w") as log_file:
-            process = subprocess.Popen(command, stdout=log_file, stderr=subprocess.STDOUT)
-            process.wait

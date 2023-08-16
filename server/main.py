@@ -35,6 +35,7 @@ app.include_router(datasets.router)
 app.include_router(pipelines.router)
 app.include_router(models.router)
 app.include_router(logs.router)
+app.include_router(servings.router)
 
 
 @app.middleware("http")
