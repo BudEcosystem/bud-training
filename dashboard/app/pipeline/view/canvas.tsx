@@ -4,8 +4,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useNodesState, useEdgesState, addEdge, ReactFlow, ReactFlowProvider, Controls, MiniMap, Background, BackgroundVariant } from 'reactflow';
 
 import 'reactflow/dist/style.css';
-import TrainNode from './components/train-node';
-import EvalNode from './components/eval-node';
+import Node from './components/node';
 import ComponentDetail from './component-detail';
 
 const initialNodes = [
@@ -15,8 +14,7 @@ const initialNodes = [
 const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
 const nodeTypes = {
-    trainerNode: TrainNode,
-    evaluateNode: EvalNode
+    node: Node
 }
 
 export default function Canvas() {
