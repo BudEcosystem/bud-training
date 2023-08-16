@@ -78,43 +78,7 @@ class BaseCRUD(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.db_session.commit()
 
 
-class DatasetCRUD(BaseCRUD[models.Datasets, None, schemas.DatasetUpdate]):
-    __model__ = models.Datasets
-
-    def __init__(self, db_session: Session):
-        super().__init__(model=self.__model__, db_session=db_session)
-
-    def create(
-        self, obj: schemas.DatasetCreate, dataset_id: UUID4 | None = None
-    ) -> models.Datasets:
-        if dataset_id:
-            db_obj = self.model(**obj.dict(), dataset_id=dataset_id)
-        else:
-            db_obj = self.model(**obj.dict())
-        self.db_session.add(db_obj)
-        try:
-            self.db_session.commit()
-        except AlchemyIntegrityError as e:
-            self.db_session.rollback()
-            if "duplicate key" in str(e):
-                raise CustomHttpException(status_code=409, detail="Conflict Error")
-            else:
-                raise e
-        self.db_session.refresh(db_obj)
-        return db_obj
-
-    def get_dataset_by_type(self, dataset_type: int, page: int = 1, limit: int = 100):
-        skip = (page - 1) * limit
-        return (
-            self.db_session.query(self.model)
-            .filter(self.model.type == dataset_type)
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
-
-
-class ModelCRUD(BaseCRUD[models.Datasets, None, schemas.DatasetUpdate]):
+class ModelCRUD(BaseCRUD[models.Models, None, schemas.ModelUpdate]):
     __model__ = models.Models
 
     def __init__(self, db_session: Session):
@@ -122,7 +86,7 @@ class ModelCRUD(BaseCRUD[models.Datasets, None, schemas.DatasetUpdate]):
 
     def create(
         self, obj: schemas.ModelCreate, model_id: UUID4 | None = None
-    ) -> models.Datasets:
+    ) -> models.Models:
         if self.db_session.query(self.__model__).filter_by(name=obj.name).first():
             raise CustomHttpException(
                 status_code=412, detail=f"Name {obj.name} already exists."

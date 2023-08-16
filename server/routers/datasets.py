@@ -8,7 +8,8 @@ from ..dependencies import (
     get_dataset_crud,
     psql_crud,
 )
-from modules.handles.postgres import schemas as psql_schemas
+from modules.controllers.datasets import schemas as dataset_schemas
+from modules.controllers.datasets import manager
 from .. import helpers
 from .. import logger
 
@@ -21,13 +22,13 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=ResponseBase[psql_schemas.Dataset])
+@router.post("/", response_model=ResponseBase[dataset_schemas.Dataset])
 def add_dataset(
-    dataset: psql_schemas.DatasetCreate = Depends(),
+    dataset: dataset_schemas.DatasetCreate = Depends(),
     metadata_file: UploadFile | None = File(None),
     archive_file: UploadFile | None = File(None),
-    service: psql_crud.DatasetCRUD = Depends(get_dataset_crud),
-) -> ResponseBase[psql_schemas.Dataset] | dict:
+    service: manager.DatasetCRUD = Depends(get_dataset_crud),
+) -> ResponseBase[dataset_schemas.Dataset] | dict:
     dataset_id = helpers.save_datasets_to_filesystem(
         source_type=dataset.source_type,
         dataset_type=dataset.type,
@@ -36,54 +37,54 @@ def add_dataset(
         archive_file=archive_file,
     )
     dataset = service.create(dataset, dataset_id=dataset_id)
-    return ResponseBase[psql_schemas.Dataset](
-        data=psql_schemas.Dataset.from_orm(dataset)
+    return ResponseBase[dataset_schemas.Dataset](
+        data=dataset_schemas.Dataset.from_orm(dataset)
     )
 
 
-@router.get("/", response_model=ResponseBase[List[psql_schemas.Dataset]])
+@router.get("/", response_model=ResponseBase[List[dataset_schemas.Dataset]])
 def read_datasets(
     dataset_type: int = None,
     page: int = 1,
     limit: int = 100,
-    service: psql_crud.DatasetCRUD = Depends(get_dataset_crud),
-) -> ResponseBase[List[psql_schemas.Dataset]] | dict:
+    service: manager.DatasetCRUD = Depends(get_dataset_crud),
+) -> ResponseBase[List[dataset_schemas.Dataset]] | dict:
     if dataset_type is None:
         datasets = service.list(page=page, limit=limit)
     else:
         datasets = service.get_dataset_by_type(
             dataset_type=dataset_type, page=page, limit=limit
         )
-    return ResponseBase[List[psql_schemas.Dataset]](
-        data=[psql_schemas.Dataset.from_orm(dataset) for dataset in datasets]
+    return ResponseBase[List[dataset_schemas.Dataset]](
+        data=[dataset_schemas.Dataset.from_orm(dataset) for dataset in datasets]
     )
 
 
-@router.get("/{dataset_id}", response_model=ResponseBase[psql_schemas.Dataset])
+@router.get("/{dataset_id}", response_model=ResponseBase[dataset_schemas.Dataset])
 def read_dataset_by_id(
-    dataset_id: UUID4, service: psql_crud.DatasetCRUD = Depends(get_dataset_crud)
-) -> ResponseBase[psql_schemas.Dataset] | dict:
+    dataset_id: UUID4, service: manager.DatasetCRUD = Depends(get_dataset_crud)
+) -> ResponseBase[dataset_schemas.Dataset] | dict:
     dataset = service.get(id=dataset_id)
-    return ResponseBase[psql_schemas.Dataset](
-        data=psql_schemas.Dataset.from_orm(dataset)
+    return ResponseBase[dataset_schemas.Dataset](
+        data=dataset_schemas.Dataset.from_orm(dataset)
     )
 
 
-@router.put("/{dataset_id}", response_model=ResponseBase[psql_schemas.Dataset])
+@router.put("/{dataset_id}", response_model=ResponseBase[dataset_schemas.Dataset])
 def edit_dataset(
     dataset_id: UUID4,
-    dataset: psql_schemas.DatasetUpdate,
-    service: psql_crud.DatasetCRUD = Depends(get_dataset_crud),
-) -> ResponseBase[psql_schemas.Dataset] | dict:
+    dataset: dataset_schemas.DatasetUpdate,
+    service: manager.DatasetCRUD = Depends(get_dataset_crud),
+) -> ResponseBase[dataset_schemas.Dataset] | dict:
     dataset = service.update(id=dataset_id, obj=dataset)
-    return ResponseBase[psql_schemas.Dataset](
-        data=psql_schemas.Dataset.from_orm(dataset)
+    return ResponseBase[dataset_schemas.Dataset](
+        data=dataset_schemas.Dataset.from_orm(dataset)
     )
 
 
 @router.delete("/{dataset_id}", response_model=ResponseBase[None])
 def delete_dataset(
-    dataset_id: UUID4, service: psql_crud.DatasetCRUD = Depends(get_dataset_crud)
+    dataset_id: UUID4, service: manager.DatasetCRUD = Depends(get_dataset_crud)
 ) -> ResponseBase[None] | dict:
     service.delete(id=dataset_id)
     helpers.delete_dir_from_filesystem("dataset", str(dataset_id))

@@ -7,9 +7,9 @@ postgres:
       0: Text
       1: Text & Image
   - table_name: "models"
-    type:
-      0: LLM
-      1: SD
+    type: &family
+      0: LLaVA
+      1: SD 1.5 LoRA
     source_type:
       0: Hugging Face
       1: Local Upload
@@ -38,3 +38,4 @@ nodes:
     boolean: 3
     dataset: 4
     model: 5
+  family: *family

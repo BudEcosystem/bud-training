@@ -3,14 +3,12 @@ from os import path as osp
 from pathlib import Path
 from uuid import uuid4
 
-from tempfile import SpooledTemporaryFile
 from fastapi import UploadFile, HTTPException
 
 import shutil
 
-from modules.handles.postgres import validations as psql_validations
+from modules.controllers.datasets import validations as psql_validations
 from modules.datasets.huggingface import is_valid_dataset
-from modules.model_module.utils import validate_model_path
 
 from config import settings
 from . import logger

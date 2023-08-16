@@ -36,7 +36,7 @@ def add_model(
 def read_datasets(
     page: int = 1,
     limit: int = 100,
-    service: psql_crud.DatasetCRUD = Depends(get_model_crud),
+    service: psql_crud.ModelCRUD = Depends(get_model_crud),
 ) -> ResponseBase[List[psql_schemas.Model]] | dict:
     models = service.list(page=page, limit=limit)
     return ResponseBase[List[psql_schemas.Model]](data=models)
@@ -54,8 +54,8 @@ def read_dataset_by_id(
 def edit_dataset(
     model_id: UUID4,
     name: str = Form(...),
-    service: psql_crud.DatasetCRUD = Depends(get_model_crud),
-) -> ResponseBase[psql_schemas.Dataset] | dict:
+    service: psql_crud.ModelCRUD = Depends(get_model_crud),
+) -> ResponseBase[psql_schemas.Model] | dict:
     model = psql_schemas.ModelUpdate(name=name)
     service.does_name_exists(model)
     model = service.update(id=model_id, obj=model)

@@ -6,8 +6,8 @@ from ..dependencies import (
     validate_token_header,
 )
 from modules.handles.postgres import schemas as psql_schemas
-from modules.pipelines.schemas import NodeCategory
-from modules.pipelines import AVAILABLE_PIPELINES
+from modules.controllers.pipelines.schemas import NodeCategory
+from modules.controllers.pipelines import AVAILABLE_PIPELINES
 
 
 router = APIRouter(
