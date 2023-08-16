@@ -29,7 +29,7 @@ def add_model(
     service.does_name_exists(model)
     model_id = utils.save_models_to_filesystem(source_type=source_type, source=source)
     model = service.create(model, model_id=model_id)
-    return ResponseBase[psql_schemas.Model](data=model)
+    return ResponseBase[psql_schemas.Model](data=psql_schemas.Model.from_orm(model))
 
 
 @router.get("/", response_model=ResponseBase[List[psql_schemas.Model]])
@@ -39,7 +39,8 @@ def read_datasets(
     service: psql_crud.DatasetCRUD = Depends(get_model_crud),
 ) -> ResponseBase[List[psql_schemas.Model]] | dict:
     models = service.list(page=page, limit=limit)
-    return ResponseBase[List[psql_schemas.Model]](data=models)
+    return ResponseBase[List[psql_schemas.Model]](
+                data=[psql_schemas.Model.from_orm(model) for model in models])
 
 
 @router.get("/{model_id}", response_model=ResponseBase[psql_schemas.Model])
@@ -47,7 +48,7 @@ def read_dataset_by_id(
     model_id: UUID4, service: psql_crud.ModelCRUD = Depends(get_model_crud)
 ) -> ResponseBase[psql_schemas.Model] | dict:
     model = service.get(id=model_id)
-    return ResponseBase[psql_schemas.Model](data=model)
+    return ResponseBase[psql_schemas.Model](data=psql_schemas.Model.from_orm(model))
 
 
 @router.put("/{model_id}", response_model=ResponseBase[psql_schemas.Model])
@@ -59,7 +60,7 @@ def edit_dataset(
     model = psql_schemas.ModelUpdate(name=name)
     service.does_name_exists(model)
     model = service.update(id=model_id, obj=model)
-    return ResponseBase[psql_schemas.Model](data=model)
+    return ResponseBase[psql_schemas.Model](data=psql_schemas.Model.from_orm(model))
 
 
 @router.delete("/{model_id}", response_model=ResponseBase[None])

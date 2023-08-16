@@ -83,3 +83,12 @@ export async function deleteModel(model_id: any) {
     return error?.response;
   }
 }
+
+export async function getPipelineConfig() {
+  try {
+    const { data } = await apiClient.get(`pipeline/config`);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
