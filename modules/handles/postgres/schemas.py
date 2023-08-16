@@ -3,9 +3,12 @@ from pydantic import BaseModel, validator, root_validator
 from pydantic.types import UUID4
 from datetime import datetime
 
-from config import PSQL_TABLE_ALIAS
+from config import settings
 from .validations import validate_constants, get_constant_alias
 from utils.exceptions import CustomHttpException
+
+
+PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
 class ModelCreate(BaseModel):
@@ -75,100 +78,6 @@ class Model(BaseModel):
 
 class ModelUpdate(BaseModel):
     name: str
-
-
-class PipelineCreate(BaseModel):
-    dataset_id: UUID4
-    base_model_id: UUID4
-    name: str
-    type: int
-    params: dict
-
-    @validator("type")
-    def type_is_valid(cls, value: str) -> str:
-        if not validate_constants(
-            table_name=PSQL_TABLE_ALIAS["Pipeline"], column_name="type", value=value
-        ):
-            raise CustomHttpException(
-                status_code=422, detail=f"'type' doesn't support value '{value}'"
-            )
-        return value
-
-
-class Pipeline(BaseModel):
-    pipeline_id: UUID4
-    dataset_id: UUID4
-    base_model_id: UUID4
-    name: str
-    type: int
-    type_alias: str | None = None
-    params: dict
-    created_at: datetime
-    modified_at: datetime
-
-    class Config:
-        orm_mode = True
-
-    @root_validator
-    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        values["type_alias"] = str(
-            get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Pipeline"],
-                column_name="type",
-                value=values["type"],
-            )
-        )
-        return values
-
-
-class Run(BaseModel):
-    run_id: UUID4
-    pipeline_id: UUID4
-    dataset_id: UUID4
-    base_model_id: UUID4
-    name: str
-    type: int
-    type_alias: str | None = None
-    params: dict
-    source: str  # local path will be displayed?
-    metadata: dict
-    status: int
-    status_alias: str | None = None
-    started_at: datetime
-    finished_at: datetime
-    created_at: datetime
-    modified_at: datetime
-
-    class Config:
-        orm_mode = True
-
-    @root_validator
-    def validate_constant_aliases(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        values["type_alias"] = str(
-            get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Run"],
-                column_name="type",
-                value=values["type"],
-            )
-        )
-        values["status_alias"] = str(
-            get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS["Run"],
-                column_name="status",
-                value=values["status"],
-            )
-        )
-        return values
-
-
-class RunModel(BaseModel):
-    run_id: UUID4
-    model_id: UUID4
-    created_at: datetime
-    modified_at: datetime
-
-    class Config:
-        orm_mode = True
 
 
 class Serving(BaseModel):

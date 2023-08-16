@@ -1,4 +1,5 @@
 description: Common Eval params
+exclude: True
 properties:
   dataset:
     description: Dataset for eval

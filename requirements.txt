@@ -11,6 +11,7 @@ fastapi
 python-multipart
 pydantic<2.0
 celery
+watchdog
 
 # LLM
 torch
@@ -34,5 +35,3 @@ xformers
 bitsandbytes
 
 git+https://github.com/microsoft/DeepSpeed.git
-
-watchdog

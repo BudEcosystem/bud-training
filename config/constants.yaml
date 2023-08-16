@@ -7,7 +7,11 @@ postgres:
       0: Text
       1: Text & Image
   - table_name: "models"
-    type: &family
+    type:
+      0: Adapter
+      1: Delta
+      2: Full
+    family: &family
       0: LLaVA
       1: SD 1.5 LoRA
     source_type:
@@ -25,17 +29,21 @@ postgres:
       0: Idle
       1: Running
       2: Failed
-nodes:
-  name:
-    0: LLM Finetuning
-    1: SD LoRA Finetuning
-    2: HumanEval
-    3: Custom Eval
-  property_type:
-    integer: 0
-    number: 1
-    string: 2
-    boolean: 3
-    dataset: 4
-    model: 5
-  family: *family
+pipelines:
+  nodes:
+    category:
+      0: Training
+      1: Eval
+    name:
+      0: LLM Finetuning
+      1: SD LoRA Finetuning
+      2: HumanEval
+      3: Custom Eval
+    property_type:
+      0: integer
+      1: number
+      2: string
+      3: boolean
+      4: dataset
+      5: model
+    family: *family

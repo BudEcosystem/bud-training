@@ -1,4 +1,5 @@
 description: Common Training params
+exclude: True
 properties:
   dataset:
     description: Dataset for training

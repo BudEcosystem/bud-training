@@ -2,7 +2,11 @@ from functools import lru_cache
 from datasets import load_dataset
 
 from utils.exceptions import CustomHttpException
-from config import PSQL_TABLE_ALIAS, PSQL_CONSTANTS
+from config import settings
+
+
+PSQL_CONSTANTS = settings.database.psql.CONSTANTS
+PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
 @lru_cache(maxsize=500)

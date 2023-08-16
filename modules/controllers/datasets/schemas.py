@@ -5,7 +5,10 @@ from datetime import datetime
 
 from ..helpers import validate_constants, get_constant_alias
 from utils.exceptions import CustomHttpException
-from config import PSQL_TABLE_ALIAS
+from config import settings
+
+
+PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
 class DatasetCreate(BaseModel):

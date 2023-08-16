@@ -7,8 +7,9 @@ from fastapi import UploadFile, HTTPException
 
 import shutil
 
-from modules.controllers.datasets import validations as psql_validations
-from modules.datasets.huggingface import is_valid_dataset
+from modules.controllers.datasets import (
+    validations as psql_validations,
+)
 
 from config import settings
 from . import logger
@@ -101,7 +102,7 @@ def save_datasets_to_filesystem(
 ):
     dataset_id = None
     if psql_validations.is_dataset_source_type_huggingface(source_type):
-        is_valid_dataset(source)
+        psql_validations.is_valid_hf_dataset(source)
     elif psql_validations.is_dataset_source_type_local_upload(source_type):
         dataset_id, _ = save_metadata_file_to_filesystem(metadata_file)
         if psql_validations.is_dataset_type_text_and_image(dataset_type):

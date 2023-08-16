@@ -1,6 +1,9 @@
 from functools import lru_cache
 
-from config import PSQL_CONSTANTS
+from config import settings
+
+
+PSQL_CONSTANTS = settings.database.psql.CONSTANTS
 
 
 @lru_cache(maxsize=2000)

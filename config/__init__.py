@@ -1,12 +1,6 @@
 from pathlib import Path
 
-from .conf import settings, ROOT_PATH, CONSTANTS
-from utils.factory import NestedNamespace
-
-
-settings = NestedNamespace(settings)
-PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
-PSQL_CONSTANTS = CONSTANTS.get("postgres", {})
+from .conf import settings
 
 
 Path(settings.LOG_DIR).mkdir(exist_ok=True, parents=True)
