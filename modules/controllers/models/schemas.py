@@ -16,6 +16,8 @@ class ModelCreate(BaseModel):
     source: str | None = None
     type: int
     source_type: int
+    family: int
+    base_model_id: UUID4 | None = None
 
     @validator("source_type")
     def source_type_is_valid(cls, value: str) -> str:
@@ -36,6 +38,16 @@ class ModelCreate(BaseModel):
                 status_code=422, detail=f"'type' doesn't support value '{value}'"
             )
         return value
+    
+    @validator("family")
+    def family_is_valid(cls, value: str) -> str:
+        if not validate_constants(
+            table_name=PSQL_TABLE_ALIAS.Model, column_name="family", value=value
+        ):
+            raise CustomHttpException(
+                status_code=422, detail=f"'family' doesn't support value '{value}'"
+            )
+        return value
 
 
 class ModelUpdate(BaseModel):
@@ -50,6 +62,9 @@ class Model(BaseModel):
     type_alias: str | None = None
     source_type: int
     source_type_alias: str | None = None
+    family: int
+    family_alias: str | None = None
+    base_model_id: UUID4 | None = None
     is_finetuned: bool
     created_at: datetime
     modified_at: datetime
@@ -71,6 +86,13 @@ class Model(BaseModel):
                 table_name=PSQL_TABLE_ALIAS.Model,
                 column_name="type",
                 value=values["type"],
+            )
+        )
+        values["family_alias"] = str(
+            get_constant_alias(
+                table_name=PSQL_TABLE_ALIAS.Model,
+                column_name="family",
+                value=values["family"],
             )
         )
         return values

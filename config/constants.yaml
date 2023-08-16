@@ -12,8 +12,8 @@ postgres:
       1: Delta
       2: Full
     family: &family
-      0: LLaVA
-      1: SD 1.5 LoRA
+      0: LLaMa
+      1: SD 1.5
     source_type:
       0: Hugging Face
       1: Local Upload

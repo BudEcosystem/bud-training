@@ -10,13 +10,20 @@ export async function getDatasets() {
 }
 
 export async function addDataset(data: any) {
-  console.log(data['meta_file'])
+  
   let queryParams = 'name=' + data['name'] + '&source_type=' + data['source_type'] + '&type=' + data['type'] + '&source=' + data['source']
+  
   let formdata = new FormData();
-  formdata.append('metadata_file', data['meta_file'])
+  if(data['meta_file']) formdata.append('metadata_file', data['meta_file'])
   if( data['archive_file']) formdata.append('archive_file', data['archive_file'])
+  
+  let params = {}
+  if(data['meta_file'] || data['archive_file'] ){
+    params = formdata
+  }
   try {
-    const { data } = await apiClient.post(`dataset?` + queryParams, formdata);
+    
+    const { data } = await apiClient.post(`dataset?` + queryParams, params);
     return data;
   } catch (error: any) {
     return error?.response;

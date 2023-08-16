@@ -13,8 +13,9 @@ export default function ComponentProvider() {
         getConfig()
     }, [])
 
-    const onDragStart = (event: any, nodeType: any) => {
-        event.dataTransfer.setData("application/reactflow", nodeType);
+    const onDragStart = (event: any, nodeData: any, cat: string) => {
+        nodeData['category'] = cat
+        event.dataTransfer.setData("application/reactflow", JSON.stringify(nodeData));
         event.dataTransfer.effectAllowed = "move";
     };
 
@@ -36,9 +37,9 @@ export default function ComponentProvider() {
             </div>
             {config.map((cat: any) => (
                 <>
-                    <div className="text-xs mb-2 leading-6 text-gray-400">{cat.category}</div>
+                    <div className="text-xs mb-2 leading-6 text-gray-400">{cat.category_name}</div>
                     {cat.nodes.map((node: any) => (
-                        <div className="group flex justify-between items-center rounded-md border border-dashed border-gray-300 px-3 py-2 bg-gray-100 text-sm mb-5 cursor-pointer hover:bg-indigo-600 hover:text-white" draggable onDragStart={(event) => onDragStart(event, 'trainerNode')}>
+                        <div className="group flex justify-between items-center rounded-md border border-dashed border-gray-300 px-3 py-2 bg-gray-100 text-sm mb-5 cursor-pointer hover:bg-indigo-600 hover:text-white" draggable onDragStart={(event) => onDragStart(event, node, cat.category_name)}>
                             {node.node_name}
                             <AdjustmentsHorizontalIcon
                                 className="h-4 w-4 shrink-0 group-hover:text-white"

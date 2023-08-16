@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Form
 from ..schemas import ResponseBase
 from ..dependencies import validate_token_header
 from modules.controllers.models import schemas, manager, utils
-
 router = APIRouter(
     prefix="/models",
     tags=["models"],
@@ -13,17 +12,18 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
 @router.post("/", response_model=ResponseBase[schemas.Model])
 def add_model(
     name: str = Form(...),
     source: str = Form(...),
     type: int = Form(...),
     source_type: int = Form(...),
+    family: int = Form(...),
+    base_model_id: UUID4 = Form(None),
     service: manager.ModelCRUD = Depends(manager.get_model_crud),
 ) -> ResponseBase[schemas.Model] | dict:
     model = schemas.ModelCreate(
-        name=name, source=source, type=type, source_type=source_type
+        name=name, source=source, type=type, source_type=source_type, family=family, base_model_id=base_model_id
     )
     service.does_name_exists(model)
     model_id = utils.save_models_to_filesystem(source_type=source_type, source=source)
