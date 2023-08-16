@@ -26,4 +26,5 @@ settings = {
         "redis": {"URL": env.str("REDIS_URL")},
     },
     "pipelines": {},
+    "PYTHON_ENV": env.str("PYTHON_ENV")
 }

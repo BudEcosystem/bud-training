@@ -15,6 +15,8 @@ import shutil
 
 from utils.exceptions import CustomHttpException
 
+import subprocess, socket
+
 def validate_model_path(model_path: str) -> bool:
     if not model_path:
         raise CustomHttpException(
@@ -77,3 +79,16 @@ def delete_model_path(model_id: str):
     if os.path.exists(path):
         shutil.rmtree(path)
     return True
+
+def find_available_port(start_port=7860):
+    port = start_port
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            result = sock.connect_ex(('0.0.0.0', port))
+            if result != 0: # Port is available
+                return port
+            port += 1
+
+def run_inference_sd_lora():
+    command = [settings.PYTHON_ENV, "core/imagegen/stable_diffusion/utils/gradio_sd_lora.py", "arg2"]
+
