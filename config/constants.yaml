@@ -44,6 +44,7 @@ pipelines:
       1: number
       2: string
       3: boolean
-      4: dataset
-      5: model
+      4: list
+      5: dataset
+      6: model
     family: *family
