@@ -2,14 +2,14 @@
 
 import { Card, Title, Text } from '@tremor/react';
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
-import ModelDetail from './model-detail';
+import ModelDetail from './inference-detail';
 import { useEffect, useState } from 'react';
-import { deleteModel, getModels } from '../../services/common-service';
+import { getInference } from '../../services/common-service';
 import { showToast } from '../../services/toast-service';
 import ConfirmDialog from '../components/confirm-dialog';
 
 
-export default function Models() {
+export default function Inference() {
 
   const [openDetail, setOpenDetail] = useState(false)
   const [models, setModels] = useState([])
@@ -33,7 +33,7 @@ export default function Models() {
     setOpenDetail(!openDetail)
   }
 
-  async function getAllModels() {
+  async function getAllInferences() {
     let res = await getModels();
 
     if (res.status) {

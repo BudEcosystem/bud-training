@@ -2,11 +2,21 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import TextField from './components/text-field'
+import DatasetField from './components/dataset-field'
+import ModelField from './components/model-field'
+import BoolField from './components/bool-field'
 
 export default function ComponentDetail(props: any) {
+  const nodeSchema = {
+    node_name: '',
+    description: '',
+    properties: []
+  }
+
   const [open, setOpen] = useState(false)
   const [init, setInit] = useState(false)
-  const [node, setNode] = useState({} as any)
+  const [node, setNode] = useState(nodeSchema as any)
 
   useEffect(() => {
     if (!init) {
@@ -17,8 +27,8 @@ export default function ComponentDetail(props: any) {
   }, [props.open])
 
   useEffect(() => {
-    
-    setOpen(props.selected?.data)
+    console.log(props.selected?.data)
+    if(props.selected?.data) setNode(props.selected?.data)
   }, [props.selected])
 
   return (
@@ -44,7 +54,7 @@ export default function ComponentDetail(props: any) {
                       <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                         <div className="flex items-center justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-white">
-                            Trainer
+                            {node.node_name}
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button
@@ -60,61 +70,24 @@ export default function ComponentDetail(props: any) {
                         </div>
                         <div className="mt-1">
                           <p className="text-sm text-indigo-300">
-                            Update the trainer parameters
+                            {node.description}
                           </p>
                         </div>
                       </div>
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="divide-y divide-gray-200 px-4 sm:px-6">
                           <div className="space-y-6 pb-5 pt-6">
-                            <div>
-                              <label
-                                htmlFor="project-name"
-                                className="block text-sm font-medium leading-6 text-gray-900"
-                              >
-                                Model path
-                              </label>
-                              <div className="mt-2">
-                                <input
-                                  type="text"
-                                  name="project-name"
-                                  id="project-name"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
+                            {node?.properties.map((item: any) => (
+                              <div>
+                                {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
+                                {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
+                                {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
+                                {item.type == 3 && <BoolField label={item.title} default={item.default}></BoolField>}
+                                {item.type == 4 && <DatasetField label={item.title}></DatasetField>}
+                                {item.type == 5 && <ModelField label={item.title}></ModelField>}
                               </div>
-                            </div>
-                            <div>
-                              <label
-                                htmlFor="project-name"
-                                className="block text-sm font-medium leading-6 text-gray-900"
-                              >
-                                Dataset
-                              </label>
-                              <div className="mt-2">
-                                <input
-                                  type="text"
-                                  name="project-name"
-                                  id="project-name"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                              </div>
-                            </div>
-                            <div>
-                              <label
-                                htmlFor="project-name"
-                                className="block text-sm font-medium leading-6 text-gray-900"
-                              >
-                                Learning rate
-                              </label>
-                              <div className="mt-2">
-                                <input
-                                  type="text"
-                                  name="project-name"
-                                  id="project-name"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                              </div>
-                            </div>
+                            ))}
+                            
                           </div>
                         </div>
                       </div>

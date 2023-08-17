@@ -42,6 +42,7 @@ class ServingHistory(BaseModel):
     stopped_at: datetime | None = None
     created_at: datetime
     modified_at: datetime
+    model: Any | None = None
 
     class Config:
         orm_mode = True
