@@ -3,10 +3,10 @@ import random
 import string
 
 from ...handles.postgres.database import create_session
-from ...handles.postgres.validations import is_model_source_type_equals
 from ..datasets import DatasetCRUD
 from ..models.manager import ModelCRUD
-from ..datasets import utils as dataset_validations
+from ..datasets.utils import is_valid_hf_dataset
+from ..models.utils import validate_model_path
 from utils.factory import fetch_word_list
 from config import settings
 
@@ -17,14 +17,16 @@ def validate_property_value_by_type(ptype, value):
         1: float,
         2: str,
         3: bool,
-        4: fetch_dataset_path_by_id,
-        5: fetch_model_path_by_id,
+        4: str,
+        5: fetch_dataset_path_by_id,
+        6: fetch_model_path_by_id,
     }
-    # ptype = int(ptype)
-    # if ptype in type_definitions:
-    #     value = type_definitions[ptype](value)
-    # else:
-    #     raise ValueError(f"Type '{ptype}' is not supported")
+    ptype = int(ptype)
+    # TODO: Add required bool field to handle nulls
+    if ptype in type_definitions:
+        value = type_definitions[ptype](value) if value is not None else value
+    else:
+        raise ValueError(f"Type '{ptype}' is not supported")
     return value
 
 
@@ -33,16 +35,12 @@ def fetch_dataset_path_by_id(dataset_id):
     db = DatasetCRUD(db_session)
 
     db_obj = db.get(dataset_id)
-    if dataset_validations.is_dataset_source_type_equals(
-        db_obj.source_type, "Local Upload"
-    ):
+    if db_obj.source_type == 1:
         dataset_path = osp.join(settings.DATA_DIR, str(db_obj.dataset_id))
         assert osp.isdir(dataset_path), f"Dataset path not found for '{dataset_id}'"
-    elif dataset_validations.is_dataset_source_type_equals(
-        db_obj.source_type, "Hugging Face"
-    ):
+    elif db_obj.source_type == 0:
         dataset_path = db_obj.source
-        dataset_validations.is_valid_hf_dataset(dataset_path)
+        is_valid_hf_dataset(dataset_path)
     else:
         raise ValueError("Couldn't recognize dataset source")
 
@@ -55,13 +53,13 @@ def fetch_model_path_by_id(model_id):
     db = ModelCRUD(db_session)
 
     db_obj = db.get(model_id)
-    if is_model_source_type_equals(db_obj.source_type, "Local Path"):
+    if db_obj.source_type == 1:
         model_path = osp.join(settings.DATA_DIR, str(db_obj.model_id))
         assert osp.isdir(model_path), f"Model path not found for '{model_id}'"
-    elif is_model_source_type_equals(db_obj.source_type, "Hugging Face"):
+    elif db_obj.source_type == 0:
         model_path = db_obj.source
         # Change
-        dataset_validations.is_valid_hf_dataset(model_path)
+        validate_model_path(model_path)
     else:
         raise ValueError("Couldn't recognize model source")
 
@@ -73,9 +71,9 @@ def random_string_generator(size=6, string=string.ascii_letters + string.digits)
     return "".join(random.choice(string) for _ in range(size))
 
 
-def rand_name_generator():
-    name_words = fetch_word_list(settings.CACHE_DIR, "word_list.json")
-    name = " ".join(
-        [name_words[random.randint(0, len(name_words) - 1)] for i in range(2)]
+def random_name_generator():
+    name_words = fetch_word_list(osp.join(settings.CACHE_DIR, "word_list.json"))
+    name = "-".join(
+        [name_words[random.randint(0, len(name_words) - 1)] for _ in range(2)]
     )
-    return name
+    return name + f"-{random_string_generator()}"

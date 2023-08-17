@@ -27,6 +27,8 @@ class Property(BaseModel):
     default: Any | None = None
     description: str
     title: str
+    skip_if_null: bool = False
+    arg_only: bool = False
     type: int | str
     type_alias: str | None = None
 
@@ -51,6 +53,11 @@ class Property(BaseModel):
         else:
             values["type_alias"] = values["type"]
             values["type"] = properties[values["type"]]
+
+        if "skip_if_null" not in values:
+            values["skip_if_null"] = False
+        if "arg_only" not in values:
+            values["arg_only"] = False
 
         return values
 

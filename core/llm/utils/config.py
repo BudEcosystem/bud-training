@@ -155,3 +155,65 @@ def get_config(args):
     }
 
     return config
+
+
+def add_common_args(parser: argparse.ArgumentParser):
+    parser.add_argument(
+        "--run_id",
+        type=str,
+        required=True,
+        help="UUID of the run for creating and managing checkpoints, logs and reports",
+    )
+
+    parser.add_argument(
+        "--base_model",
+        type=str,
+        default=None,
+        required=True,
+        help="Path to pretrained model or model identifier from huggingface.co/models.",
+    )
+
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default=None,
+        required=True,
+        help=(
+            "The name of the Dataset (from the HuggingFace hub) to train on (could be your own, possibly private,"
+            " dataset). It can also be a path pointing to a local copy of a dataset in your filesystem,"
+            " or to a folder containing files that 🤗 Datasets can understand."
+        ),
+    )
+
+    parser.add_argument(
+        "--save_to_dir",
+        type=str,
+        required=True,
+        help="The output directory where the model predictions and checkpoints will be written.",
+    )
+
+    parser.add_argument(
+        "--save_report_to",
+        type=str,
+        default="tensorboard",
+        help=(
+            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+        ),
+    )
+
+    parser.add_argument(
+        "--wandb_project_name",
+        type=str,
+        default=None,
+        help="project name to use in wandb",
+    )
+
+    parser.add_argument("--wandb_group_name", type=str, help="Wandb group to be used")
+
+    parser.add_argument(
+        "--wandb_run_name",
+        type=str,
+        default=None,
+        help="Run name to use in wandb",
+    )

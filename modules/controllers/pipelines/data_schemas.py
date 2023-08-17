@@ -41,7 +41,7 @@ class PipelineUpdate(BaseModel):
 
     @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values["name"]:
+        if "name" in values and not values["name"]:
             CustomHttpException(
                 status_code=422, detail="Pipeline name shouldn't be empty"
             )
@@ -58,6 +58,7 @@ class PipelineUpdate(BaseModel):
                 CustomHttpException(
                     status_code=422, detail="Pipeline nodes should be a valid json"
                 )
+        # TODO: Raise error if both name and dags is missing?
         return values
 
 
@@ -77,15 +78,55 @@ class RunCreate(BaseModel):
     name: str
     dags: dict | list
     status: int
-    started_at: datetime
+
+    @validator("status")
+    def status_is_valid(cls, value: int) -> int:
+        if not validate_constants(
+            table_name=PSQL_TABLE_ALIAS.Run,
+            column_name="status",
+            value=value,
+        ):
+            raise CustomHttpException(
+                status_code=422, detail=f"'status' doesn't support value '{value}'"
+            )
+        return value
 
 
 class RunUpdate(BaseModel):
-    dags: dict | list
-    results: dict | list
-    meta: dict | list
-    status: int
-    finished_at: datetime
+    dags: dict | list | None = None
+    results: dict | list | None = None
+    meta: dict | list = None
+    status: int | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
+
+    @validator("status")
+    def status_is_valid(cls, value: int) -> int:
+        if not validate_constants(
+            table_name=PSQL_TABLE_ALIAS.Run,
+            column_name="status",
+            value=value,
+        ):
+            raise CustomHttpException(
+                status_code=422, detail=f"'status' doesn't support value '{value}'"
+            )
+        return value
+
+    @validator("dags")
+    def validate_model(cls, value: Dict[str, Any]) -> Dict[str, Any]:
+        if not value:
+            CustomHttpException(
+                status_code=422, detail="Pipeline nodes should be a valid json"
+            )
+        try:
+            if isinstance(value, str):
+                value = json.loads(value)
+            json.dumps(value)
+        except Exception:
+            CustomHttpException(
+                status_code=422, detail="Pipeline nodes should be a valid json"
+            )
+        return value
 
 
 class Run(BaseModel):
@@ -97,13 +138,24 @@ class Run(BaseModel):
     meta: dict | list
     status: int
     status_alias: str | None = None
-    started_at: datetime
-    finished_at: datetime
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
     created_at: datetime
     modified_at: datetime
 
     class Config:
         orm_mode = True
+
+    @root_validator
+    def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        values["status_alias"] = str(
+            get_constant_alias(
+                table_name=PSQL_TABLE_ALIAS.Run,
+                column_name="status",
+                value=values["status"],
+            )
+        )
+        return values
 
 
 class RunModelCreate(BaseModel):

@@ -1,8 +1,7 @@
 from os import path as osp
 
-from ...config import add_common_args
 from trainer.diffusers_trainer import DiffusersTrainer
-from utils.train_config import get_lora_argparser
+from utils.train_config import get_lora_argparser, add_common_args
 
 
 def main():
@@ -11,9 +10,14 @@ def main():
 
     args = parser.parse_args()
 
-    if osp.isdir(args.dataset_name):
-        args.train_data_dir = args.dataset_name
+    args.pretrained_model_name_or_path = args.base_model
+
+    if osp.isdir(args.dataset):
+        args.train_data_dir = args.dataset
         args.dataset_name = None
+    else:
+        args.dataset_name = args.dataset
+        args.train_data_dir = None
 
     args.output_dir = args.save_to_dir
     args.logging_dir = osp.join(args.output_dir, "logs")

@@ -32,7 +32,7 @@ def add_model(
 
 
 @router.get("/", response_model=ResponseBase[List[schemas.Model]])
-def read_datasets(
+def read_models(
     page: int = 1,
     limit: int = 100,
     service: manager.ModelCRUD = Depends(manager.get_model_crud),
@@ -44,7 +44,7 @@ def read_datasets(
 
 
 @router.get("/{model_id}", response_model=ResponseBase[schemas.Model])
-def read_dataset_by_id(
+def read_model_by_id(
     model_id: UUID4, service: manager.ModelCRUD = Depends(manager.get_model_crud)
 ) -> ResponseBase[schemas.Model] | dict:
     model = service.get(id=model_id)
@@ -52,7 +52,7 @@ def read_dataset_by_id(
 
 
 @router.put("/{model_id}", response_model=ResponseBase[schemas.Model])
-def edit_dataset(
+def edit_model(
     model_id: UUID4,
     name: str = Form(...),
     service: manager.ModelCRUD = Depends(manager.get_model_crud),
@@ -64,11 +64,11 @@ def edit_dataset(
 
 
 @router.delete("/{model_id}", response_model=ResponseBase[None])
-def delete_dataset(
+def delete_model(
     model_id: UUID4, service: manager.ModelCRUD = Depends(manager.get_model_crud)
 ) -> ResponseBase[None] | dict:
     service.delete(id=model_id)
     utils.delete_model_path(model_id=model_id)
     return ResponseBase[None](
-        message="Successfully deleted", meta={"dataset_id": model_id}, data=None
+        message="Successfully deleted", meta={"model_id": model_id}, data=None
     )
