@@ -5,30 +5,17 @@ import { XMarkIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
 import Dropdown from '../dropdown'
-import { addModel, updateModel } from '../../services/common-service'
+import { addInference, addModel, updateModel } from '../../services/common-service'
 import { showToast } from '../../services/toast-service'
 import Loading from '../loading'
+import ModelField from '../pipeline/view/components/model-field'
 
-export default function ModelDetail(props: any) {
-
-    const sourceTypeList = [
-        { id: 1, name: "Local upload" },
-        { id: 0, name: "Huggingface" }
-    ]
-
-    const contentTypeList = [
-        { id: 0, name: "LLM" },
-        { id: 1, name: "SD" }
-    ]
+export default function InferenceDetail(props: any) {
 
     const [open, setOpen] = useState(false)
     const [init, setInit] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [modelId, setModelId] = useState(null)
-    const [name, setName] = useState('')
-    const [sourceType, setSourceType] = useState(0)
-    const [contentType, setContentType] = useState(0)
-    const [source, setSource] = useState('')
+    const [model, setModel] = useState('')
 
     useEffect(() => {
         if (!init) {
@@ -38,47 +25,20 @@ export default function ModelDetail(props: any) {
         setOpen(true)
     }, [props.open])
 
-    useEffect(() => {
-        
-        setModelId(props.data['model_id'])
-        setName(props.data['name'])
-        if (props.data['type'] || props.data['type'] == 0) setContentType(props.data['type'])
-        if (props.data['source_type'] || props.data['source_type'] == 0) setSourceType(props.data['source_type'])
-        setSource(props.data['source'])
-
-    }, [props.data])
-
     async function addData() {
-        console.log(name)
-        if (!name) {
-            showToast('error', 'Missing information', 'Please enter model name')
-            return
-        }
-        if (!source) {
-            showToast('error', 'Missing information', 'Please enter path')
-            return
-        }
+
         
-        let data = {
-            name: name,
-            source_type: sourceType,
-            type: contentType,
-            source: source,
-            id: modelId
-        }
+        console.log(model)
+        
         setLoading(true)
         let res
-        if (modelId) {
-            res = await updateModel(data);
-        } else {
-            res = await addModel(data);
-        }
+        res = await addInference(model);
 
         setLoading(false)
         if (res.status == true) {
             console.log(res.data);
             //   setDatasets(res.data);
-            showToast('success', 'Successfully done!', 'You can start using the model in the pipeline')
+            showToast('success', 'Successfully done!', 'You can start using the model in the inference')
             setOpen(false)
             props.onClose()
         } else {
@@ -110,7 +70,7 @@ export default function ModelDetail(props: any) {
                                             <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                                                 <div className="flex items-center justify-between">
                                                     <Dialog.Title className="text-base font-semibold leading-6 text-white">
-                                                        Model
+                                                        Inference
                                                     </Dialog.Title>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
@@ -126,57 +86,14 @@ export default function ModelDetail(props: any) {
                                                 </div>
                                                 <div className="mt-1">
                                                     <p className="text-sm text-indigo-300">
-                                                        Update the model details
+                                                        Start inference of the model
                                                     </p>
                                                 </div>
                                             </div>
                                             <div className="flex flex-1 flex-col justify-between">
                                                 <div className="divide-y divide-gray-200 px-4 sm:px-6">
                                                     <div className="space-y-6 pb-5 pt-6">
-                                                        <div>
-                                                            <label
-                                                                htmlFor="project-name"
-                                                                className="block text-sm font-medium leading-6 text-gray-900"
-                                                            >
-                                                                Model Name
-                                                            </label>
-                                                            <div className="mt-2">
-                                                                <input
-                                                                    type="text"
-                                                                    name="project-name"
-                                                                    id="project-name"
-                                                                    value={name}
-                                                                    onChange={(event) => setName(event?.target.value)}
-                                                                    className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <Dropdown label="Source Type" options={sourceTypeList} selected={sourceType} onChange={(value: any) => setSourceType(value['id'])} disabled={modelId != null}></Dropdown>
-                                                        </div>
-                                                        <div>
-                                                            <Dropdown label="Model Type" options={contentTypeList} selected={contentType} onChange={(value: any) => setContentType(value['id'])} disabled={modelId != null}></Dropdown>
-                                                        </div>
-                                                        
-                                                        <div>
-                                                            <label
-                                                                htmlFor="source-name"
-                                                                className="block text-sm font-medium leading-6 text-gray-900"
-                                                            >
-                                                                Path
-                                                            </label>
-                                                            <div className="mt-2">
-                                                                <input
-                                                                    type="text"
-                                                                    name="source-name"
-                                                                    id="source-name"
-                                                                    disabled={modelId != null}
-                                                                    value={source}
-                                                                    onChange={(event) => setSource(event?.target.value)}
-                                                                    className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                                                />
-                                                            </div>
-                                                        </div>
+                                                        <ModelField label="Model" onChange={setModel}></ModelField>
                                                         
                                                     </div>
                                                 </div>

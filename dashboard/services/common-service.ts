@@ -118,3 +118,33 @@ export async function addInference(model_id: string) {
     return error?.response;
   }
 }
+
+export async function deleteInference(serving_id: any) {
+
+  try {
+    const { data } = await apiClient.delete(`inference/delete/` + serving_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function stopInference(serving_id: any) {
+
+  try {
+    const { data } = await apiClient.post(`inference/stop/` + serving_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function startInference(serving_id: any) {
+
+  try {
+    const { data } = await apiClient.post(`inference/start/` + serving_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}

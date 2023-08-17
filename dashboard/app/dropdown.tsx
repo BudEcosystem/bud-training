@@ -24,6 +24,7 @@ export default function Dropdown(props:any) {
   const onChange =  (val: any) => {
     setSelected(val)
     props.onChange(val)
+    // console.log(val)
   }
 
   return (

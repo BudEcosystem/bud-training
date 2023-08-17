@@ -13,9 +13,9 @@ def run_inference_sd(self,serving_id,port,base_model_path,log_path,lora_path=Non
     return "Success"
 
 @celery_app.task(bind=True,base=AbortableTask)
-def run_inference_llama(self,serving_id,port,base_model_path,log_path,lora_path=None):
+def run_inference_llama(self,name,serving_id,port,base_model_path,log_path,lora_path=None):
     redis_client.delete("celery-task-meta-"+(serving_id))
-    process = utils.run_inference_llama(port,base_model_path,log_path,lora_path=None)
+    process = utils.run_inference_llama(name,serving_id,port,base_model_path,log_path,lora_path=None)
     while not self.is_aborted():
         time.sleep(5)
     process.kill()

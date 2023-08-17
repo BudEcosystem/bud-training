@@ -25,11 +25,11 @@ def run_inference_sd_lora(port,base_model_path,log_path,lora_path=None):
             process = subprocess.Popen(command, stdout=log_file, stderr=subprocess.STDOUT)
     return process
 
-def run_inference_llama(port,model_path,log_path,lora_path):
+def run_inference_llama(name,serving_id,port,model_path,log_path,lora_path):
     command = ["/root/bud-serve/.env/bin/python3",
                "/root/bud-serve/fastchat/serve/model_worker.py",
                "--model-path", model_path,"--port",str(port),"--worker-address",
-               "http://localhost:"+str(port)]
+               "http://localhost:"+str(port),"--model-name",name+"-"+serving_id]
     with open(log_path, "a") as log_file:
             process = subprocess.Popen(command, stdout=log_file, stderr=subprocess.STDOUT)
     return process
@@ -51,7 +51,7 @@ def run_inference(serving_id,port,model,base_model):
             base_model_path = get_model_path(base_model)
             task = celery_worker.run_inference_sd.apply_async([serving_id,port,base_model_path,log_path,model_path],task_id=serving_id)
     elif model.family == 0:
-            task = celery_worker.run_inference_llama.apply_async([serving_id,port,model_path,log_path],task_id=serving_id)
+            task = celery_worker.run_inference_llama.apply_async([model.name,serving_id,port,model_path,log_path],task_id=serving_id)
     else:
         CustomHttpException(status_code=422, detail="Currently we don't support inference of this model")
           

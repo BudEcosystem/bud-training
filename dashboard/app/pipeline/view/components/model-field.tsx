@@ -12,6 +12,11 @@ export default function ModelField(props: any){
         getAllOptions()
     }, [])
 
+    useEffect(() => {
+      console.log(selected)
+      props.onChange(selected)
+  }, [selected])
+
     async function getAllOptions() {
         let res = await getModels();
     
@@ -25,7 +30,7 @@ export default function ModelField(props: any){
 
     return(
         <>
-            <Dropdown label={props.label} options={models} selected={selected} onChange={(value: any) => setSelected(value['id'])}></Dropdown>
+            <Dropdown label={props.label} options={models} selected={selected} onChange={(value: any) => setSelected(value['model_id'])}></Dropdown>
         </>
     )
 }
