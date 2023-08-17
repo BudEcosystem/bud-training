@@ -68,6 +68,8 @@ class Node(TrainConfig):
     category_name: str | None = None
     family_id: int
     family_name: str | None = None
+    script: str | None = None
+    cmd: str | None = None
 
     @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -142,6 +144,8 @@ class Node(TrainConfig):
             values["description"] = data["description"]
             values["properties"] = properties
             values["outputs"] = outputs
+            values["script"] = data.get("script")
+            values["cmd"] = data.get("cmd")
 
         return values
 
@@ -196,34 +200,4 @@ class PipelinesCreate(SpecialExclusionBaseModel):
             values["pipelines"][data["node_id"]] = Node(**refactor_node(data))
 
         values["pipelines"] = dict(sorted(values["pipelines"].items()))
-        return values
-
-
-class Pipelines(BaseModel):
-    config: List[NodeCategory]
-
-    @root_validator(pre=True)
-    def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not isinstance(values["config"], dict):
-            return values
-
-        node_categories = {}
-        for node in values["config"].values():
-            node: Node
-            if node.category_id not in node_categories:
-                node_categories[node.category_id] = {
-                    "category_name": node.category_name,
-                    "nodes": [],
-                }
-
-            node_categories[node.category_id]["nodes"].append(node)
-
-        values["config"] = [
-            NodeCategory(
-                category_id=category,
-                category_name=data["category_name"],
-                nodes=data["nodes"],
-            )
-            for category, data in sorted(node_categories.items())
-        ]
         return values

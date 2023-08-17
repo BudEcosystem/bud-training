@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, ForwardRef
 from pydantic import BaseModel, validator, root_validator
+from os import path as osp
+from itertools import groupby
 
 from .utils import validate_property_value_by_type
 from config import settings
@@ -11,9 +13,16 @@ DAGNode = ForwardRef("DAGNode")
 class Node(BaseModel):
     id: str
     node_id: int
+    node_name: str
+    category_id: int
+    category_name: str
+    family_id: int
+    family_name: str
     properties: dict
     outputs: dict
     meta: dict = {}
+    script: str | None = None
+    cmd: str | None = None
 
     @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
@@ -21,6 +30,19 @@ class Node(BaseModel):
         outputs = {}
 
         node_id = values["node_id"]
+        values["node_name"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].node_name
+        values["category_id"] = settings.pipelines.AVAILABLE_PIPELINES[
+            node_id
+        ].category_id
+        values["category_name"] = settings.pipelines.AVAILABLE_PIPELINES[
+            node_id
+        ].category_name
+        values["family_id"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].family_id
+        values["family_name"] = settings.pipelines.AVAILABLE_PIPELINES[
+            node_id
+        ].family_name
+
+        cls.validate_script_path(values.get("script"), values["node_name"])
 
         # TODO: Change to [ instead of get
         cls.validate_node_id(node_id, values.get("node_name"))
@@ -84,6 +106,13 @@ class Node(BaseModel):
 
         assert found, f"Output property {out_name} is not recognized"
 
+    @staticmethod
+    def validate_script_path(script_path: str, node_name: str):
+        if script_path and not osp.isfile(script_path):
+            raise FileNotFoundError(
+                f"Script file '{script_path}' for node '{node_name}' doesn't exist"
+            )
+
 
 class DAGNode(Node):
     children: List[DAGNode] = []
@@ -91,10 +120,9 @@ class DAGNode(Node):
 
     @root_validator
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if values["children"] is None:
-            values["children"] = []
-        if values["parents"] is None:
-            values["parents"] = []
+        for key in ["children", "parents"]:
+            if values[key] is None:
+                values[key] = []
         return values
 
     # TODO: Invoke add child
@@ -192,7 +220,7 @@ class BuildDAG(BaseModel):
     @staticmethod
     def build_direction(nodes: Dict[str, DAGNode]):
         direction = {node.id: len(node.ancestors) for node in nodes.values()}
-        return sorted(direction.items(), key=lambda x: x[1])
+        return dict(sorted(direction.items(), key=lambda x: x[1]))
 
 
 def test():

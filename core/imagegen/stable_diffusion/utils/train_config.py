@@ -6,6 +6,7 @@ def get_lora_argparser(parse_args=True) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     parser.add_argument(
         "--pretrained_model_name_or_path",
+        metavar="base_model",
         type=str,
         default=None,
         required=True,
@@ -20,6 +21,7 @@ def get_lora_argparser(parse_args=True) -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--dataset_name",
+        metavar="dataset",
         type=str,
         default=None,
         help=(

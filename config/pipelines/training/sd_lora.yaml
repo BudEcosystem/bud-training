@@ -2,6 +2,8 @@ description: SD LoRA Finetuning
 category_id: 0
 node_id: 1
 family_id: 1
+script: core/imagegen/stable_diffusion/train_text_to_image_lora.py
+cmd: accelerate launch --config_file="config/accelerate/accelerate_config.yaml" --mixed_precision="fp16" core/imagegen/stable_diffusion/train_text_to_image_lora.py
 inherits:
   - config/pipelines/training/common.yaml
 outputs:
@@ -199,14 +201,6 @@ properties:
     description: The dimension of the LoRA update matrices.
     title: Rank
     type: integer
-  report_to:
-    default: tensorboard
-    description:
-      The integration to report the results and logs to. Supported platforms
-      are `"tensorboard"` (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report
-      to all integrations.
-    title: Report To
-    type: string
   resolution:
     default: 512
     description:

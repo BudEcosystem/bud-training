@@ -95,7 +95,7 @@ settings = {
         "AVAILABLE_PIPELINES": [],
     },
     "PYTHON_ENV": env.str("PYTHON_ENV"),
-    "SD_ENDPOINT": env.str("SD_ENDPOINT")
+    "SD_ENDPOINT": env.str("SD_ENDPOINT"),
 }
 
 

@@ -104,6 +104,12 @@ class DiffusersTrainer:
             log_with=report_to,
             project_config=accelerator_project_config,
         )
+        if report_to in ["wandb", "all"]:
+            accelerator.init_trackers(
+                self.args.wandb_project_name,
+                config={},
+                init_kwargs={"wandb": {"name": self.args.wandb_run_name}},
+            )
 
         if report_to == "wandb":
             if not is_wandb_available():

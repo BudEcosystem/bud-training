@@ -8,7 +8,6 @@ from ..dependencies import (
 from ..schemas import ResponseBase
 from config import settings
 
-from modules.controllers.pipelines import node_schemas
 from modules.controllers.pipelines import data_schemas
 from modules.controllers.pipelines import manager
 
@@ -22,9 +21,11 @@ router = APIRouter(
 
 
 @router.get("/config")
-def read_pipeline_config() -> ResponseBase[node_schemas.Pipelines] | dict:
-    pipelines = node_schemas.Pipelines(config=settings.pipelines.AVAILABLE_PIPELINES)
-    return ResponseBase[node_schemas.Pipelines](data=pipelines.config)
+def read_pipeline_config() -> ResponseBase[data_schemas.PipelineConfig] | dict:
+    pipelines = data_schemas.PipelineConfig(
+        config=settings.pipelines.AVAILABLE_PIPELINES
+    )
+    return ResponseBase[data_schemas.PipelineConfig](data=pipelines.config)
 
 
 @router.post("/")

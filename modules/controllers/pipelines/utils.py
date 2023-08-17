@@ -1,10 +1,13 @@
 from os import path as osp
+import random
+import string
 
 from ...handles.postgres.database import create_session
 from ...handles.postgres.validations import is_model_source_type_equals
 from ..datasets import DatasetCRUD
 from ..models.manager import ModelCRUD
 from ..datasets import utils as dataset_validations
+from utils.factory import fetch_word_list
 from config import settings
 
 
@@ -64,3 +67,15 @@ def fetch_model_path_by_id(model_id):
 
     db_session.remove()
     return str(model_path)
+
+
+def random_string_generator(size=6, string=string.ascii_letters + string.digits):
+    return "".join(random.choice(string) for _ in range(size))
+
+
+def rand_name_generator():
+    name_words = fetch_word_list(settings.CACHE_DIR, "word_list.json")
+    name = " ".join(
+        [name_words[random.randint(0, len(name_words) - 1)] for i in range(2)]
+    )
+    return name

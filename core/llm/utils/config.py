@@ -15,6 +15,7 @@ def get_argparser(parse_args=True):
 
     parser.add_argument(
         "--model_path",
+        metavar="base_model",
         required=True,
         type=str,
         help="Path to pretrained model or model from huggingface",
@@ -28,6 +29,7 @@ def get_argparser(parse_args=True):
 
     parser.add_argument(
         "--data_path",
+        metavar="dataset",
         type=str,
         required=True,
         help="path of the json file or dataset from huggingface",
@@ -75,7 +77,7 @@ def get_argparser(parse_args=True):
     parser.add_argument("--stage", type=str, default="sft", help="training stage")
     parser.add_argument("--train_type", type=str, default="full", help="training type")
     parser.add_argument(
-        "--output_dir", type=bool, required=True, help="path to save the output"
+        "--output_dir", type=str, required=True, help="path to save the output"
     )
     parser.add_argument(
         "--train_epochs", default=3, type=int, help="number epochs for train"

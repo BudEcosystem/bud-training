@@ -1,3 +1,4 @@
+from ..config import add_common_args
 from .utils.common import load_data
 from .utils.model import get_model
 from .utils.config import get_config, get_argparser
@@ -6,8 +7,14 @@ from .utils.preprocess_data import prepare_data
 
 
 def main():
-    parser = get_argparser()
+    parser = get_argparser(parse_args=False)
+    add_common_args(parser)
     args = parser.parse_args()
+
+    args.output_dir = args.save_to_dir
+
+    args.wandb_project = args.wandb_project_name or "LLaMa"
+    args.wandb_group = args.wandb_group_name or args.run_id
 
     config = get_config(args)
     model, tokenizer = get_model(args, config)
@@ -24,6 +31,7 @@ def main():
     )
 
     trainer.train()
+    return args.output_dir
 
 
 if __name__ == "__main__":

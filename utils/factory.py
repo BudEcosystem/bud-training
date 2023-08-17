@@ -4,6 +4,10 @@ from hashlib import md5, sha1, sha256
 import json
 import random
 import time
+import urllib.request
+import random
+from os import path as osp
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 from uuid import uuid4
@@ -137,6 +141,31 @@ def generate_random_id():
 
     data = str(t) + " " + str(r) + " " + str(a)
     return md5(data.encode("utf-8")).hexdigest()
+
+
+def fetch_word_list(save_path):
+    if osp.isfile(save_path):
+        try:
+            with open(save_path, "r") as file:
+                return json.load(file)
+        except Exception as e:
+            print(f"Couldn't read word list '{save_path}', {e}")
+            pass
+
+    print("Fetching word list...")
+    word_url = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+    response = urllib.request.urlopen(word_url)
+    long_txt = response.read().decode()
+    words = long_txt.splitlines()
+
+    upper_words = [word for word in words if word[0].isupper()]
+    name_words = [word for word in upper_words if not word.isupper()]
+    # one_name = ' '.join([name_words[random.randint(0, len(name_words)-1)] for i in range(2)])
+
+    Path(osp.dirname(save_path)).mkdir(exist_ok=True, parents=True)
+    with open(save_path, "w") as file:
+        json.dump(name_words, file, indent=4)
+    return name_words
 
 
 class NestedNamespace(SimpleNamespace):
