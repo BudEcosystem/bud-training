@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from pydantic.types import UUID4
+from datetime import datetime, timezone
 
 from ..dependencies import (
     validate_token_header,
@@ -10,6 +11,9 @@ from config import settings
 
 from modules.controllers.pipelines import data_schemas
 from modules.controllers.pipelines import manager
+from modules.controllers.pipelines.utils import run_pipeline
+from workers import celery_worker
+from utils.exceptions import CustomHttpException
 
 
 router = APIRouter(
@@ -81,10 +85,63 @@ def edit_pipeline(
 @router.delete("/{pipeline_id}", response_model=ResponseBase[None])
 def delete_pipeline(
     pipeline_id: UUID4,
-    service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
+    pipeline_service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
+    run_service: manager.RunCRUD = Depends(manager.get_run_crud),
 ) -> ResponseBase[None] | dict:
     # TODO: Delete run & models, runs and pipeline
-    service.delete(id=pipeline_id)
+    run: data_schemas.Run = run_service.get_pipeline_runs(pipeline_id)
+    if run and run.status in [0, 1]:
+        raise CustomHttpException(
+            status_code=422,
+            detail=f"A Run for this pipeline is in progress.",
+        )
+    pipeline_service.delete(id=pipeline_id)
     return ResponseBase[None](
         message="Successfully deleted", meta={"pipeline_id": pipeline_id}, data=None
+    )
+
+
+@router.post("/run/{pipeline_id}", response_model=ResponseBase[data_schemas.Run])
+def start_run(
+    pipeline_id: UUID4,
+    service: manager.RunCRUD = Depends(manager.get_run_crud),
+) -> ResponseBase[data_schemas.Run] | dict:
+    pipeline = service.get(id=pipeline_id)
+    run = service.create(pipeline)
+    celery_worker.run_pipeline.apply_async([run.run_id], task_id=run.run_id)
+    return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+
+
+@router.post("/stop/{run_id}", response_model=ResponseBase[data_schemas.Run])
+def stop_run(
+    run_id: UUID4,
+    service: manager.RunCRUD = Depends(manager.get_run_crud),
+) -> ResponseBase[data_schemas.Run] | dict:
+    run = service.get(id=run_id)
+    celery_worker.revoke_task(str(run_id))
+    run = service.update(
+        id=run_id,
+        obj=data_schemas.RunUpdate(status=4, finished_at=datetime.now(timezone.utc)),
+    )
+    return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+
+
+@router.delete(
+    "/delete/{run_id}", response_model=ResponseBase[data_schemas.ServingHistory]
+)
+def delete_run(
+    run_id: UUID4,
+    service: manager.RunCRUD = Depends(manager.get_run_crud),
+) -> ResponseBase[None] | dict:
+    serving = service.get(id=run_id)
+    if serving.status != 4:
+        raise CustomHttpException(
+            status_code=422,
+            detail=f"Only stopped runs can be deleted",
+        )
+    else:
+        service.delete(id=run_id)
+
+    return ResponseBase[None](
+        message="Successfully deleted", meta={"run_id": run_id}, data=None
     )

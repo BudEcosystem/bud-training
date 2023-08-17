@@ -26,7 +26,7 @@ class DatasetCreate(BaseModel):
         return value
 
     @validator("source_type")
-    def source_type_is_valid(cls, value: str) -> str:
+    def source_type_is_valid(cls, value: int) -> int:
         if not validate_constants(
             table_name=PSQL_TABLE_ALIAS.Dataset,
             column_name="source_type",
@@ -38,7 +38,7 @@ class DatasetCreate(BaseModel):
         return value
 
     @validator("type")
-    def type_is_valid(cls, value: str) -> str:
+    def type_is_valid(cls, value: int) -> int:
         if not validate_constants(
             table_name=PSQL_TABLE_ALIAS.Dataset, column_name="type", value=value
         ):

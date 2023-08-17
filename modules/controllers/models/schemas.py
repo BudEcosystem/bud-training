@@ -20,7 +20,7 @@ class ModelCreate(BaseModel):
     base_model_id: UUID4 | None = None
 
     @validator("source_type")
-    def source_type_is_valid(cls, value: str) -> str:
+    def source_type_is_valid(cls, value: int) -> int:
         if not validate_constants(
             table_name=PSQL_TABLE_ALIAS.Model, column_name="source_type", value=value
         ):
@@ -30,7 +30,7 @@ class ModelCreate(BaseModel):
         return value
 
     @validator("type")
-    def type_is_valid(cls, value: str) -> str:
+    def type_is_valid(cls, value: int) -> int:
         if not validate_constants(
             table_name=PSQL_TABLE_ALIAS.Model, column_name="type", value=value
         ):
@@ -38,9 +38,9 @@ class ModelCreate(BaseModel):
                 status_code=422, detail=f"'type' doesn't support value '{value}'"
             )
         return value
-    
+
     @validator("family")
-    def family_is_valid(cls, value: str) -> str:
+    def family_is_valid(cls, value: int) -> int:
         if not validate_constants(
             table_name=PSQL_TABLE_ALIAS.Model, column_name="family", value=value
         ):
@@ -48,6 +48,10 @@ class ModelCreate(BaseModel):
                 status_code=422, detail=f"'family' doesn't support value '{value}'"
             )
         return value
+
+
+class ModelCreateFinetuned(ModelCreate):
+    is_finetuned: bool = True
 
 
 class ModelUpdate(BaseModel):

@@ -1,22 +1,38 @@
 from os import path as osp
-from datetime import datetime
+from datetime import datetime, timezone
 import itertools
 import logging
 import subprocess
 
+from ...handles.postgres.database import create_session
+from ..helpers import get_constant_alias
+from ..models.manager import ModelCRUD
+from ..models.schemas import ModelCreateFinetuned
+from ..models.utils import save_model_to_filesystem
+from .manager import RunCRUD, RunModelCRUD
+from .data_schemas import RunUpdate, RunModelCreate
 from .dag_schemas import DAGNode, BuildDAG
 from config import settings
 
+PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
+
 
 class DAGRun:
-    def __init__(self, pipeline_config: dict):
-        self.pipeline_config = pipeline_config
+    def __init__(self, run_id: dict):
+        self.db_session = create_session()
+        self.db = RunCRUD(self.db_session)
+        # TODO: Add error logging
+        run_obj = self.db.get(id=run_id)
+        self.run_id = run_id
+        self.db.update(
+            run_id, RunUpdate(status=1, started_at=datetime.now(timezone.utc))
+        )
+
+        self.pipeline_config = run_obj.dags
         self.state_dict = {}
 
-        self.run_id = self.register_run()
-
         # TODO: Add custom exception and interrupt run
-        self.dag = BuildDAG(config=pipeline_config).graph
+        self.dag = BuildDAG(config=self.pipeline_config).graph
         self.exec_buckets = {
             key: [elem[0] for elem in gp]
             for key, gp in itertools.groupby(
@@ -33,19 +49,40 @@ class DAGRun:
             level=logging.INFO,
         )
 
-    def register_run(self):
-        pass
+        self.node_configs = {}
 
-    def update_run():
-        pass
+        self.execute()
+        self.db.update(
+            run_id, RunUpdate(status=2, finished_at=datetime.now(timezone.utc))
+        )
 
-    def pre_run_callback(self, node: DAGNode, node_config: dict):
-        pass
+    def __del__(self):
+        self.db_session.remove()
 
-    def post_run_callback(self, node: DAGNode, node_config: dict):
-        pass
+    def update_run(self, node_id: int, status: int):
+        self.node_configs[node_id]["data"]["run_info"] = {
+            "status": status,
+            "status_alias": None,
+            "message": None,
+        }
+        self.node_configs[node_id]["data"]["run_info"][
+            "status_alias"
+        ] = get_constant_alias(
+            table_name=PSQL_TABLE_ALIAS.Run,
+            column_name="status",
+            value=status,
+        )
+        self.db.update(
+            self.run_id,
+            RunUpdate(
+                dags=self.pipeline_config,
+                status=status,
+                finished_at=datetime.now(timezone.utc),
+            ),
+        )
 
     def interrupt_run(self, node: DAGNode, message: str):
+        self.update_run(node.id, status=3)
         raise Exception(message)
 
     def find_node_config(self, node: DAGNode):
@@ -62,6 +99,8 @@ class DAGRun:
 
     def build_args(self, node: DAGNode):
         args = []
+        base_model = None
+        stage = None
         for _, prop in node.properties.items():
             if prop["ref"] is None:
                 args += [prop["name"], prop["value"]]
@@ -81,19 +120,27 @@ class DAGRun:
 
             args += [prop["name"], self.state_dict[prop["ref"]]]
 
-        args.extend(self.get_node_specific_args(node))
-        return args
+            if prop["name"] == "base_model":
+                base_model = prop["old_value"]
+            elif prop["name"] == "stage":
+                stage = prop["value"]
+
+        c_args, save_dir = self.get_node_specific_args(node)
+        args += c_args
+        return args, save_dir, base_model, stage
 
     def get_node_specific_args(self, node: DAGNode):
+        # TODO: Implement cache layer to get outputs
+        save_dir = osp.join(
+            settings.TRAIN_DIR,
+            datetime.now().strftime("%Y-%m-%d"),
+            str(args.run_id),
+        )
         args = ["--run_id", self.run_id]
         if node.category_id == 0:
             args += [
                 "--save_to_dir",
-                osp.join(
-                    settings.TRAIN_DIR,
-                    datetime.now().strftime("%Y-%m-%d"),
-                    str(args.run_id),
-                ),
+                save_dir,
                 "--save_report_to",
                 "wandb",
                 "--wandb_project_name",
@@ -103,7 +150,7 @@ class DAGRun:
                 "--wandb_run_name",
                 self.run_id,
             ]
-        return args
+        return args, save_dir
 
     def spawn_daemon_process(self, command: list):
         with open(self.log_path, "a") as log_file:
@@ -111,10 +158,9 @@ class DAGRun:
         return process
 
     def run_node(self, node: DAGNode):
-        node_config = self.find_node_config(node.id)
-        self.pre_run_callback(node, node_config)
+        self.node_configs[node.id] = self.find_node_config(node.id)
 
-        args = self.build_args(node)
+        args, save_dir, base_model, stage = self.build_args(node)
 
         error = None
         if node.cmd:
@@ -141,9 +187,36 @@ class DAGRun:
         process = self.spawn_daemon_process(command)
         process.wait()
 
-        self.post_run_callback(node, node_config)
+        # TODO: Run output to node output
+        if node.category_id == 0:
+            for output in self.node_configs[node.id]["data"]["outputs"]:
+                if output["type"] == "model":
+                    if node.node_id == 0:
+                        model_type = 2
+                    elif node.node_id == 1:
+                        model_type = 0
+                    # TODO: Delete model object
+                    # TODO: Fetch model name from node inputs? Validate model name uniqueness
+                    model_id = save_model_to_filesystem(save_dir)
+                    model_obj = ModelCRUD(self.db_session)
+                    model_obj.create(
+                        ModelCreateFinetuned(
+                            name=str(self.run_id),
+                            type=model_type,
+                            source_type=1,
+                            family=node.family_id,
+                            base_model_id=base_model,
+                            is_finetuned=True,
+                        ),
+                        model_id=model_id,
+                    )
+                    run_model_obj = RunModelCRUD(self.db_session)
+                    run_model_obj.create(
+                        RunModelCreate(run_id=self.run_id, model_id=model_id)
+                    )
+        self.update_run(node.id, status=1)
 
-    def __call__(self):
+    def execute(self):
         for ordinal in sorted(self.exec_buckets):
             for node_id in self.exec_buckets[ordinal]:
                 self.run_node(self.dag.nodes[node_id])

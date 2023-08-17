@@ -17,14 +17,15 @@ def validate_property_value_by_type(ptype, value):
         1: float,
         2: str,
         3: bool,
-        4: fetch_dataset_path_by_id,
-        5: fetch_model_path_by_id,
+        4: str,
+        5: fetch_dataset_path_by_id,
+        6: fetch_model_path_by_id,
     }
-    # ptype = int(ptype)
-    # if ptype in type_definitions:
-    #     value = type_definitions[ptype](value)
-    # else:
-    #     raise ValueError(f"Type '{ptype}' is not supported")
+    ptype = int(ptype)
+    if ptype in type_definitions:
+        value = type_definitions[ptype](value)
+    else:
+        raise ValueError(f"Type '{ptype}' is not supported")
     return value
 
 
@@ -73,9 +74,9 @@ def random_string_generator(size=6, string=string.ascii_letters + string.digits)
     return "".join(random.choice(string) for _ in range(size))
 
 
-def rand_name_generator():
+def random_name_generator():
     name_words = fetch_word_list(settings.CACHE_DIR, "word_list.json")
-    name = " ".join(
-        [name_words[random.randint(0, len(name_words) - 1)] for i in range(2)]
+    name = "-".join(
+        [name_words[random.randint(0, len(name_words) - 1)] for _ in range(2)]
     )
-    return name
+    return name + f"-{random_string_generator()}"

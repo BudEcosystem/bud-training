@@ -1,11 +1,12 @@
 from typing import Any, Dict, List, ForwardRef
 from pydantic import BaseModel, validator, root_validator
 from os import path as osp
-from itertools import groupby
 
 from .utils import validate_property_value_by_type
 from config import settings
 
+
+NODE_CONSTANTS = settings.pipelines.CONSTANTS.get("nodes", {})
 
 DAGNode = ForwardRef("DAGNode")
 
@@ -30,6 +31,12 @@ class Node(BaseModel):
         outputs = {}
 
         node_id = values["node_id"]
+
+        # TODO: Change to [ instead of get
+        cls.validate_node_id(node_id, values.get("node_name"))
+        cls.validate_family_id(values["family_id"], values.get("family_name"))
+        cls.validate_category_id(values["category_id"], values.get("category_name"))
+
         values["node_name"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].node_name
         values["category_id"] = settings.pipelines.AVAILABLE_PIPELINES[
             node_id
@@ -44,23 +51,21 @@ class Node(BaseModel):
 
         cls.validate_script_path(values.get("script"), values["node_name"])
 
-        # TODO: Change to [ instead of get
-        cls.validate_node_id(node_id, values.get("node_name"))
-
         for prop in values.get("properties", []):
             # TODO: Enable this validation
-            # cls.validate_property_name(node_id, prop["name"])
+            cls.validate_property_name(node_id, prop["name"])
             val = cls.validate_property_value(prop)
             properties[prop["id"]] = {
                 "name": prop["name"],
                 "value": val,
+                "old_value": prop["value"],
                 "ref": None,
                 "type": prop["type"],
             }
 
         for out in values.get("outputs", []):
             # TODO: Uncomment this
-            # cls.validate_output_name(node_id, out["name"])
+            cls.validate_output_name(node_id, out["name"])
             outputs[out["id"]] = {
                 "name": out["name"],
                 "type": out["type"],
@@ -77,6 +82,16 @@ class Node(BaseModel):
             raise ValueError(f"{node_name} is not a supported node")
 
     @staticmethod
+    def validate_family_id(family_id: int, family_name: str) -> None:
+        if family_id not in NODE_CONSTANTS.get("family", {}):
+            raise ValueError(f"{family_name} is not a supported family")
+
+    @staticmethod
+    def validate_category_id(category_id: int, category_name: str) -> None:
+        if category_id not in NODE_CONSTANTS.get("category", {}):
+            raise ValueError(f"{category_name} is not a supported category")
+
+    @staticmethod
     def validate_property_name(node_id: int, prop_name: str) -> None:
         found = False
         for prop in settings.pipelines.AVAILABLE_PIPELINES[node_id].properties:
@@ -89,8 +104,11 @@ class Node(BaseModel):
     @staticmethod
     def validate_property_value(property: Dict[str, Any]) -> Any:
         # TODO: Revert this
-        # val_type = int(property["type"])
-        val_type = property["type"]
+        val_type = int(property["type"])
+        if val_type == 4 and property["value"] not in property.get("options", []):
+            raise ValueError(
+                f"Property {property['name']} doesn't support value '{property['value']}'"
+            )
         val = None
         if "value" in property:
             val = validate_property_value_by_type(val_type, property["value"])
