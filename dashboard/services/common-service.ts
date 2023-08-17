@@ -99,3 +99,22 @@ export async function getPipelineConfig() {
     return error?.response;
   }
 }
+
+export async function getInference() {
+  try {
+    const { data } = await apiClient.get(`inference`);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function addInference(model_id: string) {
+    
+  try {
+    const { data } = await apiClient.post(`inference/create`, {model_id: model_id});
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
