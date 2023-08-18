@@ -172,5 +172,5 @@ results
 db/*.db
 db/migrations/postgres/versions/*
 
-node_flow.json
+*.json
 graph.py

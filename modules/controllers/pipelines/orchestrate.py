@@ -221,6 +221,7 @@ class DAGRun:
         self.running_process[node.id].wait()
 
         # TODO: Run output to node output
+        # TODO: Handle run errors
         if node.category_id == 0:
             for output in self.node_configs[node.id]["data"]["outputs"]:
                 if output["type"] == 6:

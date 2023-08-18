@@ -11,6 +11,10 @@ outputs:
     title: Model
     type: model
 properties:
+  base_model:
+    description: Base model for eval
+    title: Base Model
+    type: 6
   dp_size:
     default: 1
     description: Data parallelism count
@@ -109,20 +113,5 @@ properties:
     description: Allow loading remote code for tokenizer
     title: Trust Remote Code
     type: boolean
-  wandb_group:
-    default: null
-    description: Wandb group to be used
-    title: Wandb Group
-    type: string
-  wandb_project:
-    default: training
-    description: Wandb project to be used
-    title: Wandb Project
-    type: string
-  wandb_team:
-    default: bud-a
-    description: Wandb team to be used
-    title: Wandb Team
-    type: string
 title: LLMFinetune
 type: object
