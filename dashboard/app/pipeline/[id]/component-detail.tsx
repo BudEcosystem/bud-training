@@ -84,7 +84,7 @@ export default function ComponentDetail(props: any) {
                                 {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
                                 {item.type == 3 && <BoolField label={item.title} default={item.default}></BoolField>}
                                 {item.type == 4 && <DatasetField label={item.title}></DatasetField>}
-                                {item.type == 5 && <ModelField label={item.title}></ModelField>}
+                                {item.type == 5 && <ModelField label={item.title} onChange={(x: any) => {}}></ModelField>}
                               </div>
                             ))}
                             

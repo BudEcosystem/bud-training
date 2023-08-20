@@ -174,7 +174,7 @@ def extract_and_process_image_archives(dataset_dir: str, image_column: str):
 
         metadata_path = None
         if osp.isfile(osp.join(dataset_dir, "metadata.jsonl")):
-            metadata_path = osp.isfile(osp.join(dataset_dir, "metadata.jsonl"))
+            metadata_path = osp.join(dataset_dir, "metadata.jsonl")
         elif osp.isfile(osp.join(dataset_dir, "metadata.json")):
             metadata_path = osp.join(dataset_dir, "metadata.json")
         else:
@@ -190,7 +190,7 @@ def extract_and_process_image_archives(dataset_dir: str, image_column: str):
         for data in metadata:
             if image_column not in data:
                 raise ValueError(f"Image column '{image_column}' missing in {data}")
-            data[image_column] = osp.join("images", data[image_column])
+            data[image_column] = osp.join(dataset_dir, "images", data[image_column])
 
         save_as_metadata(metadata, metadata_path)
 

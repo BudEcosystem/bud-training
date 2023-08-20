@@ -6,10 +6,11 @@ import logging
 import subprocess
 
 from ...handles.postgres.database import create_session
-from ..helpers import get_constant_alias
+from ..datasets.utils import extract_and_process_image_archives
 from ..models.manager import ModelCRUD
 from ..models.schemas import ModelCreateFinetuned
 from ..models.utils import save_model_to_filesystem
+from ..helpers import get_constant_alias
 from .manager import RunCRUD, RunModelCRUD
 from .data_schemas import RunUpdate, RunModelCreate
 from .dag_schemas import DAGNode, BuildDAG
@@ -116,8 +117,11 @@ class DAGRun:
 
     def build_args(self, node: DAGNode):
         args = []
+        # TODO: Handle these validations/retrievals in a better way
         base_model = None
         stage = None
+        image_column = None
+        dataset = None
         for _, prop in node.properties.items():
             # TODO: Handle skip if none and stor_true properly. Since popen needs string, None values might be converted to str.
             if (
@@ -132,6 +136,12 @@ class DAGRun:
                     args += [f'--{prop["name"]}', str(prop["value"])]
                 else:
                     args.append(f'--{prop["name"]}')
+
+                # TODO: Change
+                if prop["name"] == "image_column":
+                    image_column = prop["value"]
+                elif prop["name"] == "dataset":
+                    dataset = prop["value"]
                 continue
 
             ref_node = prop["ref"].split(".")[0]
@@ -151,6 +161,7 @@ class DAGRun:
             else:
                 args.append(f'--{prop["name"]}')
 
+            # TODO: Change
             if prop["name"] == "base_model":
                 base_model = prop["old_value"]
             elif prop["name"] == "stage":
@@ -158,7 +169,7 @@ class DAGRun:
 
         c_args, save_dir = self.get_node_specific_args(node)
         args += c_args
-        return args, save_dir, base_model, stage
+        return args, save_dir, base_model, stage, image_column, dataset
 
     def get_node_specific_args(self, node: DAGNode):
         # TODO: Implement cache layer to get outputs
@@ -192,7 +203,11 @@ class DAGRun:
     def run_node(self, node: DAGNode):
         self.node_configs[node.id] = self.find_node_config(node)
 
-        args, save_dir, base_model, stage = self.build_args(node)
+        args, save_dir, base_model, stage, image_column, dataset = self.build_args(node)
+
+        # TODO: Handle node/family/dataset type validations better
+        if node.node_id in [1, 3]:
+            extract_and_process_image_archives(dataset, image_column)
 
         error = None
         if node.cmd:
@@ -220,14 +235,16 @@ class DAGRun:
         self.running_process[node.id] = self.spawn_daemon_process(command)
         self.running_process[node.id].wait()
 
-        # TODO: Run output to node output
+        # TODO: Run output to node output. Handle better
         # TODO: Handle run errors
         if node.category_id == 0:
             for output in self.node_configs[node.id]["data"]["outputs"]:
                 if output["type"] == 6:
                     if node.node_id == 0:
-                        model_type = 2
+                        model_type = 0
                     elif node.node_id == 1:
+                        model_type = 2
+                    elif node.node_id == 3:
                         model_type = 0
                     # TODO: Delete model object
                     # TODO: Fetch model name from node inputs? Validate model name uniqueness

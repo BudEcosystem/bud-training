@@ -180,9 +180,9 @@ export default function HomeLayout({
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-60 lg:flex-col">
+        <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-60 lg:flex-col border border-right">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
+          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
             <div className="flex h-16 shrink-0 items-center logo-wrap">
               <img
                 className="h-8 w-auto"
@@ -201,15 +201,15 @@ export default function HomeLayout({
                           href={item.href}
                           className={classNames(
                             pathname === item.href
-                              ? 'bg-indigo-700 text-white'
-                              : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
-                            'group flex gap-x-3 rounded-md p-3 text-sm leading-5'
+                              ? 'bg-gray-200'
+                              : 'text-gray-600 hover:text-gray-600 hover:bg-gray-200',
+                            'group flex gap-x-3 rounded-md px-4 py-2 text-sm leading-5 flex items-center'
                           )}
                         >
                           <item.icon
                             className={classNames(
-                              pathname === item.href ? 'text-white' : 'text-indigo-200 group-hover:text-white',
-                              'h-5 w-5 shrink-0'
+                              pathname === item.href ? 'text-gray-600' : 'text-gray-600 group-hover:text-gray-600',
+                              'h-4 w-4 shrink-0'
                             )}
                             aria-hidden="true"
                           />
@@ -301,12 +301,12 @@ export default function HomeLayout({
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="h-8 w-8 rounded-full bg-gray-50"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      src="https://qph.cf2.quoracdn.net/main-thumb-66203696-200-ngyspigvbvkorrgaccfjowxkfgujputv.jpeg"
                       alt=""
                     />
                     <span className="hidden lg:flex lg:items-center">
                       <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
-                        Tom Cook
+                        Jithin VG
                       </span>
                       <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>

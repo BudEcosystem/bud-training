@@ -2,6 +2,7 @@ from typing import Any, Dict, List, ForwardRef
 from pydantic import BaseModel, validator, root_validator
 from os import path as osp
 
+from .node_schemas import Property
 from .utils import validate_property_value_by_type
 from config import settings
 
@@ -55,16 +56,16 @@ class Node(BaseModel):
 
         for prop in values.get("properties", []):
             # TODO: Enable this validation
-            prop_found = cls.validate_property_name(node_id, prop["name"])
-            val = cls.validate_property_value(prop)
+            prop_config: Property = cls.validate_property_name(node_id, prop["name"])
+            val = cls.validate_property_value(prop, prop_config)
             # TODO: Handle skip if none and stor_true properly
             properties[prop["id"]] = {
                 "name": prop["name"],
                 "value": val,
-                "old_value": prop["value"],
+                "old_value": prop.get("value"),
                 "ref": None,
-                "skip_if_null": prop_found.skip_if_null,
-                "arg_only": prop_found.arg_only,
+                "skip_if_null": prop_config.skip_if_null,
+                "arg_only": prop_config.arg_only,
                 "type": prop["type"],
             }
 
@@ -108,16 +109,18 @@ class Node(BaseModel):
         return prop
 
     @staticmethod
-    def validate_property_value(property: Dict[str, Any]) -> Any:
+    def validate_property_value(
+        _property: Dict[str, Any], prop_config: Property
+    ) -> Any:
         # TODO: Revert this
-        val_type = int(property["type"])
-        if val_type == 4 and property["value"] not in property.get("options", []):
+        val_type = int(_property["type"])
+        if val_type == 4 and _property.get("value") not in prop_config.options:
             raise ValueError(
-                f"Property {property['name']} doesn't support value '{property['value']}'"
+                f"Property {_property['name']} doesn't support value '{_property.get('value')}'"
             )
         val = None
-        if "value" in property:
-            val = validate_property_value_by_type(val_type, property["value"])
+        if "value" in _property:
+            val = validate_property_value_by_type(val_type, _property.get("value"))
         return val
 
     @staticmethod

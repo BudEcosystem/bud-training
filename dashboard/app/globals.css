@@ -30,7 +30,7 @@ input{
     outline: none;
 }
 .logo-wrap{
-    filter: brightness(2.5);
+    /* filter: brightness(2.5); */
 }
 .logo-wrap p{
     color: #fff;

@@ -8,6 +8,7 @@ import Nav from './nav';
 import Toast from './toast';
 import HomeLayout from './home-layout';
 import Background from './background';
+import Loading from './loading';
 
 export const metadata = {
   title: 'Bud flow',
@@ -23,14 +24,15 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full bg-white">
       <body className="h-full">
-        <Suspense>
+        <Suspense fallback={<Loading />}>
           {/* <Nav /> */}
+          <HomeLayout>
+          {children}
+        </HomeLayout>
 
         </Suspense>
         {/* <Background></Background> */}
-        <HomeLayout>
-          {children}
-        </HomeLayout>
+        
         <ToastContainer />
       </body>
     </html>

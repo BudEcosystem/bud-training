@@ -66,9 +66,9 @@ def save_models_to_filesystem(
     source: str | None = None,
 ):
     model_id = None
-    if utils.is_dataset_source_type_huggingface(source_type):
+    if source_type == 0:
         validate_model_path(source)
-    elif utils.is_dataset_source_type_local_upload(source_type):
+    elif source_type == 1:
         model_id = save_model_to_filesystem(source)
 
     return model_id

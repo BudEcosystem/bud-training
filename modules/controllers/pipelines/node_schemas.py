@@ -27,6 +27,7 @@ class Property(BaseModel):
     default: Any | None = None
     description: str
     title: str
+    options: list = []
     skip_if_null: bool = False
     arg_only: bool = False
     type: int | str

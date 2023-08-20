@@ -100,6 +100,56 @@ export async function getPipelineConfig() {
   }
 }
 
+export async function getPipeline() {
+  try {
+    const { data } = await apiClient.get(`pipeline`);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function deletePipeline(pipeline_id: any) {
+
+  try {
+    const { data } = await apiClient.delete(`pipeline/` + pipeline_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function addPipeline(params: any) {
+  console.log(params)
+  // let queryParams = 'name=' + data['name'] + '&source_type=' + data['source_type'] + '&type=' + data['type'] + '&source=' + data['source']
+  
+  try {
+    const { data } = await apiClient.post(`pipeline`, params);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function updatePipeline(params: any) {
+
+  try {
+    const { data } = await apiClient.put(`pipeline/` + params['id'], params);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function getPipelineDetail(pipeline_id) {
+  try {
+    const { data } = await apiClient.get(`pipeline/` + pipeline_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
 export async function getInference() {
   try {
     const { data } = await apiClient.get(`inference`);
