@@ -48,4 +48,4 @@ uvicorn server.main:app
 
 The service will be deployed to 8000 port. Change the port if required by specifiying ```--port``` arg.
 
-Go to http://<ip>:<port>/docs (ex: http://localhost:8000/docs) to view the API documentation
+Go to http://[host]:[port]/docs (ex: http://localhost:8000/docs) to view the API documentation
