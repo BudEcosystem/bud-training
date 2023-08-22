@@ -173,4 +173,4 @@ db/*.db
 db/migrations/postgres/versions/*
 
 *.json
-graph.py
+server/static/test_ws.html
