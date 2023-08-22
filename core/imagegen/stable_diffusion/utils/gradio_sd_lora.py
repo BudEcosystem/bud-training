@@ -1,11 +1,7 @@
 import gradio as gr
-from PIL import Image
 
 import torch
 import random
-from os import path as osp
-from datetime import datetime
-from pathlib import Path
 from diffusers import StableDiffusionPipeline
 
 import argparse

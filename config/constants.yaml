@@ -14,6 +14,7 @@ postgres:
     family: &family
       0: LLaMa
       1: Stable Diffusion 1.5
+      2: Stable Diffusion XL
     source_type:
       0: Hugging Face
       1: Local Upload
@@ -38,7 +39,7 @@ pipelines:
       0: LLM Finetuning
       1: SD LoRA Finetuning
       2: HumanEval
-      3: Custom Eval
+      3: SDXL LoRA Finetuning
     property_type:
       0: integer
       1: number

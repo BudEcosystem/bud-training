@@ -29,7 +29,7 @@ def argparse_to_pydantic(
 
     if export_path:
         suffix = Path(export_path).suffix
-        model_schema = model.model_json_schema()
+        model_schema = model.schema()
         if isinstance(extras, dict) and len(extras):
             model_schema.update(extras)
         with open(export_path, "w") as file_obj:
@@ -38,6 +38,6 @@ def argparse_to_pydantic(
             elif suffix in [".json", ".jsonl"]:
                 json.dump(model_schema, file_obj, indent=4)
             else:
-                file_obj.write(model_schema)
+                file_obj.write(json.dumps(model_schema))
         print(f"'{model_name}' schema saved to -> {export_path}")
     return model

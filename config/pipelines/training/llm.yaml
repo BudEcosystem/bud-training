@@ -3,6 +3,7 @@ category_id: 0
 node_id: 0
 family_id: 0
 script: core/llm/train.py
+cmd: torchrun core/llm/train.py
 inherits:
   - config/pipelines/training/common.yaml
 outputs:
@@ -11,10 +12,6 @@ outputs:
     title: Model
     type: model
 properties:
-  base_model:
-    description: Base model for eval
-    title: Base Model
-    type: 6
   dp_size:
     default: 1
     description: Data parallelism count

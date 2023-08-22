@@ -10,6 +10,7 @@ import diffusers
 import transformers
 import datasets
 
+from PIL import Image
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -235,11 +236,27 @@ class DiffusersTrainer:
             data_files = {}
             if self.args.train_data_dir is not None:
                 data_files["train"] = os.path.join(self.args.train_data_dir, "**")
-            dataset = load_dataset(
-                "imagefolder",
-                data_files=data_files,
-                cache_dir=self.args.cache_dir,
-            )
+            # dataset = load_dataset(
+            #     "imagefolder",
+            #     data_files=data_files,
+            #     cache_dir=self.args.cache_dir,
+            # )
+            if os.path.isfile(os.path.join(self.args.train_data_dir, "metadata.jsonl")):
+                dataset = load_dataset(
+                    "json",
+                    data_files=os.path.join(self.args.train_data_dir, "metadata.jsonl"),
+                )
+            elif os.path.isfile(
+                os.path.join(self.args.train_data_dir, "metadata.json")
+            ):
+                dataset = load_dataset(
+                    "json",
+                    data_files=os.path.join(self.args.train_data_dir, "metadata.json"),
+                )
+            else:
+                raise FileNotFoundError(
+                    "Couldn't find metadata file in the train_data_dir directory"
+                )
             # See more about loading custom images at
             # https://huggingface.co/docs/datasets/v2.4.0/en/image_load#imagefolder
 
@@ -295,7 +312,7 @@ class DiffusersTrainer:
         return inputs.input_ids
 
     def preprocess_train(self, examples):
-        images = [image.convert("RGB") for image in examples[self.image_column]]
+        images = [Image.open(image).convert("RGB") if isinstance(image, str) else image.convert("RGB") for image in examples[self.image_column]]
         examples["pixel_values"] = [self.train_transforms(image) for image in images]
         examples["input_ids"] = self.tokenize_captions(examples)
         return examples

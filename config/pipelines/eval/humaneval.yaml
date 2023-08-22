@@ -10,6 +10,10 @@ outputs:
     title: Result
     type: string
 properties:
+  model_path:
+    description: Model to be evaluated
+    title: Model
+    type: 6
   n_sample:
     default: 1
     description: Number of samples to generate per prompt

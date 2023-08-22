@@ -1,11 +1,19 @@
-from fire import Fire
+from os import path as osp, pardir as ospardir
+import sys
 
-import bbh
-import crass
-import drop
-import mmlu
-from human_eval.main import main as humaneval
-from lm_eval import evaluator
+dir_path = osp.dirname(osp.realpath(__file__))
+sys.path.append(osp.abspath(osp.join(dir_path, ospardir)))
+
+
+from fire import Fire
+import json
+
+from evaluations import bbh
+from evaluations import crass
+from evaluations import drop
+from evaluations import mmlu
+from evaluations.human_eval.main import main as humaneval
+from evaluations.lm_eval import evaluator
 
 
 def main(task_name: str, **kwargs):
@@ -45,7 +53,7 @@ def main(task_name: str, **kwargs):
         return
 
     results = {name: round(score * 100, 2) for name, score in results.items()}
-    print(results)
+    print(json.dumps(results, indent=4))
     return results
 
 

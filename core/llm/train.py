@@ -1,8 +1,15 @@
-from .utils.common import load_data
-from .utils.model import get_model
-from .utils.config import get_config, get_argparser, add_common_args
-from .utils.trainer import BudTrainer
-from .utils.preprocess_data import prepare_data
+from os import path as osp, pardir as ospardir
+import sys
+
+dir_path = osp.dirname(osp.realpath(__file__))
+sys.path.append(osp.abspath(osp.join(dir_path, ospardir)))
+
+
+from utils.common import load_data
+from utils.model import get_model
+from utils.config import get_config, get_argparser, add_common_args
+from utils.trainer import BudTrainer
+from utils.preprocess_data import prepare_data
 
 
 def main():

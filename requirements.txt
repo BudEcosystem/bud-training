@@ -6,19 +6,20 @@ sqlalchemy
 alembic
 psycopg2-binary
 
-# Server
-fastapi
-python-multipart
-pydantic<2.0
-celery
-watchdog
-
 # LLM
 torch
 git+https://github.com/OpenLMLab/collie
 fire
 gradio
 datasets
+git+https://github.com/microsoft/DeepSpeed.git
+openai
+rwkv
+vllm
+tiktoken
+sacrebleu
+pycountry
+rouge-score
 
 # SD
 git+https://github.com/huggingface/diffusers.git
@@ -34,13 +35,12 @@ wandb
 xformers
 bitsandbytes
 
-<<<<<<< HEAD
-git+https://github.com/microsoft/DeepSpeed.git
 
-watchdog
+# Server
+fastapi
+python-multipart
+pydantic<2.0
 celery
+watchdog
 gevent
 Redis
-=======
-git+https://github.com/microsoft/DeepSpeed.git
->>>>>>> 30741de2c22de644ef7bece06ab64b0276305cfd

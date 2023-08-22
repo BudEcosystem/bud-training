@@ -1,0 +1,285 @@
+description: SDXL LoRA Finetuning
+category_id: 0
+node_id: 3
+family_id: 2
+script: core/imagegen/stable_diffusion/train_text_to_image_lora_sdxl.py
+cmd: accelerate launch --config_file=config/accelerate/accelerate_config.yaml --mixed_precision=fp16 core/imagegen/stable_diffusion/train_text_to_image_lora_sdxl.py
+inherits:
+  - config/pipelines/training/common.yaml
+outputs:
+  model:
+    description: Finetuned Model Checkpoint
+    title: Model
+    type: model
+properties:
+  adam_beta1:
+    default: 0.9
+    description: The beta1 parameter for the Adam optimizer.
+    title: Adam Beta1
+    type: number
+  adam_beta2:
+    default: 0.999
+    description: The beta2 parameter for the Adam optimizer.
+    title: Adam Beta2
+    type: number
+  adam_epsilon:
+    default: 1.0e-08
+    description: Epsilon value for the Adam optimizer
+    title: Adam Epsilon
+    type: number
+  adam_weight_decay:
+    default: 0.01
+    description: Weight decay to use.
+    title: Adam Weight Decay
+    type: number
+  allow_tf32:
+    default: false
+    description: Whether or not to allow TF32 on Ampere GPUs. Can be used to speed
+      up training. For more information, see https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices
+    title: Allow Tf32
+    arg_only: true
+    type: boolean
+  caption_column:
+    default: text
+    description: The column of the dataset containing a caption or a list of captions.
+    title: Caption Column
+    type: string
+  center_crop:
+    default: false
+    description: Whether to center crop the input images to the resolution. If not
+      set, the images will be randomly cropped. The images will be resized to the
+      resolution first before cropping.
+    title: Center Crop
+    arg_only: true
+    type: boolean
+  checkpointing_steps:
+    default: 500
+    description: Save a checkpoint of the training state every X updates. These checkpoints
+      can be used both as final checkpoints in case they are better than the last
+      checkpoint, and are also suitable for resuming training using `--resume_from_checkpoint`.
+    title: Checkpointing Steps
+    type: integer
+  checkpoints_total_limit:
+    default: null
+    description: Max number of checkpoints to store.
+    title: Checkpoints Total Limit
+    skip_if_null: true
+    type: integer
+  dataloader_num_workers:
+    default: 0
+    description: Number of subprocesses to use for data loading. 0 means that the
+      data will be loaded in the main process.
+    title: Dataloader Num Workers
+    type: integer
+  dataset_config_name:
+    default: null
+    description: The config of the Dataset, leave as None if there's only one config.
+    title: Dataset Config Name
+    skip_if_null: true
+    type: string
+  enable_xformers_memory_efficient_attention:
+    default: false
+    description: Whether or not to use xformers.
+    title: Enable Xformers Memory Efficient Attention
+    arg_only: true
+    type: boolean
+  gradient_accumulation_steps:
+    default: 1
+    description: Number of updates steps to accumulate before performing a backward/update
+      pass.
+    title: Gradient Accumulation Steps
+    type: integer
+  gradient_checkpointing:
+    default: false
+    description: Whether or not to use gradient checkpointing to save memory at the
+      expense of slower backward pass.
+    title: Gradient Checkpointing
+    arg_only: true
+    type: boolean
+  hub_model_id:
+    default: null
+    description: The name of the repository to keep in sync with the local `output_dir`.
+    title: Hub Model Id
+    skip_if_null: true
+    type: string
+  hub_token:
+    default: null
+    description: The token to use to push to the Model Hub.
+    title: Hub Token
+    skip_if_null: true
+    type: string
+  image_column:
+    default: image
+    description: The column of the dataset containing an image.
+    title: Image Column
+    type: string
+  learning_rate:
+    default: 0.0001
+    description: Initial learning rate (after the potential warmup period) to use.
+    title: Learning Rate
+    type: number
+  local_rank:
+    default: -1
+    description: 'For distributed training: local_rank'
+    title: Local Rank
+    type: integer
+  lr_scheduler:
+    default: constant
+    description: The scheduler type to use. Choose between ["linear", "cosine", "cosine_with_restarts",
+      "polynomial", "constant", "constant_with_warmup"]
+    title: Lr Scheduler
+    type: string
+  lr_warmup_steps:
+    default: 500
+    description: Number of steps for the warmup in the lr scheduler.
+    title: Lr Warmup Steps
+    type: integer
+  max_grad_norm:
+    default: 1.0
+    description: Max gradient norm.
+    title: Max Grad Norm
+    type: number
+  max_train_samples:
+    default: null
+    description: For debugging purposes or quicker training, truncate the number of
+      training examples to this value if set.
+    title: Max Train Samples
+    skip_if_null: true
+    type: integer
+  max_train_steps:
+    default: null
+    description: Total number of training steps to perform.  If provided, overrides
+      num_train_epochs.
+    title: Max Train Steps
+    skip_if_null: true
+    type: integer
+  mixed_precision:
+    default: null
+    description: Whether to use mixed precision. Choose between fp16 and bf16 (bfloat16).
+      Bf16 requires PyTorch >= 1.10.and an Nvidia Ampere GPU.  Default to the value
+      of accelerate config of the current system or the flag passed with the `accelerate.launch`
+      command. Use this argument to override the accelerate config.
+    title: Mixed Precision
+    skip_if_null: true
+    type: string
+  noise_offset:
+    default: 0
+    description: The scale of noise offset.
+    title: Noise Offset
+    type: number
+  num_train_epochs:
+    default: 100
+    description: Total number of training epochs.
+    title: Num Train Epochs
+    type: integer
+  num_validation_images:
+    default: 4
+    description: Number of images that should be generated during validation with
+      `validation_prompt`.
+    title: Num Validation Images
+    type: integer
+  prediction_type:
+    default: null
+    description: 'The prediction_type that shall be used for training. Choose between
+      ''epsilon'' or ''v_prediction'' or leave `None`. If left to `None` the default
+      prediction type of the scheduler: `noise_scheduler.config.prediciton_type` is
+      chosen.'
+    title: Prediction Type
+    skip_if_null: true
+    type: string
+  prior_generation_precision:
+    description: Choose prior generation precision between fp32, fp16 and bf16 (bfloat16).
+      Bf16 requires PyTorch >= 1.10.and an Nvidia Ampere GPU.  Default to  fp16 if
+      a GPU is available else fp32.
+    title: Prior Generation Precision
+    type: string
+  push_to_hub:
+    default: false
+    description: Whether or not to push the model to the Hub.
+    title: Push To Hub
+    arg_only: true
+    type: boolean
+  random_flip:
+    default: false
+    description: whether to randomly flip images horizontally
+    title: Random Flip
+    arg_only: true
+    type: boolean
+  rank:
+    default: 4
+    description: The dimension of the LoRA update matrices.
+    title: Rank
+    type: integer
+  resolution:
+    default: 1024
+    description: The resolution for input images, all the images in the train/validation
+      dataset will be resized to this resolution
+    title: Resolution
+    type: integer
+  resume_from_checkpoint:
+    default: null
+    description: Whether training should be resumed from a previous checkpoint. Use
+      a path saved by `--checkpointing_steps`, or `"latest"` to automatically select
+      the last available checkpoint.
+    title: Resume From Checkpoint
+    skip_if_null: true
+    type: string
+  revision:
+    default: null
+    description: Revision of pretrained model identifier from huggingface.co/models.
+    title: Revision
+    skip_if_null: true
+    type: string
+  scale_lr:
+    default: false
+    description: Scale the learning rate by the number of GPUs, gradient accumulation
+      steps, and batch size.
+    title: Scale Lr
+    arg_only: true
+    type: boolean
+  seed:
+    default: null
+    description: A seed for reproducible training.
+    title: Seed
+    skip_if_null: true
+    type: integer
+  snr_gamma:
+    default: null
+    description: 'SNR weighting gamma to be used if rebalancing the loss. Recommended
+      value is 5.0. More details here: https://arxiv.org/abs/2303.09556.'
+    title: Snr Gamma
+    skip_if_null: true
+    type: number
+  train_batch_size:
+    default: 2
+    description: Batch size (per device) for the training dataloader.
+    title: Train Batch Size
+    type: integer
+  train_text_encoder:
+    default: false
+    description: Whether to train the text encoder. If set, the text encoder should
+      be float32 precision.
+    title: Train Text Encoder
+    arg_only: true
+    type: boolean
+  use_8bit_adam:
+    default: false
+    description: Whether or not to use 8-bit Adam from bitsandbytes.
+    title: Use 8Bit Adam
+    arg_only: true
+    type: boolean
+  validation_epochs:
+    default: 1
+    description: 'Run fine-tuning validation every X epochs. The validation process
+      consists of running the prompt `args.validation_prompt` multiple times: `args.num_validation_images`.'
+    title: Validation Epochs
+    type: integer
+  validation_prompt:
+    default: null
+    description: A prompt that is used during validation to verify that the model
+      is learning.
+    title: Validation Prompt
+    skip_if_null: true
+    type: string
+title: SDXLLoRAFinetune
+type: object
