@@ -6,6 +6,7 @@ import TextField from './components/text-field'
 import DatasetField from './components/dataset-field'
 import ModelField from './components/model-field'
 import BoolField from './components/bool-field'
+import ListField from './components/list-field'
 
 export default function ComponentDetail(props: any) {
   const nodeSchema = {
@@ -28,8 +29,23 @@ export default function ComponentDetail(props: any) {
 
   useEffect(() => {
     console.log(props.selected?.data)
-    if(props.selected?.data) setNode(props.selected?.data)
+    if (props.selected?.data) setNode(props.selected?.data)
   }, [props.selected])
+
+  const updateProperty = (item: any, value: any) => {
+
+    for (let prop of node.properties) {
+      if (prop.name == item) {
+
+        prop.default = value
+      }
+    }
+  }
+
+  const saveProperty = () => {
+    props.onSave(node)
+    setOpen(false)
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -79,15 +95,16 @@ export default function ComponentDetail(props: any) {
                           <div className="space-y-6 pb-5 pt-6">
                             {node?.properties.map((item: any) => (
                               <div>
-                                {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
-                                {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
-                                {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name}></TextField>}
-                                {item.type == 3 && <BoolField label={item.title} default={item.default}></BoolField>}
-                                {item.type == 4 && <DatasetField label={item.title}></DatasetField>}
-                                {item.type == 5 && <ModelField label={item.title} onChange={(x: any) => {}}></ModelField>}
+                                {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == 3 && <BoolField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></BoolField>}
+                                {item.type == 4 && <ListField label={item.title} default={item.default} name={item.name} options={item.options} onChange={updateProperty}></ListField>}
+                                {item.type == 5 && <DatasetField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></DatasetField>}
+                                {item.type == 6 && <ModelField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></ModelField>}
                               </div>
                             ))}
-                            
+
                           </div>
                         </div>
                       </div>
@@ -101,8 +118,9 @@ export default function ComponentDetail(props: any) {
                         Cancel
                       </button>
                       <button
-                        type="submit"
+                        type="button"
                         className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        onClick={saveProperty}
                       >
                         Save
                       </button>

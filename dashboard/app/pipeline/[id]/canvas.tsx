@@ -6,6 +6,7 @@ import { useNodesState, useEdgesState, addEdge, ReactFlow, ReactFlowProvider, Co
 import 'reactflow/dist/style.css';
 import Node from './components/node';
 import ComponentDetail from './component-detail';
+import { node } from 'prop-types';
 
 
 const nodeTypes = {
@@ -356,6 +357,21 @@ export default function Canvas(props: any) {
         setShowDetails(!showNodeDetails)
     }
 
+    const onUpdateProperties = (item: any) => {
+        for(let nd of nodes){
+            if(nd.id == selected.id){
+                nd.data = item
+            }
+        }
+        // setShowDetails(!showNodeDetails)
+        setNodes(nodes)
+        props.onSave(nodes, edges)
+        // setSelected({})
+        console.log(showNodeDetails)
+        console.log(selected)
+        console.log(item)
+    }
+
     return (
         <div style={{ width: '100vw', height: '100%' }}>
             <ReactFlowProvider>
@@ -382,7 +398,7 @@ export default function Canvas(props: any) {
                 </div>
 
             </ReactFlowProvider>
-            <ComponentDetail open={showNodeDetails} selected={selected}></ComponentDetail>
+            <ComponentDetail open={showNodeDetails} selected={selected} onSave={onUpdateProperties}></ComponentDetail>
         </div>
 
     );
