@@ -19,7 +19,6 @@ router = APIRouter(
     prefix="/pipeline",
     tags=["pipelines"],
     dependencies=[Depends(validate_token_header)],
-    responses={404: {"description": "Not found"}},
 )
 
 

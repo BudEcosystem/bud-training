@@ -11,10 +11,9 @@ from threading import Thread
 router = APIRouter(
     prefix="/logs",
     tags=["logs"],
-    responses={404: {"description": "Not found"}},
 )
 
-log_file_path = os.path.join(settings.LOG_DIR, 'log_file.txt')
+log_file_path = os.path.join(settings.LOG_DIR, "log_file.txt")
 
 
 class LogFileHandler(FileSystemEventHandler):
@@ -24,16 +23,18 @@ class LogFileHandler(FileSystemEventHandler):
         self.last_position = 0
 
     def on_modified(self, event):
-        with open(self.file_path, 'r') as file:
+        with open(self.file_path, "r") as file:
             file.seek(self.last_position)
             new_content = file.read()
             self.last_position = file.tell()
             if new_content:
-                asyncio.run_coroutine_threadsafe(self.websocket.send_text(new_content), loop)
+                asyncio.run_coroutine_threadsafe(
+                    self.websocket.send_text(new_content), loop
+                )
 
 
 @router.websocket("/ws/{file_path:path}")
-async def websocket_endpoint(websocket: WebSocket,  file_path: str):
+async def websocket_endpoint(websocket: WebSocket, file_path: str):
     global loop
     loop = asyncio.get_running_loop()
 
@@ -51,12 +52,8 @@ async def websocket_endpoint(websocket: WebSocket,  file_path: str):
                 # Try to receive a message with a timeout, just to see if the connection is still open
                 await websocket.receive_text()
             except WebSocketDisconnect:
-                break # If an exception is caught, break the loop to close the connection
+                break  # If an exception is caught, break the loop to close the connection
             time.sleep(1)
     finally:
         observer.stop()
         observer_thread.join()
-
-
-
-

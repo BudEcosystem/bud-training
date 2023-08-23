@@ -68,8 +68,17 @@ settings = {
     "CACHE_DIR": env.str("CACHE_DIR", osp.join(ROOT_PATH, "cache")),
     "ALLOWED_HOSTS": [name.strip() for name in env.list("ALLOWED_HOSTS", [])],
     "ALLOWED_ORIGINS": [name.strip() for name in env.list("ALLOWED_ORIGINS", [])],
+    "PYTHON_ENV": env.str("PYTHON_ENV"),
+    "SD_ENDPOINT": env.str("SD_ENDPOINT").rstrip("/"),
     "auth": {
         "X_TOKEN": env.str("X_TOKEN"),
+    },
+    "jupyterhub": {
+        "NETWORK": env.str("JUPYTERHUB_NETWORK"),
+        "BASE_URL": env.str("JUPYTERHUB_BASE_URL").rstrip("/"),
+        "REDIRECT_BASE_URL": env.str("JUPYTERHUB_REDIRECT_BASE_URL").rstrip("/"),
+        "API_TOKEN": env.str("JUPYTERHUB_API_TOKEN"),
+        "API_TIMEOUT": env.int("JUPYTERHUB_API_TIMEOUT", 120),
     },
     "database": {
         "psql": {
@@ -94,8 +103,6 @@ settings = {
         "CONFIGS": PIPELINE_CONFIGS,
         "AVAILABLE_PIPELINES": [],
     },
-    "PYTHON_ENV": env.str("PYTHON_ENV"),
-    "SD_ENDPOINT": env.str("SD_ENDPOINT"),
 }
 
 

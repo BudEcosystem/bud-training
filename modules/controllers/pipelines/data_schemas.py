@@ -178,6 +178,7 @@ class Property(BaseModel):
     default: Any | None = None
     description: str
     title: str
+    options: list = []
     type: int | str
     type_alias: str | None = None
 

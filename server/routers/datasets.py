@@ -16,7 +16,6 @@ router = APIRouter(
     prefix="/dataset",
     tags=["datasets"],
     dependencies=[Depends(validate_token_header)],
-    responses={404: {"description": "Not found"}},
 )
 
 
