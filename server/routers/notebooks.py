@@ -1,24 +1,99 @@
-from typing import List
 from pydantic.types import UUID4
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends
 
 from ..schemas import ResponseBase
 from ..dependencies import (
     validate_token_header,
 )
-from modules.controllers.pipelines import data_schemas
+
+from .. import logger
+from modules.controllers.pipelines import manager as pipeline_manager
+from modules.controllers.pipelines.dag_schemas import BuildDAG
+from modules.controllers.pipelines.data_schemas import PipelineUpdate, Pipeline
 from modules.controllers.notebooks import manager
-from modules.controllers.datasets import utils
+from utils.exceptions import CustomHttpException
 
 
-@router.post("/start/{pipeline_id}", response_model=ResponseBase[data_schemas.Run])
-def start_run(
+router = APIRouter(
+    prefix="/notebook",
+    tags=["notebooks"],
+    dependencies=[Depends(validate_token_header)],
+)
+
+
+@router.post("/", response_model=ResponseBase[dict])
+def create_or_start_notebook(
     pipeline_id: UUID4,
-    run_service: manager.RunCRUD = Depends(manager.get_run_crud),
-    pipeline_service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
-) -> ResponseBase[data_schemas.Run] | dict:
-    pipeline = pipeline_service.get(id=pipeline_id)
-    run = run_service.create(pipeline)
-    # TODO: Delete run in case of error
-    celery_worker.run_pipeline.apply_async([str(run.run_id)], task_id=str(run.run_id))
-    return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+    node_ref_id: str,
+    service: pipeline_manager.PipelineCRUD = Depends(
+        pipeline_manager.get_pipeline_crud
+    ),
+) -> ResponseBase[dict] | dict:
+    pipeline = service.get(id=pipeline_id)
+    pipeline = Pipeline.from_orm(pipeline)
+    nb_node = None
+    for node_idx, node in enumerate(pipeline.dags["pipeline"]["nodes"]):
+        if node["data"]["id"] == node_ref_id:
+            dag = BuildDAG(config={"pipeline": {"nodes": [node], "edges": []}}).graph
+            if dag.nodes[node_ref_id].category_id == 2:
+                nb_node = node
+                break
+            else:
+                raise CustomHttpException(
+                    status_code=422,
+                    detail=f"Node '{node_ref_id}' doesn't belong to a recognized notebook category.",
+                )
+
+    if nb_node is None:
+        raise CustomHttpException(
+            status_code=404,
+            detail=f"Node '{node_ref_id}' not found in pipeline '{str(pipeline_id)}'",
+        )
+
+    nb_name = [
+        prop["value"]
+        for prop in nb_node["data"]["properties"]
+        if prop["name"] == "name"
+    ]
+
+    if not len(nb_name):
+        raise CustomHttpException(
+            status_code=422, detail=f"Node '{node_ref_id}' is malformed"
+        )
+
+    nb_name = nb_name[0]
+
+    if not nb_name.strip():
+        raise CustomHttpException(
+            status_code=422, detail="Not a valid name for the notebook."
+        )
+
+    nb_node_output = [
+        prop for prop in nb_node["data"]["outputs"] if prop["name"] == "url"
+    ]
+
+    if not len(nb_node_output):
+        raise CustomHttpException(
+            status_code=422, detail=f"Node '{node_ref_id}' is malformed"
+        )
+
+    nb_node_output = nb_node_output[0]
+
+    username = "test001"
+    server_name = f"{username}-server"
+    try:
+        _ = manager.get_user(username)
+    except CustomHttpException as exc:
+        if exc.status_code == 404:
+            _ = manager.create_user(username)
+
+    nb_name = f"{nb_name.strip().replace('.ipynb', '')}.ipynb"
+    nb_url = manager.get_notebook(username, server_name, nb_name)
+    if nb_url is None:
+        nb_url = manager.create_notebook(username, server_name, nb_name)
+
+    nb_node_output["value"] = nb_url
+    pipeline.dags["pipeline"]["nodes"][node_idx] = nb_node
+    service.update(pipeline_id, pipeline)
+
+    return ResponseBase[dict](data={"notebook_url": nb_url})

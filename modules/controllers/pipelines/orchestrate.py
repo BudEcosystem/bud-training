@@ -272,4 +272,9 @@ class DAGRun:
     def execute(self):
         for ordinal in sorted(self.exec_buckets):
             for node_id in self.exec_buckets[ordinal]:
+                if self.dag.nodes[node_id].family_id == -1:
+                    self.logger.info(
+                        f"Skipping non-executable node {self.dag.nodes[node_id].node_name}..."
+                    )
+                    continue
                 self.run_node(self.dag.nodes[node_id])

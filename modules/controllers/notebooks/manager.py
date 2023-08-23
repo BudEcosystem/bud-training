@@ -264,7 +264,15 @@ def get_notebook(username, server_name, notebook_name):
     if resp.status_code == 404:
         return
     elif resp.status_code == 200:
-        return resp.json()
+        return (
+            multi_urljoin(
+                settings.jupyterhub.PUBLIC_BASE_URL,
+                service_details["service_url_prefix"],
+                "/notebooks",
+                f"/{resp.json()['path']}",
+            )
+            # + f"?token={service_details['api_token']}"
+        )
 
     resp.raise_for_status()
 
@@ -301,10 +309,10 @@ def create_notebook(username, server_name, notebook_name):
 
     return (
         multi_urljoin(
-            settings.jupyterhub.REDIRECT_BASE_URL,
+            settings.jupyterhub.PUBLIC_BASE_URL,
             service_details["service_url_prefix"],
             "/notebooks",
             f"/{resp.json()['path']}",
         )
-        + f"?token={service_details['api_token']}"
+        # + f"?token={service_details['api_token']}"
     )

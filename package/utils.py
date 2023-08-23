@@ -1,7 +1,14 @@
 from os import path as osp
 from os import walk
+from urllib.parse import urljoin, quote_plus
 import zipfile
 import io
+
+
+def multi_urljoin(*parts):
+    return urljoin(
+        parts[0], "/".join(quote_plus(part.strip("/"), safe="/") for part in parts[1:])
+    )
 
 
 def create_zipfile_buffer_from_dir(dirpath):

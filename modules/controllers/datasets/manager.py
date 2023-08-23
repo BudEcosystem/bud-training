@@ -45,6 +45,13 @@ class DatasetCRUD(BaseCRUD[Datasets, None, schemas.DatasetUpdate]):
             .all()
         )
 
+    def get_dataset_by_name(self, dataset_name: str):
+        return (
+            self.db_session.query(self.model)
+            .filter(self.model.name == dataset_name)
+            .first()
+        )
+
     def assert_is_name_unique(self, name: str) -> bool:
         if self.db_session.query(self.model).filter_by(name=name).first():
             raise CustomHttpException(

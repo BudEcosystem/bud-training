@@ -35,20 +35,25 @@ class Node(BaseModel):
 
         # TODO: Change to [ instead of get
         cls.validate_node_id(node_id, values.get("node_name"))
-        cls.validate_family_id(values["family_id"], values.get("family_name"))
-        cls.validate_category_id(values["category_id"], values.get("category_name"))
-
         values["node_name"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].node_name
-        values["category_id"] = settings.pipelines.AVAILABLE_PIPELINES[
-            node_id
-        ].category_id
+
+        cls.validate_category_id(
+            node_id, values["category_id"], values.get("category_name")
+        )
         values["category_name"] = settings.pipelines.AVAILABLE_PIPELINES[
             node_id
         ].category_name
-        values["family_id"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].family_id
-        values["family_name"] = settings.pipelines.AVAILABLE_PIPELINES[
-            node_id
-        ].family_name
+
+        if settings.pipelines.AVAILABLE_PIPELINES[node_id].family_id != -1:
+            cls.validate_family_id(
+                node_id, values["family_id"], values.get("family_name")
+            )
+            values["family_name"] = settings.pipelines.AVAILABLE_PIPELINES[
+                node_id
+            ].family_name
+        else:
+            values["family_id"] = -1
+            values["family_name"] = "N/A"
 
         values["script"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].script
         values["cmd"] = settings.pipelines.AVAILABLE_PIPELINES[node_id].cmd
@@ -88,14 +93,25 @@ class Node(BaseModel):
             raise ValueError(f"{node_name} is not a supported node")
 
     @staticmethod
-    def validate_family_id(family_id: int, family_name: str) -> None:
-        if family_id not in NODE_CONSTANTS.get("family", {}):
-            raise ValueError(f"{family_name} is not a supported family")
+    def validate_category_id(
+        node_id: int, category_id: int, category_name: str
+    ) -> None:
+        if (
+            category_id not in NODE_CONSTANTS.get("category", {})
+            or category_id
+            != settings.pipelines.AVAILABLE_PIPELINES[node_id].category_id
+        ):
+            raise ValueError(
+                f"{category_name} is not a supported category for this node"
+            )
 
     @staticmethod
-    def validate_category_id(category_id: int, category_name: str) -> None:
-        if category_id not in NODE_CONSTANTS.get("category", {}):
-            raise ValueError(f"{category_name} is not a supported category")
+    def validate_family_id(node_id: int, family_id: int, family_name: str) -> None:
+        if (
+            family_id not in NODE_CONSTANTS.get("family", {})
+            or family_id != settings.pipelines.AVAILABLE_PIPELINES[node_id].family_id
+        ):
+            raise ValueError(f"{family_name} is not a supported family for this node")
 
     @staticmethod
     def validate_property_name(node_id: int, prop_name: str) -> None:
@@ -177,7 +193,6 @@ class DAGNode(Node):
 
         child.properties[child_prop_id]["ref"] = parent_prop_id
 
-        print(self.id, child.id, [child.id for child in self.children])
         if child.id not in [child.id for child in self.children]:
             self.children.append(child)
             if self.id not in [parent.id for parent in child.parents]:
@@ -235,7 +250,6 @@ class BuildDAG(BaseModel):
     @staticmethod
     def build_edges(nodes: Dict[str, DAGNode], config: dict):
         for edge in config["pipeline"]["edges"]:
-            print(edge)
             nodes[edge["source"]].add_child(
                 nodes[edge["target"]],
                 edge["targetHandle"].split(".", 1)[-1],
@@ -248,26 +262,3 @@ class BuildDAG(BaseModel):
     def build_direction(nodes: Dict[str, DAGNode]):
         direction = {node.id: len(node.ancestors) for node in nodes.values()}
         return dict(sorted(direction.items(), key=lambda x: x[1]))
-
-
-def test():
-    import json
-
-    with open("./node_flow.json", "r") as file:
-        data = json.load(file)
-
-    dag = BuildDAG(config=data)
-    print("Direction")
-    print(dag.graph.direction)
-    print("Descendants")
-    print("dndnode_0: ", dag.graph.nodes["dndnode_0"].descendants)
-    print("dndnode_1: ", dag.graph.nodes["dndnode_1"].descendants)
-    print("dndnode_2: ", dag.graph.nodes["dndnode_2"].descendants)
-    print("dndnode_3: ", dag.graph.nodes["dndnode_3"].descendants)
-    print("dndnode_4: ", dag.graph.nodes["dndnode_4"].descendants)
-    print("Ancestors")
-    print("dndnode_0: ", dag.graph.nodes["dndnode_0"].ancestors)
-    print("dndnode_1: ", dag.graph.nodes["dndnode_1"].ancestors)
-    print("dndnode_2: ", dag.graph.nodes["dndnode_2"].ancestors)
-    print("dndnode_3: ", dag.graph.nodes["dndnode_3"].ancestors)
-    print("dndnode_4: ", dag.graph.nodes["dndnode_4"].ancestors)

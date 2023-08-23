@@ -76,7 +76,7 @@ settings = {
     "jupyterhub": {
         "NETWORK": env.str("JUPYTERHUB_NETWORK"),
         "BASE_URL": env.str("JUPYTERHUB_BASE_URL").rstrip("/"),
-        "REDIRECT_BASE_URL": env.str("JUPYTERHUB_REDIRECT_BASE_URL").rstrip("/"),
+        "PUBLIC_BASE_URL": env.str("JUPYTERHUB_PUBLIC_BASE_URL").rstrip("/"),
         "API_TOKEN": env.str("JUPYTERHUB_API_TOKEN"),
         "API_TIMEOUT": env.int("JUPYTERHUB_API_TIMEOUT", 120),
     },
