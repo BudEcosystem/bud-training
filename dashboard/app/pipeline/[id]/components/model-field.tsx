@@ -3,34 +3,47 @@ import { getModels } from "../../../../services/common-service";
 import Dropdown from "../../../dropdown";
 
 
-export default function ModelField(props: any){
+export default function ModelField(props: any) {
 
-    const [models, setModels] = useState([])
-    const [selected, setSelected] = useState({} as any)
+  const [models, setModels] = useState([])
+  const [selected, setSelected] = useState({} as any)
 
-    useEffect(() => {
-        getAllOptions()
-    }, [])
+  useEffect(() => {
+    getAllOptions()
+  }, [])
 
-    useEffect(() => {
-      console.log(selected)
-      props.onChange(selected)
+  useEffect(() => {
+    console.log(selected)
+    props.onChange(selected)
   }, [selected])
 
-    async function getAllOptions() {
-        let res = await getModels();
-    
-        if (res.status) {
-          setModels(res.data);
-          setSelected(res.data[0])
-        } else {
-          // toast.error(res.data.message);
-        }
+  async function getAllOptions() {
+    let res = await getModels();
+
+    if (res.status) {
+      res.data.map((item: any) => item['id'] = item['model_id'])
+      setModels(res.data);
+      let defaultValue = res.data[0]
+
+      if (props.default) {
+        defaultValue = res.data.filter((item: any) => item['model_id'] == props.default)[0]
       }
 
-    return(
-        <>
-            <Dropdown label={props.label} options={models} selected={selected} onChange={(value: any) => setSelected(value['model_id'])}></Dropdown>
-        </>
-    )
+      setSelected(defaultValue)
+    } else {
+      // toast.error(res.data.message);
+    }
+  }
+
+  const onChange = (value: any) => {
+    setSelected(value['id'])
+    
+    props.onChange(props.name, value['id'])
+  }
+
+  return (
+    <>
+      <Dropdown label={props.label} options={models} selected={selected} onChange={(value: any) => onChange(value)}></Dropdown>
+    </>
+  )
 }

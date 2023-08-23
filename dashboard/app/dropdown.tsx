@@ -13,9 +13,10 @@ export default function Dropdown(props:any) {
 
   useEffect(() => {
     
-    let current = props.options.filter((item: any) => item.id == props.selected)
+    let current = props.options.filter((item: any) => item.id == props.selected?.id)
     
     current = current.length ? current[0] : props.options[0]
+    
     setSelected(current)
 
     setDisabled(props.disabled)
@@ -24,7 +25,6 @@ export default function Dropdown(props:any) {
   const onChange =  (val: any) => {
     setSelected(val)
     props.onChange(val)
-    // console.log(val)
   }
 
   return (
