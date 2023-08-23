@@ -7,10 +7,10 @@ LONG_DESCRIPTION = "Client library for the Bud-MLOps service"
 # Setting up
 setup(
     # the name must match the folder name 'verysimplemodule'
-    name="bud_mlops",
+    name="bud_mlops_client",
     version=VERSION,
-    author="Adarsh M S",
-    author_email="adarsh@",
+    author="Accubit Technologies Inc",
+    author_email="admin@accubits.com",
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     packages=find_packages(),
