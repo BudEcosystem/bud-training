@@ -3,8 +3,32 @@
 
 # Configuration file for JupyterHub
 import os
+from traitlets import Unicode
+from tornado.concurrent import run_on_executor
+from jupyterhub.auth import PAMAuthenticator
+
 
 c = get_config()  # noqa: F821
+
+
+class PassThroughAuthenticator(PAMAuthenticator):
+    guest_user = Unicode(
+        "guest",
+        help="""
+        Guest account to use when logging in to jupyterhub. This account will not require any authentication
+        hence use it wisely. All the terminal access and directory will be used for the specified machine user
+        and the account must be present beforehand.
+        """,
+        config=True,
+    )
+
+    @run_on_executor
+    def authenticate(self, handler, data):
+        if data is None:
+            return self.guest_user
+        else:
+            return super(PAMAuthenticator, self).authenticate(handler, data)
+
 
 # We rely on environment variables to configure JupyterHub so that we
 # avoid having to rebuild the JupyterHub container every time we change a
@@ -91,7 +115,13 @@ c.JupyterHub.cookie_secret_file = "/data/jupyterhub_cookie_secret"
 c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
 
 # Authenticate users with Native Authenticator
-c.JupyterHub.authenticator_class = "nativeauthenticator.NativeAuthenticator"
+# c.JupyterHub.authenticator_class = "nativeauthenticator.NativeAuthenticator"
+c.JupyterHub.authenticator_class = PassThroughAuthenticator
+c.PassThroughAuthenticator.guest_user = "test001"
+c.Authenticator.auto_login = True  # Disables PAM login completely, use False otherwise
+
+# Enabling this will delete users created via API on restart
+# c.Authenticator.delete_invalid_users = True
 
 # Allow anyone to sign-up without approval
 c.NativeAuthenticator.open_signup = True

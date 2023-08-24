@@ -7,6 +7,8 @@ FROM jupyterhub/jupyterhub:$JUPYTERHUB_VERSION
 # hadolint ignore=DL3013
 RUN python3 -m pip install --no-cache-dir \
     dockerspawner \
-    jupyterhub-nativeauthenticator
+    jupyterhub-nativeauthenticator \
+    jupyterhub-tmpauthenticator \
+    jupyterhub-passthroughauth
 
 CMD ["jupyterhub", "-f", "/srv/jupyterhub/jupyterhub_config.py"]

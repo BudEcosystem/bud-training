@@ -10,6 +10,7 @@ from ..schemas import ResponseBase
 from ..dependencies import (
     validate_token_header,
 )
+from .. import logger
 from modules.controllers.datasets import schemas as dataset_schemas
 from modules.controllers.datasets import manager
 from modules.controllers.datasets import utils
@@ -65,9 +66,14 @@ def read_datasets(
             dataset_type=dataset_type, page=page, limit=limit
         )
     elif dataset_name is not None:
-        datasets = [service.get_dataset_by_name(dataset_name=dataset_name)]
+        datasets = service.get_dataset_by_name(dataset_name=dataset_name)
+        if datasets is not None:
+            datasets = [datasets]
+        else:
+            datasets = []
     else:
         datasets = service.list(page=page, limit=limit)
+    logger.info(datasets)
     return ResponseBase[List[dataset_schemas.Dataset]](
         data=[dataset_schemas.Dataset.from_orm(dataset) for dataset in datasets]
     )

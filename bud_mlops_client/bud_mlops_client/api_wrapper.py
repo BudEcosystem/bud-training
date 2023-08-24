@@ -42,7 +42,11 @@ class BudMLOpsClient:
         if not resp.json()["status"]:
             raise ValueError("Dataset fetching failed!!!")
 
-        dataset = resp.json()["data"][0]
+        dataset = resp.json()["data"]
+        if not len(dataset):
+            raise ValueError(f"Dataset '{dataset_name}' doesn't exist")
+
+        dataset = dataset[0]
         endpoint = f"/dataset/download/{dataset['dataset_id']}"
 
         chunk_size = 100000000  # size of 1 chunk to download 100000000 = 100 MB
