@@ -59,8 +59,8 @@ export default function Inference() {
   }
 
   const getTimeDifference = (created_at: any, stopped_at: any, status: number) => {
-    if(!stopped_at) stopped_at = new Date()
-    if(status == 1) stopped_at = new Date()
+    if (!stopped_at) stopped_at = new Date()
+    if (status == 1) stopped_at = new Date()
     const startTime = new Date(created_at);
     const stopTime = new Date(stopped_at);
 
@@ -166,9 +166,10 @@ export default function Inference() {
                         {item.status_alias}
                       </td>
                       <td className="relative flex items-center justify-end whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
-                        {item.status  == 1 && <a href={item.endpoint} target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
-                        {item.status  == 0 && <PlayIcon onClick={() => startItem(item)} className="h-4 w-4 mr-2 text-green-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
-                        {item.status  == 1 && <StopIcon onClick={() => stopItem(item)} className="h-4 w-4 mr-2 text-red-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
+                        {(item.status == 1 && item.model.family == 1) && <a href={item.endpoint} target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
+                        {(item.status == 1 && item.model.family == 0) && <a href='http://216.48.187.144:7860/' target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
+                        {item.status == 0 && <PlayIcon onClick={() => startItem(item)} className="h-4 w-4 mr-2 text-green-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
+                        {item.status == 1 && <StopIcon onClick={() => stopItem(item)} className="h-4 w-4 mr-2 text-red-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
                         <TrashIcon onClick={() => { setToRemove(item); setShowConfirm(true) }} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
                       </td>
                     </tr>

@@ -7,6 +7,7 @@ import 'reactflow/dist/style.css';
 import Node from './components/node';
 import ComponentDetail from './component-detail';
 import { node } from 'prop-types';
+import NotebookView from './notebook-view';
 
 
 const nodeTypes = {
@@ -301,6 +302,7 @@ export default function Canvas(props: any) {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState({} as any);
     const [showNodeDetails, setShowDetails] = useState(false);
+    const [showNotebook, setShowNotebook] = useState(false);
     const [selected, setSelected] = useState({} as any);
 
     useEffect(() => {
@@ -318,6 +320,20 @@ export default function Canvas(props: any) {
     const getId = () => `dndnode_${id++}`;
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
+    const formatNode = (data: any, nodeId: any) => {
+        console.log(data)
+        data.outputs.map((item: any, index: number)=>{ 
+            item['id'] = nodeId + "." + (index + 1)
+            return item
+        })
+        data.properties.map((item: any, index: number)=>{ 
+            item['id'] = nodeId + "." + (index + 1)
+            return item
+        })
+
+        return data
+    }
+
     const onDrop = useCallback(
         (event: { preventDefault: () => void; dataTransfer: { getData: (arg0: string) => any; }; clientX: number; clientY: number; }) => {
             event.preventDefault();
@@ -334,11 +350,12 @@ export default function Canvas(props: any) {
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
             });
+            const nodeId = getId()
             const newNode = {
-                id: getId(),
+                id: nodeId,
                 type: 'node',
                 position,
-                data: data,
+                data: formatNode(data, nodeId),
             };
 
             setNodes((nds) => nds.concat(newNode));
@@ -354,7 +371,13 @@ export default function Canvas(props: any) {
     const onNodeClick = (event: any, node: any) => {
         console.log('clicked', node);
         setSelected(node)
-        setShowDetails(!showNodeDetails)
+        if(node.data.category_id == 2){
+            setShowNotebook(!showNotebook)
+        } else {
+            setShowDetails(!showNodeDetails)
+        }
+        
+        
     }
 
     const onUpdateProperties = (item: any) => {
@@ -399,6 +422,7 @@ export default function Canvas(props: any) {
 
             </ReactFlowProvider>
             <ComponentDetail open={showNodeDetails} selected={selected} onSave={onUpdateProperties}></ComponentDetail>
+            <NotebookView open={showNotebook} selected={selected} onSave={onUpdateProperties}></NotebookView>
         </div>
 
     );
