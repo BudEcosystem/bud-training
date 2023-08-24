@@ -70,9 +70,16 @@ class RunCRUD(BaseCRUD[Runs, schemas.RunCreate, schemas.RunUpdate]):
             .first()
         )
 
-    def get_pipeline_runs(self, pipeline_id: UUID4) -> List[Runs]:
+    def get_pipeline_runs(
+        self, pipeline_id: UUID4, page: int = 1, limit: int = 100
+    ) -> List[Runs]:
+        skip = (page - 1) * limit
         return (
-            self.db_session.query(self.model).filter_by(pipeline_id=pipeline_id).all()
+            self.db_session.query(self.model)
+            .filter_by(pipeline_id=pipeline_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
         )
 
 

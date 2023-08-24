@@ -1,0 +1,55 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# JupyterHub docker-compose configuration file
+version: "3.5"
+
+services:
+  hub:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyterhub
+      args:
+        JUPYTERHUB_VERSION: latest
+    restart: always
+    image: jupyterhub
+    container_name: jupyterhub
+    networks:
+      - ${JUPYTERHUB_NETWORK}
+    volumes:
+      # The JupyterHub configuration file
+      - "./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro"
+      # Bind Docker socket on the host so we can connect to the daemon from
+      # within the container
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+      # Bind Docker volume on host for JupyterHub database and cookie secrets
+      - "jupyterhub-data:/data"
+    ports:
+      - "9743:8000"
+    environment:
+      # This username will be a JupyterHub admin
+      JUPYTERHUB_ADMIN: admin
+      # All containers will join this network
+      DOCKER_NETWORK_NAME: ${JUPYTERHUB_NETWORK}
+      # JupyterHub will spawn this Notebook image for users
+      DOCKER_NOTEBOOK_IMAGE: jupyter/base-notebook:latest
+      # JupyterHub will spawn the Notebook image at this port for users
+      DOCKER_NOTEBOOK_PORT: 8888
+      # Name of the default user
+      DOCKER_NOTEBOOK_USER: bud
+      # Notebook directory inside user image
+      DOCKER_NOTEBOOK_DIR: ~/content/notebooks
+      # Using this run command
+      DOCKER_SPAWN_CMD: start-singleuser.sh
+      # API BASE URL
+      REDIRECT_API_BASE_URL: ${API_BASE_URL}
+      # Jupyterhub API Token
+      JUPYTERHUB_API_TOKEN: ${JUPYTERHUB_API_TOKEN}
+
+volumes:
+  jupyterhub-data:
+
+
+networks:
+  jupyterhub-network:
+    name: ${JUPYTERHUB_NETWORK}

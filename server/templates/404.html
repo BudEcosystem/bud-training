@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <link href="{{ url_for('static', path='/css/404.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block title %} 
+  <title>404</title>
+{% endblock %} 
+
+{% block content %} 
+  <header>
+    <div class="head-text">
+      <p>O-o-oh! Something broke.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="main-wrapper">
+      <picture class="error-img">
+        <img src="{{ url_for('static', path='/img/404.png') }}" alt="404">
+      </picture>
+      <div class="error-text">
+        <h2>I have bad news for you</h2>
+        <p>The page you are looking for might be removed or is temporarily unvailable.</p>
+      </div>
+    </div>
+
+  </main>
+{% endblock %} 

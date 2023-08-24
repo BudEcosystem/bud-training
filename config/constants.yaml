@@ -35,11 +35,13 @@ pipelines:
     category:
       0: Training
       1: Eval
-    name:
+      2: Notebooks
+    name: #TODO: Should ids be grouped by category?
       0: LLM Finetuning
       1: SD LoRA Finetuning
       2: HumanEval
       3: SDXL LoRA Finetuning
+      4: Jupyter Notebook
     property_type:
       0: integer
       1: number
@@ -48,4 +50,5 @@ pipelines:
       4: list
       5: dataset
       6: model
+      7: url
     family: *family

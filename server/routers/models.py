@@ -9,7 +9,6 @@ router = APIRouter(
     prefix="/models",
     tags=["models"],
     dependencies=[Depends(validate_token_header)],
-    responses={404: {"description": "Not found"}},
 )
 
 @router.post("/", response_model=ResponseBase[schemas.Model])

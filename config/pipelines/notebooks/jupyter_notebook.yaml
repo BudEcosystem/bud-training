@@ -1,0 +1,14 @@
+description: Jupyter Notebook
+category_id: 2
+node_id: 4
+family_id: -1
+outputs:
+  url:
+    description: Notebook url
+    title: Notebook URL
+    type: url
+properties:
+  name:
+    description: Name of the Notebook
+    title: Notebook Name
+    type: string
