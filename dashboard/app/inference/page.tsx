@@ -108,7 +108,7 @@ export default function Inference() {
 
   return (
 
-    <div className="px-4 sm:px-6 lg:px-8 py-5">
+    <div className="pb-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <Title>Inference</Title>
