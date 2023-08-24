@@ -236,7 +236,7 @@ def stop_server(username, server_name):
         time.sleep(1)
 
 
-@lru_cache(maxsize=5)
+# @lru_cache(maxsize=5)
 def get_notebook_service_details(username, server_name):
     server_details = start_server(username, server_name)
     service_details = get_notebook_container_details(server_details["instance_name"])
@@ -283,6 +283,14 @@ def create_notebook(username, server_name, notebook_name):
     if notebook is not None:
         raise CustomHttpException(status_code=409, detail="Notebook already exists")
 
+    if not osp.isfile(settings.jupyterhub.README):
+        raise CustomHttpException(
+            status_code=500, detail="Missing notebook dependencies."
+        )
+
+    with open(settings.jupyterhub.README, "r") as file:
+        readme = file.read()
+
     payload = {
         "content": {
             "metadata": {},
@@ -292,7 +300,7 @@ def create_notebook(username, server_name, notebook_name):
                 {
                     "cell_type": "markdown",
                     "metadata": {},
-                    "source": "Some **Markdown**",
+                    "source": readme,
                 },
             ],
         },

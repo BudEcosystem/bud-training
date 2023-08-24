@@ -37,8 +37,9 @@ c.DockerSpawner.network_name = network_name
 # Most `jupyter/docker-stacks` *-notebook images run the Notebook server as
 # user `jovyan`, and set the notebook directory to `/home/jovyan/work`.
 # We follow the same convention.
+NB_USER = os.environ.get("DOCKER_NOTEBOOK_USER", "bud")
 notebook_dir = os.environ.get("DOCKER_NOTEBOOK_DIR", "~/content/notebooks").replace(
-    "~/", "/home/jovyan/"
+    "~/", f"/home/{NB_USER}/"
 )
 c.DockerSpawner.notebook_dir = notebook_dir
 
@@ -53,10 +54,20 @@ c.DockerSpawner.remove = True
 c.DockerSpawner.debug = True
 
 # Start the container as root
-c.DockerSpawner.extra_create_kwargs = {"user": "root"}  # Can also be an integer UID
+c.DockerSpawner.extra_create_kwargs = {
+    "user": "root",
+    # "workdir": f"/home/{NB_USER}/",
+}  # Can also be an integer UID
 
 # Env variables to be passed to the container
-c.DockerSpawner.environment = {"CHOWN_HOME": "yes", "CHOWN_HOME_OPTS": "-R"}
+c.DockerSpawner.environment = {
+    "NB_USER": NB_USER,
+    "HOME": f"/home/{NB_USER}/",
+    "GRANT_SUDO": "yes",
+    "CHOWN_HOME": "yes",
+    "CHOWN_HOME_OPTS": "-R",
+    # "DOCKER_STACKS_JUPYTER_CMD": "notebook",
+}
 
 # Extra arguments to be passed to the single-user server
 c.DockerSpawner.args = [
@@ -65,7 +76,7 @@ c.DockerSpawner.args = [
 ]
 
 # Set the default url of the user container to
-c.DockerSpawner.default_url = "/lab"
+c.DockerSpawner.default_url = "/notebooks"
 
 # Specify which URL prefix should be routed to the Hub. Disable or change this to '/' for hub UI access
 # c.JupyterHub.hub_routespec = "/hub/api"

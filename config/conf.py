@@ -79,6 +79,7 @@ settings = {
         "PUBLIC_BASE_URL": env.str("JUPYTERHUB_PUBLIC_BASE_URL").rstrip("/"),
         "API_TOKEN": env.str("JUPYTERHUB_API_TOKEN"),
         "API_TIMEOUT": env.int("JUPYTERHUB_API_TIMEOUT", 120),
+        "README": env.str("NOTEBOOK_README", osp.join(DIR_PATH, "NOTEBOOK.md")),
     },
     "database": {
         "psql": {

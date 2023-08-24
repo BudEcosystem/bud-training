@@ -35,6 +35,8 @@ services:
       DOCKER_NOTEBOOK_IMAGE: jupyter/base-notebook:latest
       # JupyterHub will spawn the Notebook image at this port for users
       DOCKER_NOTEBOOK_PORT: 8888
+      # Name of the default user
+      DOCKER_NOTEBOOK_USER: bud
       # Notebook directory inside user image
       DOCKER_NOTEBOOK_DIR: ~/content/notebooks
       # Using this run command
