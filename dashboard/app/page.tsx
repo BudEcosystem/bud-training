@@ -19,7 +19,7 @@ export default async function IndexPage({
   const users = [{'id': 2, 'name': 'ditto', 'username':'@ditto', 'email': ''}, {'id': 2, 'name': 'ditto', 'username':'@ditto', 'email': ''}]
 
   return (
-    <main className="p-4 md:p-10 mx-auto max-w-7xl">
+    <main className="mx-auto max-w-7xl pb-8">
       <Title>Users</Title>
       <Text>
         A list of users retrieved from a MySQL database (PlanetScale).
