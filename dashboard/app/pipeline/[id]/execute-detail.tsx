@@ -1,28 +1,30 @@
+'use client'
 
 import { Fragment, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import TextField from './components/text-field'
-import DatasetField from './components/dataset-field'
-import ModelField from './components/model-field'
-import BoolField from './components/bool-field'
-import ListField from './components/list-field'
-import { startNotebook } from '../../../services/common-service'
 
-export default function NotebookView(props: any) {
-  const nodeSchema = {
-    node_name: '',
-    description: '',
-    properties: []
-  }
+import { addPipeline, startRun, updatePipeline } from '../../../services/common-service'
+import { showToast } from '../../../services/toast-service'
+import Loading from '../../loading'
+import Dropdown from '../../dropdown'
+
+export default function ExecuteDetail(props: any) {
+  const clusterList = [
+    { id: 1, name: "cluster-dev" },
+    { id: 0, name: "cluser-stage" }
+  ]
+
+  const router = useRouter()
 
   const [open, setOpen] = useState(false)
   const [init, setInit] = useState(false)
-  const [node, setNode] = useState(nodeSchema as any)
-  const [notebookUrl, setNotebookUrl] = useState("http://216.48.187.144:9743/user/test001/test001-server/notebooks/Updated%2Bval.ipynb")
+  const [loading, setLoading] = useState(false)
+  const [pieplineId, setPipelineId] = useState(null)
+  const [cluster, setCluster] = useState('')
 
   useEffect(() => {
-    console.log('show')
     if (!init) {
       setInit(true)
       return
@@ -31,45 +33,29 @@ export default function NotebookView(props: any) {
   }, [props.open])
 
   useEffect(() => {
-    console.log(props.selected?.data)
-    if (props.selected?.data) setNode(props.selected?.data)
-    if (props.selected?.data?.category_id == 2) initiateNotebook()
-    if (props.selected?.data?.outputs[0].value) initiateNotebook()
-  }, [props.selected])
 
-  const initiateNotebook = async () => {
-    
-    // setLoading(true)
-    let res = await startNotebook('5fc0767a-4261-4d0b-8c35-ce1e4ecfcd68', props.selected?.id);
+    setPipelineId(props.pieplineId)
 
-    // setLoading(false)
+  }, [props.pieplineId])
+
+  async function executePipeline() {
+
+    // return
+    setLoading(true)
+    let res
+    res = await startRun(pieplineId);
+
+    setLoading(false)
     if (res.status == true) {
-      console.log(res.data);
-      //   setDatasets(res.data);
-      // showToast('success', 'Successfully done!', 'You can start using the data in the pipeline')
-      // setOpen(false)
-      // props.onClose()
+        console.log(res.data);
+        //   setDatasets(res.data);
+        showToast('success', 'Successfully done!', 'Execution started')
+
     } else {
-      console.log(res)
-      // showToast('error', 'Failed', res.data.detail)
+        console.log(res)
+        showToast('error', 'Failed', res.data.detail)
     }
-  }
-
-  const updateProperty = (item: any, value: any) => {
-
-    for (let prop of node.properties) {
-      if (prop.name == item) {
-
-        prop.default = value
-        prop['value'] = value
-      }
-    }
-  }
-
-  const saveProperty = () => {
-    props.onSave(node)
-    setOpen(false)
-  }
+}
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -89,12 +75,12 @@ export default function NotebookView(props: any) {
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                  <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                  <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
                     <div className="h-0 flex-1 overflow-y-auto">
                       <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                         <div className="flex items-center justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-white">
-                            {node.node_name}
+                            Run pipeline
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button
@@ -110,30 +96,23 @@ export default function NotebookView(props: any) {
                         </div>
                         <div className="mt-1">
                           <p className="text-sm text-indigo-300">
-                            {node.description}
+                            Choose the cluster to run
                           </p>
                         </div>
                       </div>
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="divide-y divide-gray-200 px-4 sm:px-6">
                           <div className="space-y-6 pb-5 pt-6">
-                            {node?.properties.map((item: any) => (
-                              <div>
-                                {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
-                                {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
-                                {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
-                                {item.type == 3 && <BoolField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></BoolField>}
-                                {item.type == 4 && <ListField label={item.title} default={item.default} name={item.name} options={item.options} onChange={updateProperty}></ListField>}
-                                {item.type == 5 && <DatasetField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></DatasetField>}
-                                {item.type == 6 && <ModelField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></ModelField>}
+                            <div>
+                              <div className="mt-2">
+                                <Dropdown label="Cluster Name" options={clusterList} selected={cluster} onChange={(value: any) => setCluster(value['id'])}></Dropdown>
                               </div>
-                            ))}
+                            </div>
 
                           </div>
                         </div>
                       </div>
                     </div>
-                    
                     <div className="flex flex-shrink-0 justify-end px-4 py-4">
                       <button
                         type="button"
@@ -143,14 +122,15 @@ export default function NotebookView(props: any) {
                         Cancel
                       </button>
                       <button
-                        type="button"
+                        type="submit"
                         className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        onClick={saveProperty}
+                        onClick={() => executePipeline()}
                       >
-                        Save
+                        Execute
                       </button>
                     </div>
-                  </form>
+                    {loading && <Loading />}
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>

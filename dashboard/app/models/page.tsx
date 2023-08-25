@@ -7,11 +7,14 @@ import { useEffect, useState } from 'react';
 import { deleteModel, getModels } from '../../services/common-service';
 import { showToast } from '../../services/toast-service';
 import ConfirmDialog from '../components/confirm-dialog';
+import Search from '../search';
 
 
 export default function Models() {
 
+
   const [openDetail, setOpenDetail] = useState(false)
+  const [modelList, setModelList] = useState([])
   const [models, setModels] = useState([])
   const [selected, setSelected] = useState({})
   const [toRemove, setToRemove] = useState({})
@@ -37,6 +40,7 @@ export default function Models() {
     let res = await getModels();
 
     if (res.status) {
+      setModelList(res.data)
       setModels(res.data);
     } else {
       // toast.error(res.data.message);
@@ -56,14 +60,32 @@ export default function Models() {
       showToast('error', 'Failed', res.data.detail)
     }
   }
+  const formatDate = (modified_at: any) => {
+    const dateObject = new Date(modified_at);
+  
+  const day = dateObject.getDate().toString().padStart(2, '0');
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+  const year = dateObject.getFullYear().toString().slice(-2);
+  
+  const formattedDate = `${day}/${month}/${year}`;
+  return formattedDate;
+  }
+
+  const filterList = (val: any) => {
+    
+    let filtered = modelList.filter((item: any) => item.name.toLowerCase().includes(val.toLowerCase()))
+    
+    setModels(filtered)
+  }
 
   return (
 
-    <div className="px-4 sm:px-6 lg:px-8 py-5">
-      <div className="sm:flex sm:items-center">
+    <div className="px-3 py-0">
+      <div className="sm:flex sm:items-end">
         <div className="sm:flex-auto">
           <Title>Models</Title>
           <Text>A list of all the available models in the workspace</Text>
+          <Search onChange={filterList}/>
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <button
@@ -93,6 +115,18 @@ export default function Models() {
                       scope="col"
                       className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
                     >
+                      Family
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                    >
+                      Version
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                    >
                       Source type
                     </th>
                     <th
@@ -107,6 +141,12 @@ export default function Models() {
                     >
                       Model type
                     </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                    >
+                      Modified at
+                    </th>
                     <th scope="col" className="relative py-3 pl-3 pr-4 sm:pr-0">
                       <span className="sr-only">Edit</span>
                     </th>
@@ -115,15 +155,18 @@ export default function Models() {
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {models.map((item: any) => (
                     <tr key={item.model_id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                      <td className="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                         {item.name}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.source_type_alias}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{item.family_alias}</td>
+                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">1</td>
+                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{item.source_type_alias}</td>
+                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
                         {item.source_type == 0 && <a className='text-indigo-400' href={"https://huggingface.co/datasets/" + item.source} target='_blank'>{item.source}</a>}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.type_alias}</td>
-                      <td className="relative flex whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
+                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{item.type_alias}</td>
+                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{formatDate(item.modified_at)}</td>
+                      <td className="relative flex whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm sm:pr-0">
                         <PencilIcon onClick={() => showDetail(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
                         <TrashIcon onClick={() => {setToRemove(item); setShowConfirm(true)}} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
                       </td>

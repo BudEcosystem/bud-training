@@ -19,8 +19,7 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
   { name: 'Datasets', href: '/datasets', icon: TableCellsIcon, current: false },
-  { name: 'Pipeline', href: '/pipeline', icon: BeakerIcon, current: false },
-  { name: 'Experiments', href: '/experiment', icon: BeakerIcon, current: false },
+  { name: 'Experiments', href: '/pipeline', icon: BeakerIcon, current: false },
   { name: 'Models', href: '/models', icon: CubeTransparentIcon, current: false },
   { name: 'Inference', href: '/inference', icon: BoltIcon, current: false },
 ]

@@ -66,7 +66,7 @@ export async function getModels() {
 
 export async function addModel(params: any) {
   
-  // let queryParams = 'name=' + data['name'] + '&source_type=' + data['source_type'] + '&type=' + data['type'] + '&source=' + data['source']
+  let queryParams = 'name=' + params['name'] + '&source_type=' + params['source_type'] + '&type=' + params['type'] + '&source=' + params['source']
   
   try {
     const { data } = await apiClient.post(`models?`, params);
@@ -217,10 +217,19 @@ export async function startNotebook(pipeline_id: any, node_id: any) {
   }
 }
 
-export async function getExperiments() {
-  let id = ''
+export async function getExperiments(id: string) {
+  // let id = ''
   try {
-    const { data } = await apiClient.get(`pipeline/${id}/runs`);
+    const { data } = await apiClient.get(`run?pipeline_id=` + id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+export async function startRun(pipeline_id: any) {
+
+  try {
+    const { data } = await apiClient.post(`run/start/` + pipeline_id);
     return data;
   } catch (error: any) {
     return error?.response;

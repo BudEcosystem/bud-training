@@ -17,9 +17,17 @@ export default function ModelDetail(props: any) {
     ]
 
     const contentTypeList = [
-        { id: 0, name: "LLM" },
-        { id: 1, name: "SD" }
+        { id: 0, name: "Adapter" },
+        { id: 1, name: "Delta" },
+        { id: 2, name: "Full" },
     ]
+
+    const familyList = [
+        { id: 0, name: "Causal" },
+        { id: 1, name: "Seq to seq" },
+        { id: 1, name: "Stable diffusion" }
+    ]
+
 
     const [open, setOpen] = useState(false)
     const [init, setInit] = useState(false)
@@ -27,7 +35,8 @@ export default function ModelDetail(props: any) {
     const [modelId, setModelId] = useState(null)
     const [name, setName] = useState('')
     const [sourceType, setSourceType] = useState(0)
-    const [contentType, setContentType] = useState(0)
+    const [contentType, setContentType] = useState(2)
+    const [family, setFamily] = useState(0)
     const [source, setSource] = useState('')
 
     useEffect(() => {
@@ -64,7 +73,8 @@ export default function ModelDetail(props: any) {
             source_type: sourceType,
             type: contentType,
             source: source,
-            id: modelId
+            id: modelId,
+            family: family
         }
         setLoading(true)
         let res
@@ -150,6 +160,9 @@ export default function ModelDetail(props: any) {
                                                                     className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
+                                                        </div>
+                                                        <div>
+                                                            <Dropdown label="Family" options={familyList} selected={family} onChange={(value: any) => setFamily(value['id'])} disabled={modelId != null}></Dropdown>
                                                         </div>
                                                         <div>
                                                             <Dropdown label="Source Type" options={sourceTypeList} selected={sourceType} onChange={(value: any) => setSourceType(value['id'])} disabled={modelId != null}></Dropdown>

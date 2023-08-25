@@ -57,6 +57,17 @@ export default function Datasets() {
     }
   }
 
+  const formatDate = (modified_at: any) => {
+    const dateObject = new Date(modified_at);
+  
+  const day = dateObject.getDate().toString().padStart(2, '0');
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+  const year = dateObject.getFullYear().toString().slice(-2);
+  
+  const formattedDate = `${day}/${month}/${year}`;
+  return formattedDate;
+  }
+
   return (
 
     <div className="px-4 sm:px-6 lg:px-8 py-5">
@@ -107,6 +118,12 @@ export default function Datasets() {
                     >
                       Content type
                     </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
+                    >
+                      Modified at
+                    </th>
                     <th scope="col" className="relative py-3 pl-3 pr-4 sm:pr-0">
                       <span className="sr-only">Edit</span>
                     </th>
@@ -123,6 +140,7 @@ export default function Datasets() {
                         {item.source_type == 0 && <a className='text-indigo-400' href={"https://huggingface.co/datasets/" + item.source} target='_blank'>{item.source}</a>}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{item.type_alias}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{formatDate(item.modified_at)}</td>
                       <td className="relative flex whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
                         <PencilIcon onClick={() => showDetail(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
                         <TrashIcon onClick={() => {setToRemove(item); setShowConfirm(true)}} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />

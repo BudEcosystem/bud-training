@@ -8,6 +8,7 @@ import Node from './components/node';
 import ComponentDetail from './component-detail';
 import { node } from 'prop-types';
 import NotebookView from './notebook-view';
+import ExecuteDetail from './execute-detail';
 
 
 const nodeTypes = {
@@ -317,7 +318,19 @@ export default function Canvas(props: any) {
     }, [props.nodes, props.edges])
 
     let id = 0;
-    const getId = () => `dndnode_${id++}`;
+    const getId = () => {
+        // let id = 0
+        // console.log(nodes)
+        // let lastNode = nodes[nodes.length - 1]
+        // console.log(lastNode)
+        // if(lastNode){
+        //     id = Number(lastNode.id.split('_')[1])
+            
+        //     id += 1
+        //     console.log(id)
+        // }
+        return `dndnode_${id++}`
+    };
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
     const formatNode = (data: any, nodeId: any) => {
@@ -357,7 +370,7 @@ export default function Canvas(props: any) {
                 position,
                 data: formatNode(data, nodeId),
             };
-
+            console.log(newNode)
             setNodes((nds) => nds.concat(newNode));
         },
         [reactFlowInstance]
@@ -396,7 +409,7 @@ export default function Canvas(props: any) {
     }
 
     return (
-        <div style={{ width: '100vw', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%' }}>
             <ReactFlowProvider>
                 {/* <ReactFlow nodes={initialNodes} edges={initialEdges} /> */}
                 <div ref={reactFlowWrapper} className='h-full'>
