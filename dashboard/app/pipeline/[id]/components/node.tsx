@@ -9,6 +9,7 @@ export default function Node(data: any){
             <Handle
                 type="target"
                 position={Position.Left}
+                id={"target."+ data.id + ".0"}
                 style={{ background: '#555' }}
                 onConnect={(params) => console.log('handle onConnect', params)}
                 // isConnectable={isConnectable}
@@ -36,7 +37,7 @@ export default function Node(data: any){
             <Handle
                 type="source"
                 position={Position.Right}
-                id="a"
+                id={"source."+ data.id + ".0"}
                 style={{ background: '#555' }}
                 // isConnectable={isConnectable}
             />

@@ -21,6 +21,16 @@ export default function DatasetDetail(props: any) {
         { id: 1, name: "Text + Image" }
     ]
 
+    const categoryList = [
+        { id: 0, name: "Reasoning" },
+        { id: 1, name: "QA" },
+        { id: 2, name: "Math" },
+        { id: 3, name: "Chain of thought" },
+        { id: 4, name: "Science" },
+        { id: 5, name: "Writing" },
+        { id: 6, name: "Coding" },
+    ]
+
     const [open, setOpen] = useState(false)
     const [init, setInit] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -28,6 +38,7 @@ export default function DatasetDetail(props: any) {
     const [name, setName] = useState('')
     const [sourceType, setSourceType] = useState(0)
     const [contentType, setContentType] = useState(0)
+    const [category, setCategory] = useState(0)
     const [source, setSource] = useState('')
     const [files, setFiles] = useState([] as any)
     const [imageFiles, setImageFiles] = useState([] as any)
@@ -196,6 +207,9 @@ export default function DatasetDetail(props: any) {
                                                                     className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
+                                                        </div>
+                                                        <div>
+                                                            <Dropdown label="Category" options={categoryList} selected={category} onChange={(value: any) => setCategory(value['id'])} disabled={datasetId != null}></Dropdown>
                                                         </div>
                                                         <div>
                                                             <Dropdown label="Source Type" options={sourceTypeList} selected={sourceType} onChange={(value: any) => setSourceType(value['id'])} disabled={datasetId != null}></Dropdown>

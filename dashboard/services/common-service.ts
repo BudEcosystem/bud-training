@@ -14,6 +14,11 @@ export async function addDataset(data: any) {
   let queryParams = 'name=' + data['name'] + '&source_type=' + data['source_type'] + '&type=' + data['type'] + '&source=' + data['source']
   
   let formdata = new FormData();
+  formdata.append('name', data['name'])
+  formdata.append('source_type', data['source_type'])
+  formdata.append('type', data['type'])
+  formdata.append('source', data['source'])
+
   if(data['meta_file']) formdata.append('metadata_file', data['meta_file'])
   if( data['archive_file']) formdata.append('archive_file', data['archive_file'])
   
@@ -23,7 +28,7 @@ export async function addDataset(data: any) {
   }
   try {
     
-    const { data } = await apiClient.post(`dataset?` + queryParams, params);
+    const { data } = await apiClient.post(`dataset?` + queryParams, formdata);
     return data;
   } catch (error: any) {
     return error?.response;
@@ -193,6 +198,29 @@ export async function startInference(serving_id: any) {
 
   try {
     const { data } = await apiClient.post(`inference/start/` + serving_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function startNotebook(pipeline_id: any, node_id: any) {
+  let body = {
+    pipeline_id: pipeline_id,
+    node_ref_id: node_id
+  }
+  try {
+    const { data } = await apiClient.post(`notebook/?pipeline_id=`+pipeline_id+'&node_ref_id='+node_id);
+    return data;
+  } catch (error: any) {
+    return error?.response;
+  }
+}
+
+export async function getExperiments() {
+  let id = ''
+  try {
+    const { data } = await apiClient.get(`pipeline/${id}/runs`);
     return data;
   } catch (error: any) {
     return error?.response;
