@@ -380,19 +380,23 @@ export default function Canvas(props: any) {
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
     }, []);
-
+    const deleteNodeById = (id: string) => {
+        setNodes(nds => nds.filter(node => node.id !== id));
+    };
     const onNodeClick = (event: any, node: any) => {
-        console.log('clicked', node);
+        event.stopPropagation();
+        let deleteButton = event.target.className.split(' ');
+        if(deleteButton[0] == 'deleteButton') {
+            deleteNodeById(node.id)
+            return;
+        }
         setSelected(node)
         if(node.data.category_id == 2){
             setShowNotebook(!showNotebook)
         } else {
             setShowDetails(!showNodeDetails)
         }
-        
-        
     }
-
     const onUpdateProperties = (item: any) => {
         for(let nd of nodes){
             if(nd.id == selected.id){

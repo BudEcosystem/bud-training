@@ -343,7 +343,7 @@ export default function HomeLayout({
             </div>
           </div>
 
-          <main className="py-8 px-8 h-full">
+          <main className="py-10 px-8 h-full">
             {children}
           </main>
         </div>

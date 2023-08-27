@@ -95,6 +95,11 @@ export default function PipelineView({ params }: { params: { id: string } }) {
         setNodes(node);
         setEdges(edges)
     }
+    
+    const onDeleteElements = (node: any, edges: any) => {
+        setNodes(node);
+        setEdges(edges)
+    }
 
     const onNodesSave = (node: any, edges: any) => {
         // setNodes(node);
@@ -102,7 +107,7 @@ export default function PipelineView({ params }: { params: { id: string } }) {
         saveData(node, edges)
     }
 
-    function classNames(...classes) {
+    function classNames(...classes: string[]) {
         return classes.filter(Boolean).join(' ')
       }
 
