@@ -5,7 +5,7 @@ import { TrashIcon, BeakerIcon, ChartBarIcon, CircleStackIcon } from "@heroicons
 export default function Node(data: any){
     // console.log(data)
     return(
-        <div className='card border border-indigo-900 rounded py-2 pl-2 pr-1 text-xs bg-white w-44'>
+        <div className='card border border-indigo-900 rounded py-1 pl-1 pr-1 text-xs bg-white '>
             <Handle
                 type="target"
                 position={Position.Left}
@@ -14,8 +14,8 @@ export default function Node(data: any){
                 onConnect={(params) => console.log('handle onConnect', params)}
                 // isConnectable={isConnectable}
             />
-            <div className='flex justify-between items-center'>
-                <p className='flex items-center'>
+            <div className='flex justify-between items-center text-[8px]'>
+                <p className='flex items-center pr-1 '>
                     
                     {data.data.category == "Training" && <BeakerIcon
                       className="h-3 w-3 mr-1 shrink-0 text-indigo-500"
@@ -30,7 +30,7 @@ export default function Node(data: any){
                       aria-hidden="true"
                     />}
                     {data.data.node_name}</p>
-                <div className='group rounded-full bg-gray-200 p-1 cursor-pointer hover:bg-indigo-500'>
+                <div className='deleteButton group rounded-full bg-gray-200 p-1 cursor-pointer hover:bg-indigo-500'>
                     <TrashIcon
                       className="h-2.5 w-2.5 shrink-0 group-hover:text-white"
                       aria-hidden="true"
