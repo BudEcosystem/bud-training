@@ -261,8 +261,8 @@ export default function DatasetDetail(props: any) {
                                                                     </div>
                                                                     <input id="file-upload" name="file-upload" type="file" accept=".json,.jsonl" className="opacity-0 absolute inset-0 cursor-pointer" onChange={(event) => handleDrop('json', 'change', event)} />
                                                                 </div>}
-                                                                {files.map((item: any) => (
-                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center'>
+                                                                {files.map((item: any, index: any) => (
+                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center' key={index}>
                                                                         <div className="flex">
                                                                             <DocumentChartBarIcon className="h-8 w-8 mr-2 text-indigo-400" aria-hidden="true" />
                                                                             <div className='w-100'>
@@ -298,8 +298,8 @@ export default function DatasetDetail(props: any) {
                                                                     </div>
                                                                     <input id="file-upload" name="file-upload" type="file" accept=".zip" className="opacity-0 absolute inset-0 cursor-pointer" onChange={(event) => handleDrop('image', 'change', event)} />
                                                                 </div>}
-                                                                {imageFiles.map((item: any) => (
-                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center'>
+                                                                {imageFiles.map((item: any, index: any) => (
+                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center' key={index}>
                                                                         <div className="flex">
                                                                             <DocumentChartBarIcon className="h-8 w-8 mr-2 text-indigo-400" aria-hidden="true" />
                                                                             <div className='w-72'>

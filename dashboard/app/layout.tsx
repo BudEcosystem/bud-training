@@ -4,7 +4,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import './globals.css';
 
-import Nav from './nav';
 import Toast from './toast';
 import HomeLayout from './home-layout';
 import Background from './background';

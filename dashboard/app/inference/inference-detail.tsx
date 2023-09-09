@@ -93,7 +93,7 @@ export default function InferenceDetail(props: any) {
                                             <div className="flex flex-1 flex-col justify-between">
                                                 <div className="divide-y divide-gray-200 px-4 sm:px-6">
                                                     <div className="space-y-6 pb-5 pt-6">
-                                                        <ModelField label="Model" onChange={setModel}></ModelField>
+                                                        <ModelField label="Model" onChange={(name: any, val: any) => setModel(val)}></ModelField>
                                                         
                                                     </div>
                                                 </div>

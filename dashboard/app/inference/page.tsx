@@ -64,7 +64,7 @@ export default function Inference() {
     const startTime = new Date(created_at);
     const stopTime = new Date(stopped_at);
 
-    const timeDifference = stopTime - startTime;
+    const timeDifference: any = stopTime.getTime() - startTime.getTime();
 
     const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -114,7 +114,14 @@ export default function Inference() {
           <Title>Inference</Title>
           <Text>A list of all the running models in the workspace</Text>
         </div>
-        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <div className="mt-4 flex">
+        <button
+            onClick={showDetail}
+            type="button"
+            className="block rounded-md mr-3 bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Workflow
+          </button>
           <button
             onClick={showDetail}
             type="button"

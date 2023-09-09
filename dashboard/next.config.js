@@ -5,7 +5,8 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['@tremor/react']
-  }
+  },
+  distDir: 'dist'
 };
 
 module.exports = nextConfig;

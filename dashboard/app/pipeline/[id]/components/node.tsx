@@ -1,6 +1,6 @@
 
 import { Handle, Position } from 'reactflow';
-import { TrashIcon, BeakerIcon, ChartBarIcon } from "@heroicons/react/24/outline"
+import { TrashIcon, BeakerIcon, ChartBarIcon, CircleStackIcon } from "@heroicons/react/24/outline"
 
 export default function Node(data: any){
     // console.log(data)
@@ -22,6 +22,10 @@ export default function Node(data: any){
                       aria-hidden="true"
                     />}
                     {data.data.category == "Eval" && <ChartBarIcon
+                      className="h-3 w-3 mr-1 shrink-0 text-indigo-500"
+                      aria-hidden="true"
+                    />}
+                    {data.data.category == "Data processing" && <CircleStackIcon
                       className="h-3 w-3 mr-1 shrink-0 text-indigo-500"
                       aria-hidden="true"
                     />}

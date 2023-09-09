@@ -102,9 +102,9 @@ export default function ModelDetail(props: any) {
             <Dialog as="div" className="relative z-10" onClose={setOpen}>
                 {/* <div className="fixed inset-0" /> */}
 
-                <div className="fixed top-16 bottom-0 overflow-hidden">
-                    <div className="absolute top-16 bottom-0 overflow-hidden">
-                        <div className="pointer-events-none fixed top-16 bottom-0 right-0 flex max-w-full pl-10 sm:pl-16">
+                <div className="fixed top-14 bottom-0 overflow-hidden">
+                    <div className="absolute top-14 bottom-0 overflow-hidden">
+                        <div className="pointer-events-none fixed top-14 bottom-0 right-0 flex max-w-full pl-10 sm:pl-16">
                             <Transition.Child
                                 as={Fragment}
                                 enter="transform transition ease-in-out duration-500 sm:duration-700"

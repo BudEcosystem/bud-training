@@ -117,8 +117,8 @@ export default function NotebookView(props: any) {
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="divide-y divide-gray-200 px-4 sm:px-6">
                           <div className="space-y-6 pb-5 pt-6">
-                            {node?.properties.map((item: any) => (
-                              <div>
+                            {node?.properties.map((item: any, index: any) => (
+                              <div key={index}>
                                 {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
                                 {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
                                 {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}

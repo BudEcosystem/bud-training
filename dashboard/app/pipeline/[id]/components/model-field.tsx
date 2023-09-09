@@ -14,7 +14,7 @@ export default function ModelField(props: any) {
 
   useEffect(() => {
     console.log(selected)
-    props.onChange(selected)
+    // props.onChange(selected)
   }, [selected])
 
   async function getAllOptions() {
@@ -36,7 +36,7 @@ export default function ModelField(props: any) {
   }
 
   const onChange = (value: any) => {
-    setSelected(value['id'])
+    setSelected(value)
     
     props.onChange(props.name, value['id'])
   }

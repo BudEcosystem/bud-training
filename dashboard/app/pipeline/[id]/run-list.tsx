@@ -6,7 +6,7 @@ export default function RunList(props: any){
 
     const [activeRun, setActiveRun] = useState('')
 
-    function classNames(...classes) {
+    function classNames(...classes: string[]) {
         return classes.filter(Boolean).join(' ')
       }
 
@@ -19,11 +19,12 @@ export default function RunList(props: any){
                     <h3 className="mt-2 text-sm font-semibold text-gray-900">No runs</h3>
                     <p className="mt-1 text-sm text-gray-500">Get started by executing a pipeline.</p>
                 </div>}
-                {props.runs.map((item: any) => (
+                {props.runs.map((item: any, index: any) => (
                     <div className={classNames(
                         activeRun == item.run_id ? "bg-gray-200" : "",
                         "flex justify-between items-center px-4 py-3 text-sm text-gray-500 text-ellipsis overflow-hidden whitespace-nowrap cursor-pointer border border-b border-gray-100 hover:bg-gray-200")}
                         onClick={() => setActiveRun(item.run_id)}
+                        key={index}
                         >
                             <>{item.name}</>
                             <TrashIcon

@@ -146,7 +146,7 @@ export async function updatePipeline(params: any) {
   }
 }
 
-export async function getPipelineDetail(pipeline_id) {
+export async function getPipelineDetail(pipeline_id: string) {
   try {
     const { data } = await apiClient.get(`pipeline/` + pipeline_id);
     return data;

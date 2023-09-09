@@ -1,5 +1,4 @@
 import { Card, Title, Text } from '@tremor/react';
-import { queryBuilder } from '../lib/planetscale';
 import Search from './search';
 import UsersTable from './table';
 
