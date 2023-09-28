@@ -1,0 +1,14 @@
+description: Toxicity
+category_id: 3
+node_id: 9
+family_id: -1
+outputs:
+  url:
+    description: Notebook url
+    title: Notebook URL
+    type: url
+properties:
+  name:
+    description: Model name
+    title: Model name
+    type: model

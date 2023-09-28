@@ -12,10 +12,32 @@ outputs:
     title: Model
     type: model
 properties:
-  dp_size:
-    default: 1
-    description: Data parallelism count
-    title: Dp Size
+  stage:
+    default: sft
+    description: training stage
+    title: Stage
+    options:
+      - sft
+      - pretrain
+    type: list
+  train_type:
+    default: full
+    description: training type
+    title: Train Type
+    options:
+      - full
+      - lora
+      - qlora
+    type: list
+  train_epochs:
+    default: 3
+    description: number epochs for train
+    title: Train Epochs
+    type: integer
+  train_micro_batch_size:
+    default: 4
+    description: micro batch size per device
+    title: Train Micro Batch Size
     type: integer
   eval_batch_size:
     default: 4
@@ -27,11 +49,6 @@ properties:
     description: every n steps for eval
     title: Eval Per N Steps
     type: integer
-  history_column:
-    default: history
-    description: Column name for history column
-    title: History Column
-    type: string
   learning_rate:
     default: 0.01
     description: Learning rate for the training
@@ -46,7 +63,10 @@ properties:
     default: efficient
     description: Optimizer to be used. [efficient, adamw]
     title: Optimizer
-    type: string
+    options:
+      - efficient
+      - adamw
+    type: list
   pp_size:
     default: 1
     description: Pipeline parallelism count
@@ -67,6 +87,11 @@ properties:
     description: Column name for response column
     title: Response Column
     type: string
+  history_column:
+    default: history
+    description: Column name for history column
+    title: History Column
+    type: string
   split:
     default: train
     description: split of the json file or dataset from huggingface
@@ -77,34 +102,16 @@ properties:
     description: Test/Validation split ratio
     title: Split Ratio
     type: number
-  stage:
-    default: sft
-    description: training stage
-    title: Stage
-    options:
-      - sft
-      - pretrain
-    type: list
   tp_size:
     default: 1
     description: Tensor parallelism count
     title: Tp Size
     type: integer
-  train_epochs:
-    default: 3
-    description: number epochs for train
-    title: Train Epochs
+  dp_size:
+    default: 1
+    description: Data parallelism count
+    title: Dp Size
     type: integer
-  train_micro_batch_size:
-    default: 4
-    description: micro batch size per device
-    title: Train Micro Batch Size
-    type: integer
-  train_type:
-    default: full
-    description: training type
-    title: Train Type
-    type: string
   trust_remote_code:
     default: true
     description: Allow loading remote code for tokenizer

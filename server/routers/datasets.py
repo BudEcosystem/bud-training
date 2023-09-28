@@ -40,6 +40,13 @@ def add_dataset(
         name=name, source=source, source_type=source_type, type=_type
     )
     service.assert_is_name_unique(dataset.name)
+    # dataset_id = utils.save_datasets_to_filesystem(
+    #     source_type=dataset.source_type,
+    #     dataset_type=dataset.type,
+    #     source=dataset.source,
+    #     metadata_file=metadata_file,
+    #     archive_file=archive_file,
+    # )
     dataset_id = utils.save_datasets_to_filesystem(
         source_type=dataset.source_type,
         dataset_type=dataset.type,

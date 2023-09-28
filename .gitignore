@@ -165,9 +165,11 @@ wandb
 cache
 data
 logs
+log
 models/
 checkpoints
 results
+test.py
 
 db/*.db
 db/migrations/postgres/versions/*

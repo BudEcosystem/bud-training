@@ -81,6 +81,11 @@ settings = {
         "API_TIMEOUT": env.int("JUPYTERHUB_API_TIMEOUT", 120),
         "README": env.str("NOTEBOOK_README", osp.join(DIR_PATH, "NOTEBOOK.md")),
     },
+    "s3_config": {
+        "AWS_ACCESS_KEY_ID": env.str("AWS_ACCESS_KEY_ID"),
+        "AWS_SECRET_ACCESS_KEY": env.str("AWS_ACCESS_KEY_ID"),
+        "BUCKET_NAME": env.str("AWS_ACCESS_KEY_ID"),
+    },
     "database": {
         "psql": {
             "URL": env.str("PSQL_URL"),
