@@ -4,26 +4,27 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
-export default function Search({ disabled }: { disabled?: boolean }) {
+export default function Search(props: any) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   function handleSearch(term: string) {
-    const params = new URLSearchParams(window.location.search);
-    if (term) {
-      params.set('q', term);
-    } else {
-      params.delete('q');
-    }
+    // const params = new URLSearchParams(window.location.search);
+    // if (term) {
+    //   params.set('q', term);
+    // } else {
+    //   params.delete('q');
+    // }
 
-    startTransition(() => {
-      replace(`${pathname}?${params.toString()}`);
-    });
+    // startTransition(() => {
+    //   replace(`${pathname}?${params.toString()}`);
+    // });
+    props.onChange(term)
   }
 
   return (
-    <div className="relative mt-5 max-w-md">
+    <div className="relative mt-3 max-w-md">
       <label htmlFor="search" className="sr-only">
         Search
       </label>
@@ -41,7 +42,7 @@ export default function Search({ disabled }: { disabled?: boolean }) {
           type="text"
           name="search"
           id="search"
-          disabled={disabled}
+          disabled={props.disabled}
           className="h-10 block w-full rounded-md border border-gray-200 pl-9 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           placeholder="Search by name..."
           spellCheck={false}

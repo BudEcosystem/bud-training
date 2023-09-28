@@ -7,6 +7,8 @@ import 'reactflow/dist/style.css';
 import Node from './components/node';
 import ComponentDetail from './component-detail';
 import { node } from 'prop-types';
+import NotebookView from './notebook-view';
+import ExecuteDetail from './execute-detail';
 
 
 const nodeTypes = {
@@ -301,6 +303,7 @@ export default function Canvas(props: any) {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [reactFlowInstance, setReactFlowInstance] = useState({} as any);
     const [showNodeDetails, setShowDetails] = useState(false);
+    const [showNotebook, setShowNotebook] = useState(false);
     const [selected, setSelected] = useState({} as any);
 
     useEffect(() => {
@@ -315,8 +318,34 @@ export default function Canvas(props: any) {
     }, [props.nodes, props.edges])
 
     let id = 0;
-    const getId = () => `dndnode_${id++}`;
+    const getId = () => {
+        // let id = 0
+        // console.log(nodes)
+        // let lastNode = nodes[nodes.length - 1]
+        // console.log(lastNode)
+        // if(lastNode){
+        //     id = Number(lastNode.id.split('_')[1])
+            
+        //     id += 1
+        //     console.log(id)
+        // }
+        return `dndnode_${id++}`
+    };
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+    const formatNode = (data: any, nodeId: any) => {
+        console.log(data)
+        data.outputs.map((item: any, index: number)=>{ 
+            item['id'] = nodeId + "." + (index + 1)
+            return item
+        })
+        data.properties.map((item: any, index: number)=>{ 
+            item['id'] = nodeId + "." + (index + 1)
+            return item
+        })
+
+        return data
+    }
 
     const onDrop = useCallback(
         (event: { preventDefault: () => void; dataTransfer: { getData: (arg0: string) => any; }; clientX: number; clientY: number; }) => {
@@ -334,13 +363,14 @@ export default function Canvas(props: any) {
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
             });
+            const nodeId = getId()
             const newNode = {
-                id: getId(),
+                id: nodeId,
                 type: 'node',
                 position,
-                data: data,
+                data: formatNode(data, nodeId),
             };
-
+            console.log(newNode)
             setNodes((nds) => nds.concat(newNode));
         },
         [reactFlowInstance]
@@ -350,13 +380,23 @@ export default function Canvas(props: any) {
         event.preventDefault();
         event.dataTransfer.dropEffect = "move";
     }, []);
-
+    const deleteNodeById = (id: string) => {
+        setNodes(nds => nds.filter(node => node.id !== id));
+    };
     const onNodeClick = (event: any, node: any) => {
-        console.log('clicked', node);
+        event.stopPropagation();
+        let deleteButton = event.target.className.split(' ');
+        if(deleteButton[0] == 'deleteButton') {
+            deleteNodeById(node.id)
+            return;
+        }
         setSelected(node)
-        setShowDetails(!showNodeDetails)
+        if(node.data.category_id == 2){
+            setShowNotebook(!showNotebook)
+        } else {
+            setShowDetails(!showNodeDetails)
+        }
     }
-
     const onUpdateProperties = (item: any) => {
         for(let nd of nodes){
             if(nd.id == selected.id){
@@ -373,7 +413,7 @@ export default function Canvas(props: any) {
     }
 
     return (
-        <div style={{ width: '100vw', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%' }}>
             <ReactFlowProvider>
                 {/* <ReactFlow nodes={initialNodes} edges={initialEdges} /> */}
                 <div ref={reactFlowWrapper} className='h-full'>
@@ -399,6 +439,7 @@ export default function Canvas(props: any) {
 
             </ReactFlowProvider>
             <ComponentDetail open={showNodeDetails} selected={selected} onSave={onUpdateProperties}></ComponentDetail>
+            <NotebookView open={showNotebook} selected={selected} onSave={onUpdateProperties}></NotebookView>
         </div>
 
     );
