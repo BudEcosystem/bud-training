@@ -21,6 +21,16 @@ export default function DatasetDetail(props: any) {
         { id: 1, name: "Text + Image" }
     ]
 
+    const categoryList = [
+        { id: 0, name: "Reasoning" },
+        { id: 1, name: "QA" },
+        { id: 2, name: "Math" },
+        { id: 3, name: "Chain of thought" },
+        { id: 4, name: "Science" },
+        { id: 5, name: "Writing" },
+        { id: 6, name: "Coding" },
+    ]
+
     const [open, setOpen] = useState(false)
     const [init, setInit] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -28,6 +38,7 @@ export default function DatasetDetail(props: any) {
     const [name, setName] = useState('')
     const [sourceType, setSourceType] = useState(0)
     const [contentType, setContentType] = useState(0)
+    const [category, setCategory] = useState(0)
     const [source, setSource] = useState('')
     const [files, setFiles] = useState([] as any)
     const [imageFiles, setImageFiles] = useState([] as any)
@@ -198,6 +209,9 @@ export default function DatasetDetail(props: any) {
                                                             </div>
                                                         </div>
                                                         <div>
+                                                            <Dropdown label="Category" options={categoryList} selected={category} onChange={(value: any) => setCategory(value['id'])} disabled={datasetId != null}></Dropdown>
+                                                        </div>
+                                                        <div>
                                                             <Dropdown label="Source Type" options={sourceTypeList} selected={sourceType} onChange={(value: any) => setSourceType(value['id'])} disabled={datasetId != null}></Dropdown>
                                                         </div>
                                                         <div>
@@ -247,8 +261,8 @@ export default function DatasetDetail(props: any) {
                                                                     </div>
                                                                     <input id="file-upload" name="file-upload" type="file" accept=".json,.jsonl" className="opacity-0 absolute inset-0 cursor-pointer" onChange={(event) => handleDrop('json', 'change', event)} />
                                                                 </div>}
-                                                                {files.map((item: any) => (
-                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center'>
+                                                                {files.map((item: any, index: any) => (
+                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center' key={index}>
                                                                         <div className="flex">
                                                                             <DocumentChartBarIcon className="h-8 w-8 mr-2 text-indigo-400" aria-hidden="true" />
                                                                             <div className='w-100'>
@@ -284,8 +298,8 @@ export default function DatasetDetail(props: any) {
                                                                     </div>
                                                                     <input id="file-upload" name="file-upload" type="file" accept=".zip" className="opacity-0 absolute inset-0 cursor-pointer" onChange={(event) => handleDrop('image', 'change', event)} />
                                                                 </div>}
-                                                                {imageFiles.map((item: any) => (
-                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center'>
+                                                                {imageFiles.map((item: any, index: any) => (
+                                                                    <div className='bg-gray-100 py-3 px-3 flex rounded-md my-5 justify-between items-center' key={index}>
                                                                         <div className="flex">
                                                                             <DocumentChartBarIcon className="h-8 w-8 mr-2 text-indigo-400" aria-hidden="true" />
                                                                             <div className='w-72'>

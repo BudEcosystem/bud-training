@@ -97,7 +97,18 @@ c.DockerSpawner.environment = {
 c.DockerSpawner.args = [
     "--NotebookApp.terminals_enabled=False",
     "--NotebookApp.default_url=/notebooks/Untitled.ipynb",
+    "--NotebookApp.tornado_settings={ \
+        'headers':{ \
+            'Content-Security-Policy': 'frame-ancestors self http://216.48.187.144:3000', \
+        } \
+    }",
 ]
+
+c.JupyterHub.tornado_settings = {
+    "headers": {
+        "Content-Security-Policy": "frame-ancestors self http://216.48.187.144:3000",
+    }
+}
 
 # Set the default url of the user container to
 c.DockerSpawner.default_url = "/notebooks"

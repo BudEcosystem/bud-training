@@ -59,12 +59,12 @@ export default function Inference() {
   }
 
   const getTimeDifference = (created_at: any, stopped_at: any, status: number) => {
-    if(!stopped_at) stopped_at = new Date()
-    if(status == 1) stopped_at = new Date()
+    if (!stopped_at) stopped_at = new Date()
+    if (status == 1) stopped_at = new Date()
     const startTime = new Date(created_at);
     const stopTime = new Date(stopped_at);
 
-    const timeDifference = stopTime - startTime;
+    const timeDifference: any = stopTime.getTime() - startTime.getTime();
 
     const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -108,13 +108,20 @@ export default function Inference() {
 
   return (
 
-    <div className="px-4 sm:px-6 lg:px-8 py-5">
+    <div className="pb-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <Title>Inference</Title>
           <Text>A list of all the running models in the workspace</Text>
         </div>
-        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <div className="mt-4 flex">
+        <button
+            onClick={showDetail}
+            type="button"
+            className="block rounded-md mr-3 bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            Workflow
+          </button>
           <button
             onClick={showDetail}
             type="button"
@@ -166,9 +173,10 @@ export default function Inference() {
                         {item.status_alias}
                       </td>
                       <td className="relative flex items-center justify-end whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
-                        {item.status  == 1 && <a href={item.endpoint} target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
-                        {item.status  == 0 && <PlayIcon onClick={() => startItem(item)} className="h-4 w-4 mr-2 text-green-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
-                        {item.status  == 1 && <StopIcon onClick={() => stopItem(item)} className="h-4 w-4 mr-2 text-red-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
+                        {(item.status == 1 && item.model.family == 1) && <a href={item.endpoint} target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
+                        {(item.status == 1 && item.model.family == 0) && <a href='http://216.48.187.144:7860/' target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
+                        {item.status == 0 && <PlayIcon onClick={() => startItem(item)} className="h-4 w-4 mr-2 text-green-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
+                        {item.status == 1 && <StopIcon onClick={() => stopItem(item)} className="h-4 w-4 mr-2 text-red-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
                         <TrashIcon onClick={() => { setToRemove(item); setShowConfirm(true) }} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
                       </td>
                     </tr>

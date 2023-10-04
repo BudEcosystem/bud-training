@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { deletePipeline, getPipeline } from '../../services/common-service';
 import { showToast } from '../../services/toast-service';
 import ConfirmDialog from '../components/confirm-dialog';
+import Search from '../search';
 
 
 
@@ -27,14 +28,18 @@ export default function Pipeline() {
 
   const showDetail = (edit: any = {}) => {
 
-    router.push('/pipeline/' + edit.pipeline_id)
-    // if (!edit.pipeline_id) {
-    //   edit['pipeline_id'] = null
-    //   edit['name'] = ''
-    // }
-    // setSelected(edit)
+    // router.push('/pipeline/' + edit.pipeline_id)
+    if (!edit.pipeline_id) {
+      edit['pipeline_id'] = null
+      edit['name'] = ''
+    }
+    setSelected(edit)
 
-    // setOpenDetail(!openDetail)
+    setOpenDetail(!openDetail)
+  }
+
+  const goToView = (item: any) => {
+    router.push('/pipeline/' + item.pipeline_id)
   }
 
   async function getAllPipelines() {
@@ -73,7 +78,7 @@ export default function Pipeline() {
 
   return (
 
-    <div className="px-4 sm:px-6 lg:px-8 py-5">
+    <div className="pb-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <Title>Pipeline</Title>
@@ -122,7 +127,7 @@ export default function Pipeline() {
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{getTimeFormat(item?.modified_at)}</td>
                       <td className="relative flex whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
-                        <PencilIcon onClick={() => showDetail(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
+                        <PencilIcon onClick={() => goToView(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
                         <TrashIcon onClick={() => {setToRemove(item); setShowConfirm(true)}} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
                       </td>
                     </tr>

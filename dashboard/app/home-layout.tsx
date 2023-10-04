@@ -10,18 +10,20 @@ import {
   Cog6ToothIcon,
   TableCellsIcon,
   BoltIcon,
-  HomeIcon,
+  UserCircleIcon,
   BeakerIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { ArrowPathIcon, ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
+  // { name: 'Dashboard', href: '/', icon: HomeIcon, current: true },
   { name: 'Datasets', href: '/datasets', icon: TableCellsIcon, current: false },
-  { name: 'Pipeline', href: '/pipeline', icon: BeakerIcon, current: false },
+  { name: 'Experiments', href: '/pipeline', icon: BeakerIcon, current: false },
   { name: 'Models', href: '/models', icon: CubeTransparentIcon, current: false },
+  // { name: 'Agents', href: '/agents', icon: UserCircleIcon, current: false },
   { name: 'Inference', href: '/inference', icon: BoltIcon, current: false },
+
 ]
 const teams = [
   { id: 1, name: 'Heroicons', href: '#', initial: 'H', current: false },
@@ -33,7 +35,7 @@ const userNavigation = [
   { name: 'Sign out', href: '#' },
 ]
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -105,7 +107,7 @@ export default function HomeLayout({
                         src="/loddgo.svg"
                         alt="Bud"
                       />
-                      <p>Bud Flow</p>
+                      <p>LLMops</p>
                     </div>
                     <nav className="flex flex-1 flex-col">
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -133,29 +135,37 @@ export default function HomeLayout({
                                 </a>
                               </li>
                             ))}
+                            <li>
+                              <a
+                                href="/inference/workflow"
+                                className={classNames(
+                                  pathname === "/inference/workflow"
+                                    ? 'bg-indigo-700 text-white'
+                                    : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
+                                  'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
+                                )}
+                              >
+                                <span className="truncate">Workflow</span>
+                              </a>
+                            </li>
                           </ul>
                         </li>
                         {/* <li>
                           <div className="text-xs font-semibold leading-6 text-indigo-200">Your teams</div>
                           <ul role="list" className="-mx-2 mt-2 space-y-1">
-                            {teams.map((team) => (
-                              <li key={team.name}>
+                            <li>
                                 <a
-                                  href={team.href}
+                                  href="/inference/workflow"
                                   className={classNames(
-                                    team.current
+                                    pathname === "/inference/workflow"
                                       ? 'bg-indigo-700 text-white'
                                       : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
                                     'group flex gap-x-3 rounded-md p-2 text-sm leading-6 font-semibold'
                                   )}
                                 >
-                                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">
-                                    {team.initial}
-                                  </span>
-                                  <span className="truncate">{team.name}</span>
+                                  <span className="truncate">Workflow</span>
                                 </a>
                               </li>
-                            ))}
                           </ul>
                         </li> */}
                         <li className="mt-auto">
@@ -217,31 +227,48 @@ export default function HomeLayout({
                         </a>
                       </li>
                     ))}
+                    <li>
+                      <a
+                        href="/inference/workflow"
+                        className={classNames(
+                          pathname === "/inference/workflow"
+                            ? 'bg-gray-200'
+                            : 'text-gray-600 hover:text-gray-600 hover:bg-gray-200',
+                          'group flex gap-x-3 rounded-md px-12 py-2 text-sm leading-5 flex items-center'
+                        )}
+                      >
+                        <ArrowPathIcon
+                          className={classNames(
+                            pathname === "/inference/workflow" ? 'text-gray-600' : 'text-gray-600 group-hover:text-gray-600',
+                            'h-4 w-4 shrink-0'
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">Workflow</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="/agents"
+                        className={classNames(
+                          pathname === "/agents"
+                            ? 'bg-gray-200'
+                            : 'text-gray-600 hover:text-gray-600 hover:bg-gray-200',
+                          'group flex gap-x-3 rounded-md px-4 py-2 text-sm leading-5 flex items-center'
+                        )}
+                      >
+                        <UserCircleIcon
+                          className={classNames(
+                            pathname === "/agents" ? 'text-gray-600' : 'text-gray-600 group-hover:text-gray-600',
+                            'h-4 w-4 shrink-0'
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">Agents</span>
+                      </a>
+                    </li>
                   </ul>
                 </li>
-                {/* <li>
-                  <div className="text-xs font-semibold leading-6 text-indigo-200">Your teams</div>
-                  <ul role="list" className="-mx-2 mt-2 space-y-1">
-                    {teams.map((team) => (
-                      <li key={team.name}>
-                        <a
-                          href={team.href}
-                          className={classNames(
-                            team.current
-                              ? 'bg-indigo-700 text-white'
-                              : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
-                            'group flex gap-x-3 rounded-md p-2 text-sm leading-6'
-                          )}
-                        >
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-indigo-400 bg-indigo-500 text-[0.625rem] font-medium text-white">
-                            {team.initial}
-                          </span>
-                          <span className="truncate">{team.name}</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </li> */}
                 <li className="mt-auto">
                   <a
                     href="#"
@@ -259,8 +286,8 @@ export default function HomeLayout({
           </div>
         </div>
 
-      <div className="lg:pl-60 h-full">
-          <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="lg:pl-60 h-full">
+          <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
             <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
@@ -287,7 +314,7 @@ export default function HomeLayout({
                 />
               </form>
               <div className="flex items-center gap-x-4 lg:gap-x-6">
-                <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+                <button type="button" className="-m-2.5 p-2 text-gray-400 hover:text-gray-500">
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
                 </button>

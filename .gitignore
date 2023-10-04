@@ -169,6 +169,7 @@ log
 models/
 checkpoints
 results
+test.py
 
 db/*.db
 db/migrations/postgres/versions/*

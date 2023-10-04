@@ -7,8 +7,9 @@ import DatasetField from './components/dataset-field'
 import ModelField from './components/model-field'
 import BoolField from './components/bool-field'
 import ListField from './components/list-field'
+import { startNotebook } from '../../../services/common-service'
 
-export default function ComponentDetail(props: any) {
+export default function NotebookView(props: any) {
   const nodeSchema = {
     node_name: '',
     description: '',
@@ -18,8 +19,10 @@ export default function ComponentDetail(props: any) {
   const [open, setOpen] = useState(false)
   const [init, setInit] = useState(false)
   const [node, setNode] = useState(nodeSchema as any)
+  const [notebookUrl, setNotebookUrl] = useState("http://216.48.187.144:9743/user/test001/test001-server/notebooks/Updated%2Bval.ipynb")
 
   useEffect(() => {
+    console.log('show')
     if (!init) {
       setInit(true)
       return
@@ -30,7 +33,27 @@ export default function ComponentDetail(props: any) {
   useEffect(() => {
     console.log(props.selected?.data)
     if (props.selected?.data) setNode(props.selected?.data)
+    if (props.selected?.data?.category_id == 2) initiateNotebook()
+    if (props.selected?.data?.outputs[0].value) initiateNotebook()
   }, [props.selected])
+
+  const initiateNotebook = async () => {
+    
+    // setLoading(true)
+    let res = await startNotebook('5fc0767a-4261-4d0b-8c35-ce1e4ecfcd68', props.selected?.id);
+
+    // setLoading(false)
+    if (res.status == true) {
+      console.log(res.data);
+      //   setDatasets(res.data);
+      // showToast('success', 'Successfully done!', 'You can start using the data in the pipeline')
+      // setOpen(false)
+      // props.onClose()
+    } else {
+      console.log(res)
+      // showToast('error', 'Failed', res.data.detail)
+    }
+  }
 
   const updateProperty = (item: any, value: any) => {
 
@@ -38,6 +61,7 @@ export default function ComponentDetail(props: any) {
       if (prop.name == item) {
 
         prop.default = value
+        prop['value'] = value
       }
     }
   }
@@ -109,6 +133,7 @@ export default function ComponentDetail(props: any) {
                         </div>
                       </div>
                     </div>
+                    
                     <div className="flex flex-shrink-0 justify-end px-4 py-4">
                       <button
                         type="button"
