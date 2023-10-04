@@ -1,0 +1,27 @@
+description: MT Bench
+category_id: 1
+node_id: 13
+family_id: 0
+script: core/llm/eval.py
+cmd: python core/llm/eval.py humaneval --model_name llama
+outputs:
+outputs:
+  result:
+    description: Evaluation results
+    title: Result
+    type: string
+properties:
+  model_path:
+    description: Model to be evaluated
+    title: Model
+    type: model
+  n_sample:
+    default: 1
+    description: Number of samples to generate per prompt
+    title: N Samples
+    type: integer
+  load_8bit:
+    default: true
+    description: Use 8-bit precision
+    title: Load 8bit
+    type: boolean

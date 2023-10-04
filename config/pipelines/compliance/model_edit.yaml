@@ -1,0 +1,22 @@
+description: Model edit
+category_id: 3
+node_id: 8
+family_id: -1
+outputs:
+  url:
+    description: Notebook url
+    title: Notebook URL
+    type: url
+properties:
+  model_name:
+    description: Model name
+    title: Model name
+    type: model
+  current_value:
+    description: Current value
+    title: Current value
+    type: string
+  new_value:
+    description: New value
+    title: New value
+    type: string

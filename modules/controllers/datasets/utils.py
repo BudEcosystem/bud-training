@@ -9,6 +9,8 @@ from fastapi import UploadFile, HTTPException
 import shutil
 import zipfile
 import json
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 from ..helpers import logger
 from utils.exceptions import CustomHttpException
@@ -86,6 +88,31 @@ def save_file_obj_to_filesystem(file: UploadFile, filepath: str) -> Path:
 
     logger.info(f"Succesffully saved the file {file.filename} to {filepath}")
     return Path(filepath)
+
+
+def save_file_obj_to_s3(file: UploadFile, s3_key: str) -> str:
+    try:
+        # Initialize an S3 client
+        s3 = boto3.client(
+            's3',
+            aws_access_key_id=settings.aws_s3.ACCESS_KEY_ID,
+            aws_secret_access_key=settings.aws_s3.SECRET_ACCESS_KEY
+        )
+
+        # Upload the file to S3
+        s3.upload_fileobj(file.file, settings.aws_s3.BUCKET_NAME, s3_key)
+
+        # Close the file-like object
+        file.file.close()
+
+        # Construct the S3 URL for the uploaded file
+        s3_url = f"https://{settings.aws_s3.BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
+
+        return s3_url
+    except NoCredentialsError:
+        raise Exception("AWS credentials not found")
+    except Exception as e:
+        raise Exception(f"An error occurred: {e}")
 
 
 def save_metadata_file_to_filesystem(

@@ -12,7 +12,7 @@ postgres:
       1: Delta
       2: Full
     family: &family
-      0: LLaMa
+      0: Causal
       1: Stable Diffusion 1.5
       2: Stable Diffusion XL
     source_type:
@@ -35,13 +35,32 @@ pipelines:
     category:
       0: Training
       1: Eval
-      2: Notebooks
+      2: Data processing
+      3: Compliance
     name: #TODO: Should ids be grouped by category?
       0: LLM Finetuning
       1: SD LoRA Finetuning
       2: HumanEval
       3: SDXL LoRA Finetuning
-      4: Jupyter Notebook
+      4: Notebook
+      5: Deduplication
+      6: Merge data
+      7: Split data
+      8: Model edit
+      9: Toxicity
+      10: MMLU
+      11: GSM8K
+      12: BBH
+      13: MT Bench
+      14: Alpaca Eval
+      15: ARC
+      16: Math QA
+      17: Toxigen
+      18: Truthful QA
+      19: C-eval
+      20: SDXL DreamBooth Finetuning
+      21: SD DreamBooth Finetuning
+      22: SD Custom Diffusion Finetuning
     property_type:
       0: integer
       1: number

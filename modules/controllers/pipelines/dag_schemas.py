@@ -31,6 +31,8 @@ class Node(BaseModel):
         properties = {}
         outputs = {}
 
+        _id = values["id"]
+        values = values["data"]
         node_id = values["node_id"]
 
         # TODO: Change to [ instead of get
@@ -85,6 +87,7 @@ class Node(BaseModel):
 
         values["properties"] = properties
         values["outputs"] = outputs
+        values["id"] = _id
         return values
 
     @staticmethod
@@ -243,7 +246,7 @@ class BuildDAG(BaseModel):
     def build_nodes(config: dict) -> Dict[str, DAGNode]:
         nodes = {}
         for node in config["pipeline"]["nodes"]:
-            obj = DAGNode(**node["data"])
+            obj = DAGNode(**node)
             nodes[obj.id] = obj
         return nodes
 

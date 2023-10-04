@@ -1,5 +1,6 @@
 from pydantic.types import UUID4
 from fastapi import APIRouter, Depends
+from copy import deepcopy
 
 from ..schemas import ResponseBase
 from ..dependencies import (
@@ -32,11 +33,12 @@ def create_or_start_notebook(
     pipeline = service.get(id=pipeline_id)
     pipeline = Pipeline.from_orm(pipeline)
     nb_node = None
+    pipeline_cpy = deepcopy(pipeline)
     for node_idx, node in enumerate(pipeline.dags["pipeline"]["nodes"]):
-        if node["data"]["id"] == node_ref_id:
+        if node["id"] == node_ref_id:
             dag = BuildDAG(config={"pipeline": {"nodes": [node], "edges": []}}).graph
             if dag.nodes[node_ref_id].category_id == 2:
-                nb_node = node
+                nb_node = pipeline_cpy.dags["pipeline"]["nodes"][node_idx]
                 break
             else:
                 raise CustomHttpException(
@@ -50,6 +52,7 @@ def create_or_start_notebook(
             detail=f"Node '{node_ref_id}' not found in pipeline '{str(pipeline_id)}'",
         )
 
+    logger.info(nb_node)
     nb_name = [
         prop["value"]
         for prop in nb_node["data"]["properties"]
@@ -93,7 +96,7 @@ def create_or_start_notebook(
         nb_url = manager.create_notebook(username, server_name, nb_name)
 
     nb_node_output["value"] = nb_url
-    pipeline.dags["pipeline"]["nodes"][node_idx] = nb_node
-    service.update(pipeline_id, pipeline)
+    pipeline_cpy.dags["pipeline"]["nodes"][node_idx] = nb_node
+    service.update(pipeline_id, pipeline_cpy)
 
     return ResponseBase[dict](data={"notebook_url": nb_url})
