@@ -15,18 +15,16 @@ import numpy as np
 
 from functools import partial
 from collections import defaultdict
+from itertools import count
 from itertools import tee
 from tqdm import tqdm
 from scipy.integrate import quad as integrate
 
 from .utils.union_find import UnionFind
-from .utils.hashing import sha1_hash
-from .utils.hashing import xxh3_16hash
-from .utils.hashing import xxh3_32hash
+from .utils.hashing import sha1_hash, xxh3_16hash, xxh3_32hash
 
 
 SEED = 42
-RNG = np.random.RandomState(SEED)
 NON_ALPHA = re.compile(r"\W", re.UNICODE)
 datasets.logging.set_verbosity_error()
 
@@ -96,8 +94,40 @@ def optimal_param(
 
 
 def embed_func(
-    content: str,
-    idx: int,
+    row,
+    content_column: str,
+    id_column: str,
+    *,
+    num_perm: int,
+    ngram_size: int,
+    min_length: int,
+    hashranges: List[Tuple[int, int]],
+    permutations: np.ndarray,
+    hash_func: Callable,
+    dtype: type,
+    max_hash: np.uint,
+    modulo_prime: np.uint,
+):
+    a, b = permutations
+    tokens: Set[bytes] = {
+        bytes(" ".join(t).lower(), "utf-8")
+        for t in ngrams(NON_ALPHA.split(row[content_column]), ngram_size, min_length)
+    }
+
+    hashvalues: np.ndarray = np.array(
+        [hash_func(token) for token in tokens], dtype=dtype
+    ).reshape(len(tokens), 1)
+    hashvalues = (hashvalues * a + b) % modulo_prime & max_hash
+    masks: np.ndarray = np.full(shape=num_perm, dtype=dtype, fill_value=max_hash)
+    hashvalues = np.vstack([hashvalues, masks]).min(axis=0)
+    Hs: List[bytes] = [bytes(hashvalues[start:end].data) for start, end in hashranges]
+    return {"__signatures__": Hs, "__id__": row[id_column]}
+
+
+def batch_embed_func(
+    rows: str,
+    content_column: str,
+    id_column: str,
     *,
     num_perm: int,
     ngram_size: int,
@@ -114,10 +144,12 @@ def embed_func(
 
     Parameters
     ----------
-    content : str
-        The content to be embedded.
-    idx : int
-        The index of the content.
+    rows : dict
+        The dataset rows to process.
+    content_column : str
+        The column of the dataset row to be embedded.
+    id_column : str
+        The index column of the dataset row.
     num_perm : int
         The number of permutations.
     ngram_size : int
@@ -136,25 +168,29 @@ def embed_func(
     Dict[str, Any]
         The hash values in each range and the index.
     """
-    a, b = permutations
-    tokens: Set[bytes] = {
-        bytes(" ".join(t).lower(), "utf-8")
-        for t in ngrams(NON_ALPHA.split(content), ngram_size, min_length)
-    }
 
-    hashvalues: np.ndarray = np.array(
-        [hash_func(token) for token in tokens], dtype=dtype
-    ).reshape(len(tokens), 1)
-    hashvalues = (hashvalues * a + b) % modulo_prime & max_hash
-    masks: np.ndarray = np.full(shape=num_perm, dtype=dtype, fill_value=max_hash)
-    hashvalues = np.vstack([hashvalues, masks]).min(axis=0)
-    Hs: List[bytes] = [bytes(hashvalues[start:end].data) for start, end in hashranges]
-    return {"__signatures__": Hs, "__id__": idx}
+    rows = ray.data.from_pandas(rows)
+    return rows.map(
+        partial(
+            embed_func,
+            content_column=content_column,
+            id_column=id_column,
+            num_perm=num_perm,
+            ngram_size=ngram_size,
+            min_length=min_length,
+            hashranges=hashranges,
+            permutations=permutations,
+            hash_func=hash_func,
+            dtype=dtype,
+            max_hash=max_hash,
+            modulo_prime=modulo_prime,
+        ),
+    ).to_pandas()
 
 
 def load_hf_dataset(dataset_name):
-    hf_dataset = datasets.load_dataset(dataset_name, streaming=True)
-    for split in hf_dataset.splits:
+    hf_dataset = datasets.load_dataset(dataset_name)
+    for split in hf_dataset:
         yield ray.data.from_huggingface(hf_dataset[split])
 
 
@@ -164,10 +200,11 @@ def load_dataset_from_filesystem(dataset_path):
 
 def minhash_dedup(
     dataset,
-    column,
+    content_column,
+    id_column="__id__",
     hash_bits=32,
     hash_algo="sha1",
-    ngram=5,
+    ngram_size=5,
     min_length=5,
     seed=SEED,
     num_perm=256,
@@ -176,6 +213,7 @@ def minhash_dedup(
     threshold=0.7,
 ):
     DTYPE, MAX_HASH, MODULO_PRIME = HASH_CONFIG.get(hash_bits, HASH_CONFIG[32])
+    RNG = np.random.RandomState(seed)
     if bands is not None and rows is not None:
         BANDS, ROWS = bands, rows
     else:
@@ -198,12 +236,41 @@ def minhash_dedup(
     HASH_RANGES = [(i * ROWS, (i + 1) * ROWS) for i in range(BANDS)]
     HASH_TABLES: List[Dict[int, Set]] = [defaultdict(set) for _ in range(BANDS)]
 
-    for ray_dataset in load_hf_dataset("knowrohit07/know_sql"):
+    for ray_dataset in load_hf_dataset(dataset):
         uf = UnionFind()
+        columns = ray_dataset.columns()
+        if id_column not in columns:
+            counter = count(0)
+            ray_dataset = ray_dataset.add_column("__id__", lambda x: [next(counter) for _ in range(len(x))])
+        else:
+            ray_dataset = ray_dataset.add_column("__id__", lambda x: x[id_column])
+        id_column = "__id__"
 
         PERMUTATIONS: Tuple[np.ndarray, np.ndarray] = (
-            RNG.randint(1, MODULO_PRIME, size=(num_perm,), dtype=DTYPE),  # a is a multiplier so should not be 0
+            RNG.randint(
+                1, MODULO_PRIME, size=(num_perm,), dtype=DTYPE
+            ),  # a is a multiplier so should not be 0
             RNG.randint(0, MODULO_PRIME, size=(num_perm,), dtype=DTYPE),  # b
         )
 
-        embeds = ray_dataset.map(embed_func, fn_constructor_args={"num_perm": num_perm, "ngram_size": ngrams})
+        embeds = ray_dataset.map_batches(
+            batch_embed_func,
+            fn_kwargs={
+                "content_column": content_column,
+                "id_column": id_column,
+                "num_perm": num_perm,
+                "ngram_size": ngram_size,
+                "min_length": min_length,
+                "hashranges": HASH_RANGES,
+                "permutations": PERMUTATIONS,
+                "hash_func": hash_func,
+                "dtype": DTYPE,
+                "max_hash": MAX_HASH,
+                "modulo_prime": MODULO_PRIME,
+            },
+            batch_format="pandas",
+        )
+
+
+if __name__ == "__main__":
+    minhash_dedup("knowrohit07/know_sql", "question")
