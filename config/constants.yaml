@@ -3,6 +3,7 @@ postgres:
     source_type:
       0: Hugging Face
       1: Local Upload
+      2: Blob
     type:
       0: Text
       1: Text & Image
@@ -18,6 +19,7 @@ postgres:
     source_type:
       0: Hugging Face
       1: Local Upload
+      2: Blob
   - table_name: "runs"
     status:
       0: Queued
