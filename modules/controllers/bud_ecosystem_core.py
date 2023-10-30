@@ -1,5 +1,7 @@
 import requests
 
+from .helpers import logger
+from utils.exceptions import CustomHttpException
 from config import settings
 
 
@@ -31,8 +33,10 @@ def list_agents(page: int = 1, limit: int = 100):
     try:
         return resp["data"]["agents"]
     except KeyError:
-        print(f"Error in fetching agents {resp}")
-        raise
+        logger.error(f"Failed to fetch agents => {resp}", exc_info=True)
+        raise CustomHttpException(
+            status_code=502, detail=f"Failed to communicate with the Bud Ecosystem"
+        )
 
 
 def list_agent(id: str):
@@ -45,39 +49,79 @@ def list_agent(id: str):
             }
         }
     """
-    variables = {"id": id}
+    variables = {"id": str(id)}
     resp = fetch_response(operation, "GetAgent", variables)
     
     try:
-        return resp["data"]["agents_by_pk"]
+        agent = resp["data"]["agents_by_pk"]
+        if agent is None:
+            raise CustomHttpException(
+                status_code=404, detail=f"No data exist for id '{id}'"
+            )
+        return agent
     except KeyError:
-        print(f"Error in fetching agent {resp}")
-        raise
+        logger.error(f"Failed to fetch agent => {resp}", exc_info=True)
+        raise CustomHttpException(
+            status_code=502, detail=f"Failed to communicate with the Bud Ecosystem"
+        )
 
 
-def add_agents(id: str, agent_name: str, agent_pipeline: str):
+def assert_is_name_unique(agent_name: str, id: str = None):
     operation = """
-        mutation AddAgent($id: uuid, $agent_name: String, $agent_pipeline: json) {
-            insert_agents(objects: {id: $id, agent_name: $agent_name, agent_pipeline: $agent_pipeline}) {
-                affected_rows
-                returning {
-                    id
-                    agent_name
-                    agent_pipeline
-                }
+        query GetAgentByName($name: String) {
+            agents(where: {agent_name: {_eq: $name}}) {
+                id
+                agent_name
+                agent_pipeline
             }
         }
     """
-    variables = {"id": id, "agent_name": agent_name, "agent_pipeline": agent_pipeline}
+    variables = {"name": agent_name}
+    resp = fetch_response(operation, "GetAgentByName", variables)
+    
+    try:
+        agents = resp["data"]["agents"]
+        if len(agents) > 1:
+            raise CustomHttpException(
+                status_code=412, detail=f"Name {agent_name} already exists."
+            )
+        elif len(agents) == 1:
+            if id is not None and agents[0]["id"] == str(id):
+                return True 
+            else:
+                raise CustomHttpException(
+                    status_code=412, detail=f"Name {agent_name} already exists."
+                )
+        return True
+    except KeyError:
+        logger.error(f"Failed to fetch agent by name => {resp}", exc_info=True)
+        raise CustomHttpException(
+            status_code=502, detail=f"Failed to communicate with the Bud Ecosystem"
+        )
+
+
+def add_agents(agent_name: str, agent_pipeline: str):
+    operation = """
+        mutation AddAgent($agent_name: String, $agent_pipeline: json) {
+            insert_agents_one(object: {agent_name: $agent_name, agent_pipeline: $agent_pipeline}) {
+                id
+                agent_name
+                agent_pipeline
+            }
+        }
+    """
+    variables = {"agent_name": agent_name, "agent_pipeline": agent_pipeline}
     resp = fetch_response(operation, "AddAgent", variables)
     
     try:
         if "errors" in resp and resp["errors"][0]["extensions"]["code"] == "constraint-violation":
             raise ValueError("Already exists")
-        return resp["data"]["insert_agents"]
-    except KeyError:
-        print(f"Error in adding agents {resp}")
-        raise   
+        return resp["data"]["insert_agents_one"]
+    except (KeyError, IndexError):
+        logger.error(f"Failed to add agent => {resp}", exc_info=True)
+        raise CustomHttpException(
+            status_code=502, detail=f"Failed to communicate with the Bud Ecosystem"
+        )
 
 
 def update_agents(id: str, agent_name: str, agent_pipeline: str):
@@ -90,14 +134,21 @@ def update_agents(id: str, agent_name: str, agent_pipeline: str):
             }
         }
     """
-    variables = {"id": id, "agent_name": agent_name, "agent_pipeline": agent_pipeline}
+    variables = {"id": str(id), "agent_name": agent_name, "agent_pipeline": agent_pipeline}
     resp = fetch_response(operation, "UpdateAgent", variables)
     
     try:
-        return resp["data"]["update_agents_by_pk"]
+        agent = resp["data"]["update_agents_by_pk"]
+        if agent is None:
+            raise CustomHttpException(
+                status_code=404, detail=f"No data exist for id '{id}'"
+            )
+        return agent
     except KeyError:
-        print(f"Error in updating agents {resp}")
-        raise
+        logger.error(f"Failed to update agent => {resp}", exc_info=True)
+        raise CustomHttpException(
+            status_code=502, detail=f"Failed to communicate with the Bud Ecosystem"
+        )
 
 
 def delete_agents(id: str):
@@ -110,11 +161,17 @@ def delete_agents(id: str):
             }
         }
     """
-    variables = {"id": id}
+    variables = {"id": str(id)}
     resp = fetch_response(operation, "DeleteAgent", variables)
     
     try:
-        return resp["data"]["delete_agents_by_pk"]
+        agent = resp["data"]["delete_agents_by_pk"]
+        if agent is None:
+            raise CustomHttpException(
+                status_code=404, detail=f"No data exist for id '{id}'"
+            )
     except KeyError:
-        print(f"Error in deleting agents {resp}")
-        raise
+        logger.error(f"Failed to delete agent => {resp}", exc_info=True)
+        raise CustomHttpException(
+            status_code=502, detail=f"Failed to communicate with the Bud Ecosystem"
+        )

@@ -13,21 +13,21 @@ PSQL_TABLE_ALIAS = settings.database.psql.TABLE_ALIAS
 
 
 class PipelineCreate(BaseModel):
-    name: str
-    dags: dict | list
+    agent_name: str
+    agent_pipeline: dict | list
 
     @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values["name"]:
+        if not values["agent_name"]:
             CustomHttpException(
                 status_code=422, detail="Pipeline name shouldn't be empty"
             )
-        if not values["dags"]:
+        if not values["agent_pipeline"]:
             CustomHttpException(
                 status_code=422, detail="Pipeline nodes should be a valid json"
             )
         try:
-            json.dumps(values["dags"])
+            json.dumps(values["agent_pipeline"])
         except Exception:
             CustomHttpException(
                 status_code=422, detail="Pipeline nodes should be a valid json"
@@ -36,24 +36,24 @@ class PipelineCreate(BaseModel):
 
 
 class PipelineUpdate(BaseModel):
-    name: str | None = None
-    dags: dict | list | str | None = None
+    agent_name: str | None = None
+    agent_pipeline: dict | list | str | None = None
 
     @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if "name" in values and not values["name"]:
+        if "agent_name" in values and not values["agent_name"]:
             CustomHttpException(
                 status_code=422, detail="Pipeline name shouldn't be empty"
             )
-        if "dags" in values:
-            if not values["dags"]:
+        if "agent_pipeline" in values:
+            if not values["agent_pipeline"]:
                 CustomHttpException(
                     status_code=422, detail="Pipeline nodes should be a valid json"
                 )
             try:
-                if isinstance(values["dags"], str):
-                    values["dags"] = json.loads(values["dags"])
-                json.dumps(values["dags"])
+                if isinstance(values["agent_pipeline"], str):
+                    values["agent_pipeline"] = json.loads(values["agent_pipeline"])
+                json.dumps(values["agent_pipeline"])
             except Exception:
                 CustomHttpException(
                     status_code=422, detail="Pipeline nodes should be a valid json"
