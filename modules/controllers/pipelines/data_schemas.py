@@ -63,14 +63,14 @@ class PipelineUpdate(BaseModel):
 
 
 class Pipeline(BaseModel):
-    pipeline_id: UUID4
-    name: str
-    dags: dict | list
-    created_at: datetime
-    modified_at: datetime
+    id: UUID4
+    agent_name: str
+    agent_pipeline: dict | list
+    # created_at: datetime
+    # modified_at: datetime
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
 
 
 class RunCreate(BaseModel):
@@ -175,28 +175,42 @@ class RunModel(BaseModel):
 
 class Property(BaseModel):
     name: str
+    label: str
     default: Any | None = None
+    value: Any | None = None
     description: str
-    title: str
+    placeholder: str | None = None
     options: list = []
-    type: int | str
-    type_alias: str | None = None
+    type: str | None = None
 
 
 class Node(BaseModel):
-    node_id: int
+    # node_id: str
     node_name: str | None = None
+    icon: str | None = None
     description: str | None = None
-    properties: List[Property] | None = []
+    inputs: List[Property] | None = []
     outputs: List[Property] | None = []
-    category_id: int
+    # category_id: int
     category_name: str | None = None
-    family_id: int
-    family_name: str | None = None
+    # family_id: int
+    # family_name: str | None = None
+
+    @root_validator(pre=True)
+    def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "node_name": values["name"],
+            "icon": values.get("icon"),
+            "description": values.get("description"),
+            "inputs": values.get("inputs", []),
+            "outputs": values.get("outputs", []),
+            "category_name": values.get("category", "All")
+        }
+
 
 
 class NodeCategory(BaseModel):
-    category_id: int
+    # category_id: int
     category_name: str
     nodes: List[Node]
 
@@ -210,22 +224,23 @@ class PipelineConfig(BaseModel):
             return values
 
         node_categories = {}
-        for node in values["config"].values():
+        # for node in values["config"].values():
+        for node in values["config"]:
             node: Node
-            if node.category_id not in node_categories:
-                node_categories[node.category_id] = {
+            if node.category_name not in node_categories:
+                node_categories[node.category_name] = {
                     "category_name": node.category_name,
                     "nodes": [],
                 }
 
-            node_categories[node.category_id]["nodes"].append(node)
+            node_categories[node.category_name]["nodes"].append(node)
 
         values["config"] = [
             NodeCategory(
-                category_id=category,
-                category_name=data["category_name"],
+                # category_id=category,
+                category_name=category_name,
                 nodes=data["nodes"],
             )
-            for category, data in sorted(node_categories.items())
+            for category_name, data in sorted(node_categories.items())
         ]
         return values

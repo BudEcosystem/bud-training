@@ -36,23 +36,16 @@ def add_dataset(
     archive_file: UploadFile | None = File(None),
     service: manager.DatasetCRUD = Depends(manager.get_dataset_crud),
 ) -> ResponseBase[dataset_schemas.Dataset] | dict:
-    dataset = dataset_schemas.DatasetCreate(
-        name=name, source=source, source_type=source_type, type=_type
-    )
-    service.assert_is_name_unique(dataset.name)
-    # dataset_id = utils.save_datasets_to_filesystem(
-    #     source_type=dataset.source_type,
-    #     dataset_type=dataset.type,
-    #     source=dataset.source,
-    #     metadata_file=metadata_file,
-    #     archive_file=archive_file,
-    # )
-    dataset_id = utils.save_datasets_to_filesystem(
+    service.assert_is_name_unique(name)
+    dataset_id, _source = utils.save_datasets_to_filesystem(
         source_type=dataset.source_type,
         dataset_type=dataset.type,
         source=dataset.source,
         metadata_file=metadata_file,
         archive_file=archive_file,
+    )
+    dataset = dataset_schemas.DatasetCreate(
+        name=name, source=_source, source_type=source_type, type=_type
     )
     dataset = service.create(dataset, dataset_id=dataset_id)
     return ResponseBase[dataset_schemas.Dataset](

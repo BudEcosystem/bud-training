@@ -109,6 +109,9 @@ settings = {
         "CONFIGS": PIPELINE_CONFIGS,
         "AVAILABLE_PIPELINES": [],
     },
+    "bud": {
+        "graphql": {"URL": env.str("BUD_GRAPHQL_URL"), "PWD": env.str("BUD_GRAPHQL_PWD")} 
+    }
 }
 
 

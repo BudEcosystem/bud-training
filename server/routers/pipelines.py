@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends
 from pydantic.types import UUID4
-from datetime import datetime, timezone
+import requests
 
 from ..dependencies import (
     validate_token_header,
@@ -11,6 +11,7 @@ from config import settings
 
 from modules.controllers.pipelines import data_schemas
 from modules.controllers.pipelines import manager
+from modules.controllers import bud_ecosystem_core
 from utils.exceptions import CustomHttpException
 
 
@@ -23,8 +24,11 @@ router = APIRouter(
 
 @router.get("/config")
 def read_pipeline_config() -> ResponseBase[data_schemas.PipelineConfig] | dict:
+    resp = requests.get("")
+    if resp.status_code != 200:
+        CustomHttpException(status_code=502, detail="Couldn't reach the node registry")
     pipelines = data_schemas.PipelineConfig(
-        config=settings.pipelines.AVAILABLE_PIPELINES
+        config=resp.json()["data"]["nodes"]
     )
     return ResponseBase[data_schemas.PipelineConfig](data=pipelines.config)
 
@@ -37,6 +41,7 @@ def add_pipeline(
     service.assert_is_name_unique(pipeline.name)
     # TODO: Name and dags validation not working
     pipeline = service.create(pipeline)
+    agent = bud_ecosystem_core.add_agents(pipeline.pipeline_id, pipeline.name, pipeline.dags)
     return ResponseBase[data_schemas.Pipeline](
         data=data_schemas.Pipeline.from_orm(pipeline)
     )
@@ -46,11 +51,12 @@ def add_pipeline(
 def read_pipelines(
     page: int = 1,
     limit: int = 100,
-    service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
+    # service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
 ) -> ResponseBase[List[data_schemas.Pipeline]] | dict:
-    pipelines = service.list(page=page, limit=limit)
+    # pipelines = service.list(page=page, limit=limit)
+    agents = bud_ecosystem_core.list_agents(page, limit)
     return ResponseBase[List[data_schemas.Pipeline]](
-        data=[data_schemas.Pipeline.from_orm(pipeline) for pipeline in pipelines]
+        data=[data_schemas.Pipeline(**agent) for agent in agents]
     )
 
 
@@ -59,9 +65,10 @@ def read_pipeline_by_id(
     pipeline_id: UUID4,
     service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
 ) -> ResponseBase[data_schemas.Pipeline] | dict:
-    pipeline = service.get(id=pipeline_id)
+    # pipeline = service.get(id=pipeline_id)
+    agent = bud_ecosystem_core.list_agent(pipeline_id)
     return ResponseBase[data_schemas.Pipeline](
-        data=data_schemas.Pipeline.from_orm(pipeline)
+        data=data_schemas.Pipeline(**agent)
     )
 
 
@@ -74,6 +81,7 @@ def edit_pipeline(
     service.assert_is_name_unique(pipeline.name)
     # TODO: Name and dags validation not working
     pipeline = service.update(id=pipeline_id, obj=pipeline)
+    agent = bud_ecosystem_core.update_agents(pipeline_id, pipeline.name, pipeline.dags)
     return ResponseBase[data_schemas.Pipeline](
         data=data_schemas.Pipeline.from_orm(pipeline)
     )
@@ -93,6 +101,7 @@ def delete_pipeline(
             detail=f"A Run for this pipeline is in progress.",
         )
     pipeline_service.delete(id=pipeline_id)
+    agent = bud_ecosystem_core.delete_agents(pipeline_id)
     return ResponseBase[None](
         message="Successfully deleted", meta={"pipeline_id": pipeline_id}, data=None
     )

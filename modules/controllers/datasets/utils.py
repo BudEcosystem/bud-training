@@ -6,11 +6,13 @@ from datasets import load_dataset
 from huggingface_hub import HfApi
 from huggingface_hub import DatasetFilter
 from fastapi import UploadFile, HTTPException
+
+from bud_ecosystem_utils.blob import BlobService
+
 import shutil
 import zipfile
 import json
-import boto3
-from botocore.exceptions import NoCredentialsError
+
 
 from ..helpers import logger
 from utils.exceptions import CustomHttpException
@@ -90,29 +92,16 @@ def save_file_obj_to_filesystem(file: UploadFile, filepath: str) -> Path:
     return Path(filepath)
 
 
-def save_file_obj_to_s3(file: UploadFile, s3_key: str) -> str:
-    try:
-        # Initialize an S3 client
-        s3 = boto3.client(
-            's3',
-            aws_access_key_id=settings.aws_s3.ACCESS_KEY_ID,
-            aws_secret_access_key=settings.aws_s3.SECRET_ACCESS_KEY
-        )
-
-        # Upload the file to S3
-        s3.upload_fileobj(file.file, settings.aws_s3.BUCKET_NAME, s3_key)
-
-        # Close the file-like object
-        file.file.close()
-
-        # Construct the S3 URL for the uploaded file
-        s3_url = f"https://{settings.aws_s3.BUCKET_NAME}.s3.amazonaws.com/{s3_key}"
-
-        return s3_url
-    except NoCredentialsError:
-        raise Exception("AWS credentials not found")
-    except Exception as e:
-        raise Exception(f"An error occurred: {e}")
+def save_files_to_remote(dirpath: str, base_key: str) -> str:
+    blob_service = BlobService()
+    blob_url = blob_service.bulk_upload(
+        dirpath,
+        base_key + ".zip",
+        zip_data=True,
+    )
+    
+    logger.info(f"Succesffully saved the files in {dirpath} to {blob_url}")
+    return blob_url
 
 
 def save_metadata_file_to_filesystem(
@@ -158,7 +147,7 @@ def save_image_archive_to_filesystem(
 
     filename = f"images.{suffix}"
     return dataset_id, save_file_obj_to_filesystem(file, osp.join(dataset_id, filename))
-
+    
 
 def save_datasets_to_filesystem(
     source_type: int,
@@ -171,10 +160,12 @@ def save_datasets_to_filesystem(
     if source_type == 0:
         is_valid_hf_dataset(source)
     elif source_type == 1:
-        dataset_id, _ = save_metadata_file_to_filesystem(metadata_file)
+        dataset_id, filepath = save_metadata_file_to_filesystem(metadata_file)
         if dataset_type == 1:
             save_image_archive_to_filesystem(archive_file, dataset_id)
-    return dataset_id
+        source = save_files_to_remote(osp.dirname(filepath), f"datasets/{dataset_id}")
+        shutil.rmtree(osp.dirname(filepath))
+    return dataset_id, source
 
 
 def extract_and_process_image_archives(dataset_dir: str, image_column: str):
