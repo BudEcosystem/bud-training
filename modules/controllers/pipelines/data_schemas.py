@@ -129,34 +129,55 @@ class RunUpdate(BaseModel):
         return value
 
 
+# class Run(BaseModel):
+#     run_id: UUID4
+#     pipeline_id: UUID4
+#     name: str
+#     dags: dict | list
+#     results: dict | list
+#     meta: dict | list
+#     status: int
+#     status_alias: str | None = None
+#     started_at: datetime | None = None
+#     finished_at: datetime | None = None
+#     created_at: datetime
+#     modified_at: datetime
+
+#     class Config:
+#         orm_mode = True
+
+#     @root_validator
+#     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+#         values["status_alias"] = str(
+#             get_constant_alias(
+#                 table_name=PSQL_TABLE_ALIAS.Run,
+#                 column_name="status",
+#                 value=values["status"],
+#             )
+#         )
+#         return values
+
+
 class Run(BaseModel):
-    run_id: UUID4
-    pipeline_id: UUID4
-    name: str
-    dags: dict | list
-    results: dict | list
-    meta: dict | list
-    status: int
-    status_alias: str | None = None
-    started_at: datetime | None = None
-    finished_at: datetime | None = None
+    id: UUID4
+    agent_id: UUID4
+    session_id: UUID4
+    output: Any = None
+    status: str
     created_at: datetime
-    modified_at: datetime
+    updated_at: datetime
 
-    class Config:
-        orm_mode = True
-
-    @root_validator
+    @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        values["status_alias"] = str(
-            get_constant_alias(
-                table_name=PSQL_TABLE_ALIAS.Run,
-                column_name="status",
-                value=values["status"],
-            )
-        )
-        return values
+        if values["output"] is None:
+            return values
+        
+        try:
+            values["output"] = json.loads(values["output"])
+        except Exception:
+            pass
 
+        return values
 
 class RunModelCreate(BaseModel):
     run_id: UUID4

@@ -110,7 +110,8 @@ settings = {
         "AVAILABLE_PIPELINES": [],
     },
     "bud": {
-        "graphql": {"URL": env.str("BUD_GRAPHQL_URL"), "PWD": env.str("BUD_GRAPHQL_PWD")} 
+        "graphql": {"URL": env.str("BUD_GRAPHQL_URL"), "PWD": env.str("BUD_GRAPHQL_PWD")},
+        "backend": {"URL": env.str("BUD_BACKEND_URL").strip("/"), "EMAIL": env.str("BUD_BACKEND_EMAIL"), "PWD": env.str("BUD_BACKEND_PWD")}
     }
 }
 

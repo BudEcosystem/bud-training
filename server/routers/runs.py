@@ -10,6 +10,7 @@ from ..schemas import ResponseBase
 
 from modules.controllers.pipelines import data_schemas
 from modules.controllers.pipelines import manager
+from modules.controllers import bud_ecosystem_client
 from workers import celery_worker
 from utils.exceptions import CustomHttpException
 
@@ -21,72 +22,83 @@ router = APIRouter(
 )
 
 
-@router.post("/start/{pipeline_id}", response_model=ResponseBase[data_schemas.Run])
+@router.post("/start/{agent_id}", response_model=ResponseBase[data_schemas.Run])
 def start_run(
-    pipeline_id: UUID4,
-    run_service: manager.RunCRUD = Depends(manager.get_run_crud),
-    pipeline_service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
+    agent_id: UUID4,
+    # run_service: manager.RunCRUD = Depends(manager.get_run_crud),
+    # pipeline_service: manager.PipelineCRUD = Depends(manager.get_pipeline_crud),
 ) -> ResponseBase[data_schemas.Run] | dict:
-    pipeline = pipeline_service.get(id=pipeline_id)
-    run = run_service.create(pipeline)
+    # pipeline = pipeline_service.get(id=agent_id)
+    # run = run_service.create(pipeline)
     # TODO: Delete run in case of error
-    celery_worker.run_pipeline.apply_async([str(run.run_id)], task_id=str(run.run_id))
-    return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+    # celery_worker.run_pipeline.apply_async([str(run.session_id)], task_id=str(run.session_id))
+    # return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+    
+    agent = bud_ecosystem_client.list_agent(agent_id)
+    bud_ecosystem_client.publish_agent(agent_id)
+    resp = bud_ecosystem_client.run_agent(agent_id)
+    return ResponseBase[None](message="Agent execution initiated", meta={"session_id": ""}, data=None)
 
 
-@router.post("/stop/{run_id}", response_model=ResponseBase[data_schemas.Run])
+@router.post("/stop/{session_id}", response_model=ResponseBase[data_schemas.Run])
 def stop_run(
-    run_id: UUID4,
-    service: manager.RunCRUD = Depends(manager.get_run_crud),
+    session_id: UUID4,
+    # service: manager.RunCRUD = Depends(manager.get_run_crud),
 ) -> ResponseBase[data_schemas.Run] | dict:
-    run = service.get(id=run_id)
-    celery_worker.revoke_task(str(run_id))
-    run = service.update(
-        id=run_id,
-        obj=data_schemas.RunUpdate(status=4, finished_at=datetime.now(timezone.utc)),
-    )
-    return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+    # run = service.get(id=session_id)
+    # celery_worker.revoke_task(str(session_id))
+    # run = service.update(
+    #     id=session_id,
+    #     obj=data_schemas.RunUpdate(status=4, finished_at=datetime.now(timezone.utc)),
+    # )
+    # return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+    # TODO: Add agent stop
+    return ResponseBase[None](message="Agent execution terminated", meta={"session_id": ""}, data=None)
 
 
 @router.get("/", response_model=ResponseBase[List[data_schemas.Run]])
 def read_runs(
-    pipeline_id: UUID4 = None,
+    agent_id: UUID4 = None,
     page: int = 1,
     limit: int = 100,
-    service: manager.RunCRUD = Depends(manager.get_run_crud),
+    # service: manager.RunCRUD = Depends(manager.get_run_crud),
 ) -> ResponseBase[List[data_schemas.Run]] | dict:
-    if pipeline_id is None:
-        runs = service.list(page=page, limit=limit)
+    if agent_id is None:
+        # runs = service.list(page=page, limit=limit)
+        runs = bud_ecosystem_client.list_runs(page=page, limit=limit)
     else:
-        runs = service.get_pipeline_runs(pipeline_id=pipeline_id)
+        runs = bud_ecosystem_client.list_runs_by_agent_id(agent_id=agent_id, page=page, limit=limit)
     return ResponseBase[List[data_schemas.Run]](
-        data=[data_schemas.Run.from_orm(run) for run in runs]
+        data=[data_schemas.Run(**run) for run in runs]
     )
 
 
-@router.get("/{run_id}", response_model=ResponseBase[data_schemas.Run])
+@router.get("/{session_id}", response_model=ResponseBase[data_schemas.Run])
 def read_run_by_id(
-    run_id: UUID4,
-    service: manager.RunCRUD = Depends(manager.get_run_crud),
+    session_id: UUID4,
+    # service: manager.RunCRUD = Depends(manager.get_run_crud),
 ) -> ResponseBase[data_schemas.Run] | dict:
-    run = service.get(id=run_id)
-    return ResponseBase[data_schemas.Run](data=data_schemas.Run.from_orm(run))
+    # run = service.get(id=session_id)
+    run = bud_ecosystem_client.list_agent_by_session_id(session_id)
+    return ResponseBase[data_schemas.Run](data=data_schemas.Run(**run))
 
 
-@router.delete("/{run_id}", response_model=ResponseBase[data_schemas.Run])
+@router.delete("/{session_id}", response_model=ResponseBase[data_schemas.Run])
 def delete_run(
-    run_id: UUID4,
-    service: manager.RunCRUD = Depends(manager.get_run_crud),
+    session_id: UUID4,
+    # service: manager.RunCRUD = Depends(manager.get_run_crud),
 ) -> ResponseBase[None] | dict:
-    run = service.get(id=run_id)
-    if run.status != 4:
+    # run = service.get(id=session_id)
+    run = bud_ecosystem_client.list_agent_by_session_id(session_id)
+    if run["status"] in ["Running"]:
         raise CustomHttpException(
             status_code=422,
             detail=f"Only stopped runs can be deleted",
         )
     else:
-        service.delete(id=run_id)
+        # service.delete(id=session_id)
+        bud_ecosystem_client.delete_runs(session_id)
 
     return ResponseBase[None](
-        message="Successfully deleted", meta={"run_id": run_id}, data=None
+        message="Successfully deleted", meta={"session_id": session_id}, data=None
     )
