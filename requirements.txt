@@ -8,33 +8,8 @@ psycopg2-binary
 
 # LLM
 torch
-git+https://github.com/OpenLMLab/collie
-fire
 gradio
 datasets
-git+https://github.com/microsoft/DeepSpeed.git
-openai
-rwkv
-vllm
-tiktoken
-sacrebleu
-pycountry
-rouge-score
-
-# SD
-git+https://github.com/huggingface/diffusers.git
-accelerate>=0.16.0
-torchvision
-transformers>=4.25.1
-ftfy
-tensorboard>=2.14.0
-Jinja2
-
-# Optional
-wandb
-xformers
-bitsandbytes
-
 
 # Server
 fastapi
@@ -44,6 +19,9 @@ celery
 watchdog
 gevent>=22.0
 Redis>=4.0
+
+# NB
+docker>=6.1.3
 
 # Bud Ecosystem
 git+https://github.com/BudEcosystem/bud-ecosystem-utils.git@bud-training

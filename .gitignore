@@ -176,3 +176,4 @@ db/migrations/postgres/versions/*
 
 *.json
 server/static/test_ws.html
+.python-version

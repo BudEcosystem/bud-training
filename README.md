@@ -29,6 +29,10 @@ Fill the env variables in the new .env file
 #### Migrations
 
 ```
+mkdir db/migrations/postgres/versions
+```
+
+```
 alembic revision --autogenerate -m "Initial table creation"
 ```
 
