@@ -396,7 +396,7 @@ class BudEcosystemClient:
         resp = self.fetch_backend_response(
             "post",
             "/api/v1/execute-agent",
-            body={"agent_id": str(id), "is_blocking": True, "data": agent_pipeline}
+            body={"agent_id": str(id), "is_blocking": False, "data": agent_pipeline}
         )
         try:
             if resp["status"].lower() == "error":

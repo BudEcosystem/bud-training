@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, Field, validator, root_validator
 from pydantic.types import UUID4
 from datetime import datetime
 import json
@@ -199,7 +199,7 @@ class Property(BaseModel):
     label: str
     default: Any | None = None
     value: Any | None = None
-    description: str
+    description: str | None = None
     placeholder: str | None = None
     options: list = []
     type: str | None = None
@@ -237,17 +237,18 @@ class NodeCategory(BaseModel):
 
 
 class PipelineConfig(BaseModel):
-    config: List[NodeCategory]
+    out_config: List[NodeCategory] = []
+    in_config: List[str] | List[Dict] = Field([], hidden=True)
 
     @root_validator(pre=True)
     def validate_model(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not isinstance(values["config"], dict):
+        if not isinstance(values["in_config"], list):
             return values
 
         node_categories = {}
-        # for node in values["config"].values():
-        for node in values["config"]:
-            node: Node
+        # for node in values["in_config"].values():
+        for node in values["in_config"]:
+            node = Node(**node)
             if node.category_name not in node_categories:
                 node_categories[node.category_name] = {
                     "category_name": node.category_name,
@@ -256,7 +257,7 @@ class PipelineConfig(BaseModel):
 
             node_categories[node.category_name]["nodes"].append(node)
 
-        values["config"] = [
+        values["out_config"] = [
             NodeCategory(
                 # category_id=category,
                 category_name=category_name,

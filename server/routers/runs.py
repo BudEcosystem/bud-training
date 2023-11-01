@@ -37,7 +37,7 @@ def start_run(
     agent = bud_ecosystem_client.list_agent(agent_id)
     bud_ecosystem_client.publish_agent(agent_id)
     resp = bud_ecosystem_client.run_agent(agent_id)
-    return ResponseBase[None](message="Agent execution initiated", meta={"session_id": ""}, data=None)
+    return ResponseBase[None](message="Agent execution initiated", meta={"session_id": resp.get("session_id")}, data=None)
 
 
 @router.post("/stop/{session_id}", response_model=ResponseBase[data_schemas.Run])

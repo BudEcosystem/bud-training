@@ -24,13 +24,9 @@ router = APIRouter(
 
 @router.get("/config")
 def read_pipeline_config() -> ResponseBase[data_schemas.PipelineConfig] | dict:
-    resp = requests.get("")
-    if resp.status_code != 200:
-        CustomHttpException(status_code=502, detail="Couldn't reach the node registry")
-    pipelines = data_schemas.PipelineConfig(
-        config=resp.json()["data"]["nodes"]
-    )
-    return ResponseBase[data_schemas.PipelineConfig](data=pipelines.config)
+    nodes = bud_ecosystem_client.list_nodes()
+    pipelines = data_schemas.PipelineConfig(in_config=nodes)
+    return ResponseBase[data_schemas.PipelineConfig](data=pipelines.out_config)
 
 
 @router.post("/")
