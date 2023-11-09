@@ -38,9 +38,9 @@ def add_dataset(
 ) -> ResponseBase[dataset_schemas.Dataset] | dict:
     service.assert_is_name_unique(name)
     dataset_id, _source = utils.save_datasets_to_filesystem(
-        source_type=dataset.source_type,
-        dataset_type=dataset.type,
-        source=dataset.source,
+        source_type=source_type,
+        dataset_type=type,
+        source=source,
         metadata_file=metadata_file,
         archive_file=archive_file,
     )

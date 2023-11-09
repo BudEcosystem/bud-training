@@ -8,7 +8,7 @@ from config import settings
 
 class BudEcosystemClient:
     def __init__(self) -> None:
-        self.backend_session = self.refresh_backend_session()
+        self.backend_session = self.authenticate_backend_client()
 
     @staticmethod
     def multi_urljoin(*parts):
@@ -67,11 +67,6 @@ class BudEcosystemClient:
         session.headers = headers
         return session
 
-    def refresh_backend_session(self):
-        self.backend_session = None
-        self.backend_session = self.authenticate_backend_client()
-        return self.backend_session
-
     def fetch_backend_response(
         self, method, endpoint, headers=None, params=None, body=None, timeout=30
     ):
@@ -86,7 +81,7 @@ class BudEcosystemClient:
                 url, headers=headers, params=params, json=body, timeout=timeout
             )
             if resp.status_code == 401:
-                self.refresh_backend_session()
+                self.backend_session = self.authenticate_backend_client()
                 resp = getattr(self.backend_session, method.lower())(
                     url, headers=headers, params=params, json=body, timeout=timeout
                 )

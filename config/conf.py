@@ -84,7 +84,7 @@ settings = {
     "aws_s3": {
         "ACCESS_KEY_ID": env.str("AWS_ACCESS_KEY_ID"),
         "SECRET_ACCESS_KEY": env.str("AWS_SECRET_ACCESS_KEY"),
-        "BUCKET_NAME": env.str("BUCKET_NAME"),
+        "BUCKET_NAME": env.str("AWS_BUCKET_NAME"),
     },
     "database": {
         "psql": {
