@@ -160,11 +160,19 @@ def save_datasets_to_filesystem(
     if source_type == 0:
         is_valid_hf_dataset(source)
     elif source_type == 1:
-        dataset_id, filepath = save_metadata_file_to_filesystem(metadata_file)
-        if dataset_type == 1:
+        if dataset_type == 0:
+            dataset_id, filepath = save_metadata_file_to_filesystem(metadata_file)
+        elif dataset_type == 1:
+            dataset_id, filepath = save_metadata_file_to_filesystem(metadata_file)
             save_image_archive_to_filesystem(archive_file, dataset_id)
+        elif dataset_type == 2:
+            dataset_id, filepath = save_image_archive_to_filesystem(archive_file)
+        else:
+            raise CustomHttpException(status_code=422, detail="Dataset type is invalid")
         source = save_files_to_remote(osp.dirname(filepath), f"datasets/{dataset_id}")
         shutil.rmtree(osp.dirname(filepath))
+    else:
+        raise CustomHttpException(status_code=422, detail="Source type is invalid")
     return dataset_id, source
 
 
@@ -218,5 +226,6 @@ def delete_dataset_from_filesystem(dirname: str):
     if osp.isdir(dirpath):
         try:
             shutil.rmtree(dirpath)
+            #TODO: Remove from blob as well
         except Exception:
             logger.warning("Folder delete failed", exc_info=True)

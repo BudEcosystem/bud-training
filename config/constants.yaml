@@ -7,6 +7,7 @@ postgres:
     type:
       0: Text
       1: Text & Image
+      2: Image
   - table_name: "models"
     type:
       0: Adapter
