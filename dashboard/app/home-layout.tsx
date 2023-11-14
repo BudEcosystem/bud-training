@@ -104,7 +104,7 @@ export default function HomeLayout({
                     <div className="flex h-16 shrink-0 items-center logo-wrap">
                       <img
                         className="h-8 w-auto"
-                        src="/loddgo.svg"
+                        src="/assets/images/logoBlack.png"
                         alt="Bud"
                       />
                       <p>LLMops</p>
@@ -196,7 +196,7 @@ export default function HomeLayout({
             <div className="flex h-16 shrink-0 items-center logo-wrap">
               <img
                 className="h-8 w-auto"
-                src="/loddgo.svg"
+                src="/assets/images/logoBlack.png"
                 alt="Bud"
               />
               <p>Bud Flow</p>
