@@ -3,6 +3,7 @@
 import { Fragment, useState } from 'react'
 import { usePathname } from 'next/navigation';
 import { Dialog, Menu, Transition } from '@headlessui/react'
+import Image from 'next/image'
 import {
   Bars3Icon,
   BellIcon,
@@ -34,6 +35,8 @@ const userNavigation = [
   { name: 'Your profile', href: '#' },
   { name: 'Sign out', href: '#' },
 ]
+import logoWhite from './assets/images/logoBlack.png';
+
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -102,12 +105,8 @@ export default function HomeLayout({
                   {/* Sidebar component, swap this element with another sidebar if you like */}
                   <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
                     <div className="flex h-16 shrink-0 items-center logo-wrap">
-                      <img
-                        className="h-8 w-auto"
-                        src="/assets/images/logoBlack.png"
-                        alt="Bud"
-                      />
-                      <p>LLMops</p>
+                    <Image className="h-8 w-auto" src={logoWhite} alt="Bud" />
+                      {/* <p>LLMops</p> */}
                     </div>
                     <nav className="flex flex-1 flex-col">
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -194,12 +193,7 @@ export default function HomeLayout({
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4">
             <div className="flex h-16 shrink-0 items-center logo-wrap">
-              <img
-                className="h-8 w-auto"
-                src="/assets/images/logoBlack.png"
-                alt="Bud"
-              />
-              <p>Bud Flow</p>
+            <Image className="h-8 w-auto" src={logoWhite} alt="Bud" />
             </div>
             <nav className="flex flex-1 flex-col">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
