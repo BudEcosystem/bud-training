@@ -36,6 +36,7 @@ const userNavigation = [
   { name: 'Sign out', href: '#' },
 ]
 import logoWhite from './assets/images/logoBlack.png';
+import avatarIcon from './assets/images/avatar.jpg';
 
 
 function classNames(...classes: string[]) {
@@ -320,14 +321,14 @@ export default function HomeLayout({
                 <Menu as="div" className="relative">
                   <Menu.Button className="-m-1.5 flex items-center p-1.5">
                     <span className="sr-only">Open user menu</span>
-                    <img
+                    <Image
                       className="h-8 w-8 rounded-full bg-gray-50"
-                      src="https://qph.cf2.quoracdn.net/main-thumb-66203696-200-ngyspigvbvkorrgaccfjowxkfgujputv.jpeg"
-                      alt=""
+                      src={avatarIcon}
+                      alt="avatar"
                     />
                     <span className="hidden lg:flex lg:items-center">
                       <span className="ml-4 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
-                        Jithin VG
+                        John Doe
                       </span>
                       <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
