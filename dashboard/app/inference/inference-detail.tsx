@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-import Dropdown from '../dropdown'
+import Dropdown from '../components/dropdown'
 import { addInference, addModel, updateModel } from '../../services/common-service'
 import { showToast } from '../../services/toast-service'
 import Loading from '../loading'
@@ -65,7 +65,7 @@ export default function InferenceDetail(props: any) {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                                    <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-[var(--color-page-background)] shadow-xl">
                                         <div className="h-0 flex-1 overflow-y-auto">
                                             <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                                                 <div className="flex items-center justify-between">

@@ -311,9 +311,12 @@ export default function Canvas(props: any) {
     }, [nodes, edges])
 
     useEffect(() => {
+        console.log(props, "props")
+        // setNodes(initialNodes)
         setNodes(props.nodes)
         setEdges(props.edges)
         console.log(props.nodes, props.edges)
+        console.log("nodes", nodes)
         setTimeout(() => {reactFlowInstance.setView}, 1000);
     }, [props.nodes, props.edges])
 
@@ -334,12 +337,13 @@ export default function Canvas(props: any) {
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
     const formatNode = (data: any, nodeId: any) => {
+
         console.log(data)
         data.outputs.map((item: any, index: number)=>{ 
             item['id'] = nodeId + "." + (index + 1)
             return item
         })
-        data.properties.map((item: any, index: number)=>{ 
+        data.inputs.map((item: any, index: number)=>{ 
             item['id'] = nodeId + "." + (index + 1)
             return item
         })
@@ -350,7 +354,6 @@ export default function Canvas(props: any) {
     const onDrop = useCallback(
         (event: { preventDefault: () => void; dataTransfer: { getData: (arg0: string) => any; }; clientX: number; clientY: number; }) => {
             event.preventDefault();
-
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
             const data = JSON.parse(event.dataTransfer.getData('application/reactflow'));
             console.log(data)

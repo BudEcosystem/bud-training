@@ -1,5 +1,5 @@
 "use client"
-
+import React from 'react';
 import { useEffect, useState } from "react";
 import { getExperiments, getPipelineDetail, startRun, updatePipeline } from "../../../services/common-service";
 import Canvas from "./canvas";
@@ -9,6 +9,7 @@ import Loading from "../../loading";
 import RunReport from "./run-report";
 import RunList from "./run-list";
 import ExecuteDetail from "./execute-detail";
+import { error } from "console";
 
 
 export default function PipelineView({ params }: { params: { id: string } }) {
@@ -38,14 +39,22 @@ export default function PipelineView({ params }: { params: { id: string } }) {
     }, [currentTab])
 
     async function getDetail() {
-        let res = await getPipelineDetail(params.id);
+        try {
+            let res = await getPipelineDetail(params.id);
+            if (res.status) {
+                console.log(res)
+                setDetails(res.data);
+                console.log(details);
+                setInitialNodes(res.data.agent_pipeline?.nodes ? res.data.agent_pipeline?.nodes : [])
+                setInitialEdges(res.data.agent_pipeline?.edges ? res.data.agent_pipeline?.edges : [])
+                
+                // setInitialNodes(res.data.dags?.pipeline?.nodes ? res.data.dags?.pipeline?.nodes : [])
+                // setInitialEdges(res.data.dags?.pipeline?.edges ? res.data.dags?.pipeline?.edges : [])
+            } else {
+                // toast.error(res.data.message);
+            }
+        } catch (error) {
 
-        if (res.status) {
-            setDetails(res.data);
-            setInitialNodes(res.data.dags?.pipeline?.nodes ? res.data.dags?.pipeline?.nodes : [])
-            setInitialEdges(res.data.dags?.pipeline?.edges ? res.data.dags?.pipeline?.edges : [])
-        } else {
-            // toast.error(res.data.message);
         }
     }
 
@@ -113,7 +122,7 @@ export default function PipelineView({ params }: { params: { id: string } }) {
 
     return (
         <div className="-mt-10 -mx-8 h-full">
-            <div className="sticky top-14 z-10 flex justify-between items-center px-5 bg-gray-100 text-sm border border-b-gray">
+            <div className="sticky top-14 z-10 flex justify-between items-center px-5 text-sm border-b-gray">
                 <div className="flex items-center">
                     <div>{details.name}</div>
                     <div className="mt-4 sm:ml-10 sm:mt-0">
@@ -143,7 +152,7 @@ export default function PipelineView({ params }: { params: { id: string } }) {
                 </div>}
                 
             </div>
-            <div className="fixed top-28 bottom-0 left-60 w-56 h-[-63px] border-r">
+            <div className="fixed top-28 bottom-0 w-56 h-[-63px] border-r">
                 {currentTab == 'Runs' && <RunList runs={run}></RunList>}
                 {currentTab == 'Pipeline' && <ComponentProvider></ComponentProvider>}
             </div>

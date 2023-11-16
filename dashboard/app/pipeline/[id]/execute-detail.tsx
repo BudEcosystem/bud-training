@@ -8,7 +8,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 import { addPipeline, startRun, updatePipeline } from '../../../services/common-service'
 import { showToast } from '../../../services/toast-service'
 import Loading from '../../loading'
-import Dropdown from '../../dropdown'
+import Dropdown from '../../components/dropdown'
 
 export default function ExecuteDetail(props: any) {
   const clusterList = [

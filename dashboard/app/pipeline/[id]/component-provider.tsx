@@ -4,7 +4,8 @@ import _ from 'lodash';
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline"
 import { getPipelineConfig } from "../../../services/common-service";
 import { useEffect, useState } from "react";
-import Search from "../../search";
+import Search from "../../components/search";
+// import Search from "../../search";
 
 
 export default function ComponentProvider() {
@@ -55,9 +56,9 @@ export default function ComponentProvider() {
             </div>
             {config.map((cat: any) => (
                 <div key={cat.category_name}>
-                    <div className="text-xs mb-2 leading-6 text-gray-400">{cat.category_name}</div>
+                    <div className="text-xs mb-2 leading-6">{cat.category_name}</div>
                     {cat.nodes.map((node: any) => (
-                        <div key={node.node_name} className="group flex justify-between items-center rounded-md border border-dashed border-gray-300 px-3 py-2 bg-gray-100 text-sm mb-3 cursor-pointer hover:bg-indigo-600 hover:text-white" draggable onDragStart={(event) => onDragStart(event, node, cat.category_name)}>
+                        <div key={node.node_name} className="group flex justify-between items-center rounded-md border border-dashed border-gray-300 px-3 py-2 text-sm mb-3 cursor-pointer hover:bg-indigo-600 hover:text-white" draggable onDragStart={(event) => onDragStart(event, node, cat.category_name)}>
                             {node.node_name}
                             <AdjustmentsHorizontalIcon
                                 className="h-4 w-4 shrink-0 group-hover:text-white"

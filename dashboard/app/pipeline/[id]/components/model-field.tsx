@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getModels } from "../../../../services/common-service";
-import Dropdown from "../../../dropdown";
+import Dropdown from "../../../components/dropdown";
 
 
 export default function ModelField(props: any) {

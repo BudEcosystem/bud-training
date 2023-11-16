@@ -1,13 +1,14 @@
 'use client';
 
-import { Card, Title, Text } from '@tremor/react';
+import { Card, Title } from '@tremor/react';
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import ModelDetail from './model-detail';
 import { useEffect, useState } from 'react';
 import { deleteModel, getModels } from '../../services/common-service';
 import { showToast } from '../../services/toast-service';
 import ConfirmDialog from '../components/confirm-dialog';
-import Search from '../search';
+import Search from '../components/search';
+import { Heading, Section, Box, Table, Text} from '@radix-ui/themes';
 
 
 export default function Models() {
@@ -80,12 +81,12 @@ export default function Models() {
 
   return (
 
-    <div className="px-3 py-0">
+    <div className=" py-0" >
       <div className="sm:flex sm:items-end">
         <div className="sm:flex-auto">
-          <Title>Models</Title>
-          <Text>A list of all the available models in the workspace</Text>
-          <Search onChange={filterList}/>
+          <Heading weight='medium' size='8' style={{color: 'var(--color-primary)'}}>Models</Heading>
+          {/* <Text>A list of all the available models in the workspace</Text> */}
+
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <button
@@ -98,85 +99,78 @@ export default function Models() {
         </div>
       </div>
       <div className="mt-8 flow-root">
-        <Card>
-
-          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0"
-                    >
-                      Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Family
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Version
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Source type
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Source
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Model type
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Modified at
-                    </th>
-                    <th scope="col" className="relative py-3 pl-3 pr-4 sm:pr-0">
+      <div className='table-container'>
+      <Box className='flex flex-col	justify-center items-center	pb-2 mb-20 rounded-xl my-8 bg-[var(--nav-bg)]'  style={{boxShadow:'var(--shadow-4)'}}>
+        <Search onChange={filterList}/>
+        <Section className="mt-2 w-full" p='0' style={{boxShadow: '0px -1px 0px 0px var(--gray-a5)'}}>
+          {/* <TableModel data={users} />           */}
+          <Table.Root size='3' className="rounded-lg overflow-x-hidden radixTable">
+                <Table.Header>
+                  <Table.Row >
+                    <Table.ColumnHeaderCell>
+                    Name
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Family
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Version
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Source type
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Source
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Model type
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Modified at
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
                       <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                    </Table.ColumnHeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
                   {models.map((item: any) => (
-                    <tr key={item.model_id}>
-                      <td className="whitespace-nowrap py-3 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                        {item.name}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{item.family_alias}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">1</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{item.source_type_alias}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">
-                        {item.source_type == 0 && <a className='text-indigo-400' href={"https://huggingface.co/datasets/" + item.source} target='_blank'>{item.source}</a>}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{item.type_alias}</td>
-                      <td className="whitespace-nowrap px-3 py-3 text-sm text-gray-500">{formatDate(item.modified_at)}</td>
-                      <td className="relative flex whitespace-nowrap py-3 pl-3 pr-4 text-right text-sm sm:pr-0">
+                    <Table.Row key={item.model_id}>
+                      <Table.Cell >
+                      {item.name}
+                      </Table.Cell>
+                      <Table.Cell>
+                      {item.family_alias}
+                      </Table.Cell>
+                      <Table.Cell>
+                      1
+                      </Table.Cell>
+                      <Table.Cell >
+                      {item.source_type_alias}
+                      </Table.Cell>
+                      <Table.Cell>
+                      {item.source_type == 0 && <a className='text-indigo-400' href={"https://huggingface.co/datasets/" + item.source} target='_blank'>{item.source}</a>}
+                      </Table.Cell>
+                      <Table.Cell>
+                      {item.type_alias}
+                      </Table.Cell>
+                      <Table.Cell>
+                      {formatDate(item.modified_at)}
+                      </Table.Cell>
+                      <Table.Cell className="relative flex whitespace-nowrap">
+                        <div style={{'display': 'flex'}}>
                         <PencilIcon onClick={() => showDetail(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
                         <TrashIcon onClick={() => {setToRemove(item); setShowConfirm(true)}} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
-                      </td>
-                    </tr>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </Card>
+                </Table.Body>
+              </Table.Root>
+              {!models.length && <p className='flex justify-center w-full pt-2'>No data available</p>}
+        </Section>
+        </Box>
+        </div>
       </div>
       <ModelDetail open={openDetail} data={selected} onClose={() => getAllModels()}></ModelDetail>
       <ConfirmDialog show={showConfirm} hide={() => setShowConfirm(false)} confirmed={(item: any) => deleteItem(item)} selected={toRemove}  title="Delete model" message="Are you sure you want to delete the model? The model will be permanently removed from our servers forever. This action cannot be undone."></ConfirmDialog>

@@ -140,6 +140,7 @@ export async function updatePipeline(params: any) {
 
   try {
     const { data } = await apiClient.put(`pipeline/` + params['id'], params);
+    console.log("data", data)
     return data;
   } catch (error: any) {
     return error?.response;

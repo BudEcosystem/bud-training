@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Title, Text } from '@tremor/react';
+import { Card, Title } from '@tremor/react';
 import { TrashIcon } from '@heroicons/react/24/outline'
 import { PlayIcon, StopIcon } from '@heroicons/react/24/solid'
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import { deleteInference, getInference, startInference, stopInference } from '..
 import { showToast } from '../../services/toast-service';
 import ConfirmDialog from '../components/confirm-dialog';
 import InferenceDetail from './inference-detail';
+import { Heading, Section, Box, Table, Text} from '@radix-ui/themes';
 
 
 export default function Inference() {
@@ -111,8 +112,9 @@ export default function Inference() {
     <div className="pb-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <Title>Inference</Title>
-          <Text>A list of all the running models in the workspace</Text>
+          <Heading weight='medium' size='8' style={{color: 'var(--color-primary)'}}>Inference</Heading>
+
+          {/* <Text>A list of all the running models in the workspace</Text> */}
         </div>
         <div className="mt-4 flex">
         <button
@@ -132,60 +134,53 @@ export default function Inference() {
         </div>
       </div>
       <div className="mt-8 flow-root">
-        <Card>
-
-          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0"
-                    >
-                      Model Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Running Time
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Status
-                    </th>
-                    <th scope="col" className="relative py-3 pl-3 pr-4 sm:pr-0">
+      <Box className='flex flex-col	justify-center items-center	pb-2 rounded-xl my-8 bg-[var(--nav-bg)]'  style={{boxShadow:'var(--shadow-4)'}}>
+        <Section className="mt-2 w-full" p='0' >
+          {/* <TableModel data={users} />           */}
+          <Table.Root size='3' className="rounded-lg overflow-x-hidden radixTable">
+                <Table.Header>
+                  <Table.Row >
+                    <Table.ColumnHeaderCell>
+                    Model Name
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Running Time
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
+                    Status
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
                       <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                    </Table.ColumnHeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
                   {inferences.map((item: any) => (
-                    <tr key={item.model_id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                        {item.model?.name}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{getTimeDifference(item.modified_at, item.stopped_at, item.status)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {item.status_alias}
-                      </td>
-                      <td className="relative flex items-center justify-end whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
-                        {(item.status == 1 && item.model.family == 1) && <a href={item.endpoint} target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
+                    <Table.Row key={item.model_id}>
+                      <Table.Cell >
+                      {item.model?.name}
+                      </Table.Cell>
+                      <Table.Cell>
+                      {getTimeDifference(item.modified_at, item.stopped_at, item.status)}
+                      </Table.Cell>
+                      <Table.Cell>
+                      {item.status_alias}
+                      </Table.Cell>
+                      <Table.Cell className="relative flex whitespace-nowrap">
+                      {(item.status == 1 && item.model.family == 1) && <a href={item.endpoint} target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
                         {(item.status == 1 && item.model.family == 0) && <a href='http://216.48.187.144:7860/' target='_blank' className='rounded-md bg-indigo-600 px-3 py-1 text-white text-xs mr-2 hover:bg-indigo-500'>View</a>}
                         {item.status == 0 && <PlayIcon onClick={() => startItem(item)} className="h-4 w-4 mr-2 text-green-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
                         {item.status == 1 && <StopIcon onClick={() => stopItem(item)} className="h-4 w-4 mr-2 text-red-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />}
                         <TrashIcon onClick={() => { setToRemove(item); setShowConfirm(true) }} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
-                      </td>
-                    </tr>
+                      </Table.Cell>
+                    </Table.Row>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </Card>
+                </Table.Body>
+              </Table.Root>
+              {!inferences.length && <p className='flex justify-center w-full pt-2'>No data available</p>}
+
+        </Section>
+        </Box>
       </div>
       <InferenceDetail open={openDetail} data={selected} onClose={() => getAllInferences()}></InferenceDetail>
       <ConfirmDialog show={showConfirm} hide={() => setShowConfirm(false)} confirmed={(item: any) => deleteItem(item)} selected={toRemove} title="Delete model" message="Are you sure you want to delete the model? The model will be permanently removed from our servers forever. This action cannot be undone."></ConfirmDialog>

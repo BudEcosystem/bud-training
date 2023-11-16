@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import Dropdown from "../../../dropdown";
+import Dropdown from "../../../components/dropdown";
 
 export default function BoolField(props: any) {
 

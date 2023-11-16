@@ -4,7 +4,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-import Dropdown from '../dropdown'
+import Dropdown from '../components/dropdown'
 import { addModel, updateModel } from '../../services/common-service'
 import { showToast } from '../../services/toast-service'
 import Loading from '../loading'
@@ -115,7 +115,7 @@ export default function ModelDetail(props: any) {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                                    <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-[var(--color-page-background)] shadow-xl">
                                         <div className="h-0 flex-1 overflow-y-auto">
                                             <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                                                 <div className="flex items-center justify-between">
@@ -146,7 +146,7 @@ export default function ModelDetail(props: any) {
                                                         <div>
                                                             <label
                                                                 htmlFor="project-name"
-                                                                className="block text-sm font-medium leading-6 text-gray-900"
+                                                                className="block text-sm font-medium leading-6"
                                                             >
                                                                 Model Name
                                                             </label>
@@ -157,7 +157,7 @@ export default function ModelDetail(props: any) {
                                                                     id="project-name"
                                                                     value={name}
                                                                     onChange={(event) => setName(event?.target.value)}
-                                                                    className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                    className="bg-transparent block w-full rounded-md border-0 py-1.5 px-2.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
                                                         </div>
@@ -174,7 +174,7 @@ export default function ModelDetail(props: any) {
                                                         <div>
                                                             <label
                                                                 htmlFor="source-name"
-                                                                className="block text-sm font-medium leading-6 text-gray-900"
+                                                                className="block text-sm font-medium leading-6"
                                                             >
                                                                 Path
                                                             </label>
@@ -186,7 +186,7 @@ export default function ModelDetail(props: any) {
                                                                     disabled={modelId != null}
                                                                     value={source}
                                                                     onChange={(event) => setSource(event?.target.value)}
-                                                                    className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                    className="bg-transparent block w-full rounded-md border-0 py-1.5 px-2.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
                                                         </div>

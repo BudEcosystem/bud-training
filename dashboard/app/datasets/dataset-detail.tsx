@@ -1,13 +1,15 @@
 
+import React from 'react';
 import { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline'
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-import Dropdown from '../dropdown'
+import Dropdown from '../components/dropdown'
 import { addDataset, updateDataset } from '../../services/common-service'
 import { showToast } from '../../services/toast-service'
 import Loading from '../loading'
+import { Heading, Section, Box, Table, Text} from '@radix-ui/themes';
 
 export default function DatasetDetail(props: any) {
 
@@ -52,12 +54,12 @@ export default function DatasetDetail(props: any) {
     }, [props.open])
 
     useEffect(() => {
-        
+        console.log(props.data);
         setDatasetId(props.data['dataset_id'])
         setName(props.data['name'])
         if (props.data['type'] || props.data['type'] == 0) setContentType(props.data['type'])
         if (props.data['source_type'] || props.data['source_type'] == 0) setSourceType(props.data['source_type'])
-        setSource(props.data['source'])
+        setSource(props.data['source'] ? props.data['source'] : '')
         setFiles([])
         setImageFiles([])
 
@@ -162,7 +164,7 @@ export default function DatasetDetail(props: any) {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                                    <div className="relative flex h-full flex-col divide-y divide-gray-200 bg-[var(--color-page-background)] shadow-xl">
                                         <div className="h-0 flex-1 overflow-y-auto">
                                             <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                                                 <div className="flex items-center justify-between">
@@ -172,7 +174,7 @@ export default function DatasetDetail(props: any) {
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
                                                             type="button"
-                                                            className="relative rounded-md bg-indigo-700 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                                                            className="relative rounded-md bg-indigo-700 text-indigo-200 hover:text-text-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-white"
                                                             onClick={() => setOpen(false)}
                                                         >
                                                             <span className="absolute -inset-2.5" />
@@ -193,7 +195,7 @@ export default function DatasetDetail(props: any) {
                                                         <div>
                                                             <label
                                                                 htmlFor="project-name"
-                                                                className="block text-sm font-medium leading-6 text-gray-900"
+                                                                className="block text-sm font-medium leading-6"
                                                             >
                                                                 Dataset Name
                                                             </label>
@@ -204,7 +206,7 @@ export default function DatasetDetail(props: any) {
                                                                     id="project-name"
                                                                     value={name}
                                                                     onChange={(event) => setName(event?.target.value)}
-                                                                    className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                    className="bg-transparent block w-full rounded-md border-0 py-1.5 px-2.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
                                                         </div>
@@ -221,7 +223,7 @@ export default function DatasetDetail(props: any) {
                                                             <div>
                                                                 <label
                                                                     htmlFor="source-name"
-                                                                    className="block text-sm font-medium leading-6 text-gray-900"
+                                                                    className="block text-sm font-medium leading-6 "
                                                                 >
                                                                     Huggingface name
                                                                 </label>
@@ -233,14 +235,14 @@ export default function DatasetDetail(props: any) {
                                                                         disabled={datasetId != null}
                                                                         value={source}
                                                                         onChange={(event) => setSource(event?.target.value)}
-                                                                        className="block w-full rounded-md border-0 py-1.5 px-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                        className="bg-transparent block w-full rounded-md border-0 py-1.5 px-2.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                                                     />
                                                                 </div>
                                                             </div>
                                                         }
                                                         {(sourceType == 1 && !datasetId) &&
                                                             <div className="col-span-full">
-                                                                <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 ">
                                                                     JSON file
                                                                 </label>
                                                                 {files.length < 1 && <div className="relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 hover:bg-indigo-100 hover:border-indigo-600"
@@ -251,7 +253,7 @@ export default function DatasetDetail(props: any) {
                                                                         <div className="mt-4 flex text-sm leading-6 text-gray-600">
                                                                             <label
                                                                                 htmlFor="file-upload"
-                                                                                className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                                                                                className="relative cursor-pointer rounded-md font-semibold  focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                                                                             >
                                                                                 <span>Upload a file</span>
                                                                             </label>
@@ -277,7 +279,7 @@ export default function DatasetDetail(props: any) {
                                                         }
                                                         {(sourceType == 1 && contentType == 1 && !datasetId) &&
                                                             <div className="col-span-full">
-                                                                <label htmlFor="cover-photo" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                <label htmlFor="cover-photo" className="block text-sm font-medium leading-6">
                                                                     Image archive
                                                                 </label>
                                                                 {imageFiles.length < 1 && <div className="relative mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-6 hover:bg-indigo-100 hover:border-indigo-600"
@@ -319,7 +321,7 @@ export default function DatasetDetail(props: any) {
                                         <div className="flex flex-shrink-0 justify-end px-4 py-4">
                                             <button
                                                 type="button"
-                                                className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                                                className="rounded-md bg-[var(--color-page-background)] px-3 py-2 text-sm font-semibold hover:text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                                 onClick={() => setOpen(false)}
                                             >
                                                 Cancel

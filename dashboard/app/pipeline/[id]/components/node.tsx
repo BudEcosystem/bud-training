@@ -3,9 +3,9 @@ import { Handle, Position } from 'reactflow';
 import { TrashIcon, BeakerIcon, ChartBarIcon, CircleStackIcon } from "@heroicons/react/24/outline"
 
 export default function Node(data: any){
-    // console.log(data)
+  console.log(data)
     return(
-        <div className='card border border-indigo-900 rounded py-1 pl-1 pr-1 text-xs bg-white '>
+        <div className='card border border-indigo-900 rounded py-0.5 pl-1 pr-1 text-xs bg-[var(--color-page-background)]'>
             <Handle
                 type="target"
                 position={Position.Left}
@@ -15,7 +15,7 @@ export default function Node(data: any){
                 // isConnectable={isConnectable}
             />
             <div className='flex justify-between items-center text-[8px]'>
-                <p className='flex items-center pr-1 '>
+                <p className='flex items-center pt-0.5 pr-1 pl-0.5 '>
                     
                     {data.data.category == "Training" && <BeakerIcon
                       className="h-3 w-3 mr-1 shrink-0 text-indigo-500"
@@ -30,7 +30,7 @@ export default function Node(data: any){
                       aria-hidden="true"
                     />}
                     {data.data.node_name}</p>
-                <div className='deleteButton group rounded-full bg-gray-200 p-1 cursor-pointer hover:bg-indigo-500'>
+                <div className='deleteButton group rounded-full bg-indigo-500 p-1 cursor-pointer hover:bg-indigo-900'>
                     <TrashIcon
                       className="h-2.5 w-2.5 shrink-0 group-hover:text-white"
                       aria-hidden="true"

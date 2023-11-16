@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDatasets } from "../../../../services/common-service";
-import Dropdown from "../../../dropdown";
+import Dropdown from "../../../components/dropdown";
 
 
 export default function DatasetField(props: any){

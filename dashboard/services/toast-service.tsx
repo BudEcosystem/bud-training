@@ -1,6 +1,6 @@
 import { CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { toast } from "react-toastify";
-import ToastComponent from "../app/toast";
+import ToastComponent from "../app/components/toast";
 
 export async function showToast(type: string, title: string, message: string) {
     const options = {

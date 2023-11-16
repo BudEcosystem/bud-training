@@ -1,6 +1,6 @@
 'use client';
-
-import { Card, Title, Text } from '@tremor/react';
+import React from 'react';
+import { Card, Title } from '@tremor/react';
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline'
 import PipelineDetail from './pipeline-detail';
 import { useEffect, useState } from 'react';
@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation';
 import { deletePipeline, getPipeline } from '../../services/common-service';
 import { showToast } from '../../services/toast-service';
 import ConfirmDialog from '../components/confirm-dialog';
-import Search from '../search';
+import Search from '../components/search';
+import { Heading, Section, Box, Table, Text} from '@radix-ui/themes';
+
 
 
 
@@ -39,7 +41,7 @@ export default function Pipeline() {
   }
 
   const goToView = (item: any) => {
-    router.push('/pipeline/' + item.pipeline_id)
+    router.push('/pipeline/' + item.id)
   }
 
   async function getAllPipelines() {
@@ -81,8 +83,8 @@ export default function Pipeline() {
     <div className="pb-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <Title>Pipeline</Title>
-          <Text>A list of all the available pipelines in the workspace</Text>
+          <Heading weight='medium' size='8' style={{color: 'var(--color-primary)'}}>Pipeline</Heading>
+          {/* <Text>A list of all the available pipelines in the workspace</Text> */}
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <button
@@ -95,48 +97,38 @@ export default function Pipeline() {
         </div>
       </div>
       <div className="mt-8 flow-root">
-        <Card>
-
-          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0"
-                    >
+      <Box className='flex flex-col	justify-center items-center	pb-2 rounded-xl my-8 bg-[var(--nav-bg)]'  style={{boxShadow:'var(--shadow-4)'}}>
+        <Section className="mt-2 w-full" p='0' >
+          {/* <TableModel data={users} />           */}
+          <Table.Root size='3' className="rounded-lg overflow-x-hidden radixTable">
+                <Table.Header>
+                  <Table.Row >
+                    <Table.ColumnHeaderCell>
                       Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
-                    >
-                      Updated Time
-                    </th>
-                    <th scope="col" className="relative py-3 pl-3 pr-4 sm:pr-0">
+                    </Table.ColumnHeaderCell>
+                    <Table.ColumnHeaderCell>
                       <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                    </Table.ColumnHeaderCell>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
                   {models.map((item: any) => (
-                    <tr key={item.model_id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                        {item.name}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{getTimeFormat(item?.modified_at)}</td>
-                      <td className="relative flex whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm sm:pr-0">
-                        <PencilIcon onClick={() => goToView(item)} className="h-4 w-4 mr-2 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
+                    <Table.Row key={item.id}>
+                      <Table.Cell >
+                        {item.agent_name}
+                      </Table.Cell>
+                      <Table.Cell className="relative flex justify-center  whitespace-nowrap">
+                        <div style={{'display': 'flex'}}>
+                        <PencilIcon onClick={() => goToView(item)} className="h-4 w-4 mr-8 text-gray-400 cursor-pointer hover:text-indigo-500" aria-hidden="true" />
                         <TrashIcon onClick={() => {setToRemove(item); setShowConfirm(true)}} className="h-4 w-4 text-gray-400 cursor-pointer hover:text-red-600" aria-hidden="true" />
-                      </td>
-                    </tr>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </Card>
+                </Table.Body>
+              </Table.Root>
+        </Section>
+        </Box>
       </div>
       <PipelineDetail open={openDetail} data={selected} onClose={() => getAllPipelines()}></PipelineDetail>
       <ConfirmDialog show={showConfirm} hide={() => setShowConfirm(false)} confirmed={(item: any) => deleteItem(item)} selected={toRemove}  title="Delete pipeline" message="Are you sure you want to delete the pipeline? The model will be permanently removed from our servers forever. This action cannot be undone."></ConfirmDialog>

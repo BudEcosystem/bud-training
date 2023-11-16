@@ -1,8 +1,88 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-
+@font-face {
+    font-family: 'helvetica';
+    src: url('./assets/fonts/helvetica/helvetica-neue-lt-std-45-light-58d9f5e1d7940.otf') format('otf');
+    font-weight: 300;
+    font-style: light;
+  }
+  
+  @font-face {
+    font-family: 'helvetica';
+    src: url('./assets/fonts/helvetica/helvetica-neue-lt-std-65-medium-58d9f688d5de1.otf') format('otf');
+    font-weight: 400;
+    font-style: regular;
+  }
+  
+  @font-face {
+    font-family: 'helvetica';
+    src: url('./assets/fonts/helvetica/helvetica-neue-lt-std-95-black-58d9f6c915bda.otf') format('otf');
+    font-weight: 500;
+    font-style: medium;
+  }
+/* @import '@radix-ui/colors/gray.css'; */
+@import '@radix-ui/colors/blue.css';
+@import '@radix-ui/colors/green.css';
+@import '@radix-ui/colors/red.css';
+@import '@radix-ui/colors/indigo.css';
+@import '@radix-ui/colors/gray-dark.css';
+@import '@radix-ui/colors/blue-dark.css';
+@import '@radix-ui/colors/green-dark.css';
+@import '@radix-ui/colors/red-dark.css';
+/* --indigo {
+    --indigo-1: hsl(225, 60.0%, 99.4%);
+    --indigo-2: hsl(223, 100%, 98.6%);
+    --indigo-3: hsl(223, 98.4%, 97.1%);
+    --indigo-4: hsl(223, 92.9%, 95.0%);
+    --indigo-5: hsl(224, 87.1%, 92.0%);
+    --indigo-6: hsl(224, 81.9%, 87.8%);
+    --indigo-7: hsl(225, 77.4%, 82.1%);
+    --indigo-8: hsl(226, 75.4%, 74.5%);
+    --indigo-9: hsl(226, 70.0%, 55.5%);
+    --indigo-10: hsl(226, 58.6%, 51.3%);
+    --indigo-11: hsl(226, 55.0%, 45.0%);
+    --indigo-12: hsl(226, 50.0%, 24.0%);
+} */
+:root {
+    --panel: white;
+    --panelContrast: var(--black-a11);
+    --shadow: var(--slate-a3);
+    --overlay: var(--black-a8);
+    --color-primary: var(--gray-12);
+    --color-white: var(--panel);
+    --nav-bg: white;
+    --nav-btn-bg: #00FFFFFF;
+    --nav-btn-bg-active: var(--indigo-5);
+    --nav-text: var(--color-primary);
+  }
+  
+  .dark {
+    /* Remap your colors for dark mode */
+    --panel: var(--slate-2);
+    --panelContrast: var(--white-a11);
+    --shadow: black;
+    --overlay: var(--black-a12);
+    --color-primary: var(--accent-12);
+    --nav-bg: rgb(30, 30, 30);
+    --nav-btn-bg: #000000;
+    --nav-btn-bg-active: #000000;
+    --nav-text: var(--color-primary);
+    --color-fix: white !important;
+  }
+  .light {
+    --color-fix: black !important;
+    /* --panel: var(--slate-2);
+    --panelContrast: var(--white-a11);
+    --shadow: black;
+    --overlay: var(--black-a12);
+    --color-primary: var(--accent-12);
+    --nav-bg: rgb(30, 30, 30);
+    --nav-btn-bg: #000000;
+    --nav-btn-bg-active: #000000;
+    --nav-text: var(--color-primary); */
+  }
 html{
     --color-background-image-base: #fff; 
     --color-background-image-accent-1: #4f46e5; 
@@ -21,10 +101,23 @@ html{
     --color-background-image-accent-5: var(--slate-1); 
     --color-background-image-accent-6: var(--crimson-a5); 
     --color-background-image-accent-7: var(--indigo-5); */
+    /* font-family: 'helvetica'; */
+}
+.radix-themes {
+    color: black;
+    --default-font-family: 'helvetica' !important;
+    --heading-font-family: 'helvetica' !important;
+    /* ... */
+}
+.dark .radix-themes  {
+    color: white;
 }
 
 body{
     background: #fff;
+}
+.dark body {
+    /* background: black !important;     */
 }
 input{
     outline: none;
@@ -71,4 +164,30 @@ button[data-headlessui-state='disabled']{
     top: 0;
     left: 0;
     z-index: 3;
+}
+.dashboardTable {
+    padding: 0 !important;
+}
+.blackColor {
+    color: black !important;
+}
+.radixTable .rt-TableBody .rt-TableRow:nth-last-child(1) {
+    --table-row-border-bottom: none
+}
+.searchField {
+    background: none !important;
+    background-color: none !important;
+    box-shadow: none !important;
+}
+.searchField div{
+    background: none !important;
+    background-color: none !important;
+    box-shadow: none !important;
+}
+.modelsWrap {
+    overflow-y: auto;
+}
+.radixTable td {
+    display:table-cell;
+    vertical-align:top;
 }
