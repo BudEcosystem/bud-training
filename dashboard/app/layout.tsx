@@ -5,7 +5,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import './globals.css';
-import Nav from './nav';
 import Toast from './components/toast';
 import HomeLayout from './home-layout';
 import Background from './background';

@@ -1,21 +1,5 @@
-// import {
-//   Table,
-//   TableHead,
-//   TableRow,
-//   TableHeaderCell,
-//   TableBody,
-//   TableCell,
-//   Text
-// } from '@tremor/react';
-
-// interface User {
-//   id: number;
-//   name: string;
-//   username: string;
-//   email: string;
-// }
-
 import { Box, Flex, Table, Text } from '@radix-ui/themes';
+import { User } from 'next-auth';
 
 export default async function UsersTable({ users }: { users: User[] }) {
   return (
@@ -57,7 +41,7 @@ export default async function UsersTable({ users }: { users: User[] }) {
             <Table.RowHeaderCell>{user.id}</Table.RowHeaderCell>
             <Table.RowHeaderCell>{user.name}</Table.RowHeaderCell>
             <Table.Cell>
-              <Text>{user.username}</Text>
+              {/* <Text>{user.username}</Text> */}
             </Table.Cell>
             <Table.Cell>
               <Text>{user.email}</Text>
