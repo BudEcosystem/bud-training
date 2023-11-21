@@ -394,6 +394,11 @@ export default function Canvas(props: any) {
             return;
         }
         setSelected(node)
+        console.log("node", node)
+        console.log(showNodeDetails)
+        console.log(onUpdateProperties)
+        console.log(selected)
+        // console.log(showNotebook)
         if(node.data.category_id == 2){
             setShowNotebook(!showNotebook)
         } else {

@@ -12,7 +12,7 @@ export default function ComponentDetail(props: any) {
   const nodeSchema = {
     node_name: '',
     description: '',
-    properties: []
+    inputs: []
   }
 
   const [open, setOpen] = useState(false)
@@ -28,13 +28,13 @@ export default function ComponentDetail(props: any) {
   }, [props.open])
 
   useEffect(() => {
-    console.log(props.selected?.data)
     if (props.selected?.data) setNode(props.selected?.data)
+    console.log(node.inputs)
   }, [props.selected])
 
   const updateProperty = (item: any, value: any) => {
 
-    for (let prop of node.properties) {
+    for (let prop of node.Z) {
       if (prop.name == item) {
 
         prop.default = value
@@ -46,7 +46,7 @@ export default function ComponentDetail(props: any) {
     props.onSave(node)
     setOpen(false)
   }
-
+  
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -65,7 +65,7 @@ export default function ComponentDetail(props: any) {
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                  <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                  <form className="flex h-full flex-col divide-y divide-gray-200 bg-[var(--color-page-background)] shadow-xl">
                     <div className="h-0 flex-1 overflow-y-auto">
                       <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                         <div className="flex items-center justify-between">
@@ -93,15 +93,24 @@ export default function ComponentDetail(props: any) {
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="divide-y divide-gray-200 px-4 sm:px-6">
                           <div className="space-y-6 pb-5 pt-6">
-                            {node?.properties.map((item: any, index: any) => (
+                            {node?.inputs.map((item: any, index: any) => (
                               <div key={index}>
-                                {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == null && <TextField label={item.label} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == "string" && <TextField label={item.label} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == "secret" && <TextField label={item.label} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {item.type == "env" && <TextField label={item.label} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
+                                {/* {item.type == 3 && <BoolField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></BoolField>}
+                                {item.type == 4 && <ListField label={item.title} default={item.default} name={item.name} options={item.options} onChange={updateProperty}></ListField>}
+                                {item.type == 5 && <DatasetField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></DatasetField>}
+                                {item.type == 6 && <ModelField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></ModelField>} */}
+                                {/* old */}
+                                {/* {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
                                 {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
                                 {item.type == 2 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
                                 {item.type == 3 && <BoolField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></BoolField>}
                                 {item.type == 4 && <ListField label={item.title} default={item.default} name={item.name} options={item.options} onChange={updateProperty}></ListField>}
                                 {item.type == 5 && <DatasetField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></DatasetField>}
-                                {item.type == 6 && <ModelField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></ModelField>}
+                                {item.type == 6 && <ModelField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></ModelField>} */}
                               </div>
                             ))}
 

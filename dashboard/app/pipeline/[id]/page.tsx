@@ -122,7 +122,7 @@ export default function PipelineView({ params }: { params: { id: string } }) {
 
     return (
         <div className="-mt-10 -mx-8 h-full">
-            <div className="sticky top-14 z-10 flex justify-between items-center px-5 text-sm border-b-gray">
+            <div className="sticky z-10 flex justify-between items-center px-5 text-sm border-b-gray">
                 <div className="flex items-center">
                     <div>{details.name}</div>
                     <div className="mt-4 sm:ml-10 sm:mt-0">

@@ -13,7 +13,7 @@ export default function NotebookView(props: any) {
   const nodeSchema = {
     node_name: '',
     description: '',
-    properties: []
+    inputs: []
   }
 
   const [open, setOpen] = useState(false)
@@ -35,6 +35,7 @@ export default function NotebookView(props: any) {
     if (props.selected?.data) setNode(props.selected?.data)
     if (props.selected?.data?.category_id == 2) initiateNotebook()
     if (props.selected?.data?.outputs[0].value) initiateNotebook()
+    console.log(node);
   }, [props.selected])
 
   const initiateNotebook = async () => {
@@ -57,7 +58,7 @@ export default function NotebookView(props: any) {
 
   const updateProperty = (item: any, value: any) => {
 
-    for (let prop of node.properties) {
+    for (let prop of node.inputs) {
       if (prop.name == item) {
 
         prop.default = value
@@ -117,7 +118,7 @@ export default function NotebookView(props: any) {
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="divide-y divide-gray-200 px-4 sm:px-6">
                           <div className="space-y-6 pb-5 pt-6">
-                            {node?.properties.map((item: any, index: any) => (
+                            {node?.inputs.map((item: any, index: any) => (
                               <div key={index}>
                                 {item.type == 0 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
                                 {item.type == 1 && <TextField label={item.title} default={item.default} name={item.name} onChange={updateProperty}></TextField>}
