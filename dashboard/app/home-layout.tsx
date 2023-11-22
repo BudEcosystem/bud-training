@@ -76,7 +76,9 @@ export default function HomeLayout({
     console.log("click")
     window.history.go(-1); return false;
   };
-  const { theme = 'dark' } = useTheme();
+  const theme = useTheme();
+  const Logo = theme.theme == 'dark' ? logoWhite : logoBlack;
+  console.log(theme, Logo);
   return (
     <>
       <div className="h-screen w-full fixed">
@@ -109,7 +111,7 @@ export default function HomeLayout({
           </div>
           <div className="sticky top-0 z-40 flex h-14 shrink-0 items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8 justify-center">
             <div className="flex h-14 shrink-0 items-center justify-center logo-wrap ">
-              <Image className="h-8 w-auto" src={theme == 'dark' ? logoWhite : logoBlack} alt="Bud" />
+              <Image className="h-8 w-auto" src={Logo} alt="Bud" />
               {/* <p>Bud</p> */}
             </div>
             {/* Separator */}
